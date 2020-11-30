@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: config-service
+
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: "file:${CONFIG_FILE_PATH}"
+
+  security:
+    user:
+      name: ${services.config-service.username}
+      password: ${services.config-service.password}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh
+
+server:
+  port: 8010

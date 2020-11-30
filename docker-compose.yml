@@ -1,0 +1,7 @@
+version: "3"
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    container_name: cloud-bank-rabbit
+    ports:
+      - 5672:5672

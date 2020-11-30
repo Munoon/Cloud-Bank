@@ -1,0 +1,19 @@
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+services:
+  config-service:
+    username: test
+    password: test
+  discovery-service:
+    username: user
+    password: pass
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: "http://${services.discovery-service.username}:${services.discovery-service.password}@localhost:8761/eureka"

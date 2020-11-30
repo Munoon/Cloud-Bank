@@ -1,0 +1,15 @@
+server:
+  port: 8761
+
+spring:
+  security:
+    user:
+      name: ${services.discovery-service.username}
+      password: ${services.discovery-service.password}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
