@@ -5,6 +5,12 @@ spring:
     username: guest
     password: guest
 
+databases:
+  users:
+    url: jdbc:postgresql://localhost:5432/bank-users
+    username: postgres
+    password: password
+
 services:
   config-service:
     username: test

@@ -1,0 +1,14 @@
+server:
+  port: 8030
+  servlet:
+    context-path: /uaa
+
+spring:
+  datasource:
+    url: ${databases.users.url}
+    username: ${databases.users.username}
+    password: ${databases.users.password}
+    driver-class-name: org.postgresql.Driver
+    schema: classpath:db/schema.sql
+    data: classpath:db/data.sql
+    initialization-mode: always

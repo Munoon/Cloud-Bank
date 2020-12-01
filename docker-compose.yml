@@ -5,3 +5,12 @@ services:
     container_name: cloud-bank-rabbit
     ports:
       - 5672:5672
+
+  postgres:
+    image: postgres:13.0
+    container_name: cloud-bank-postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bank-users
