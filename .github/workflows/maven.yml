@@ -10,8 +10,8 @@ jobs:
         ports:
           - 5432:5432
         env:
-          - POSTGRES_PASSWORD=password
-          - POSTGRES_DB=bank-users
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: bank-users
 
     steps:
       - uses: actions/checkout@v1
