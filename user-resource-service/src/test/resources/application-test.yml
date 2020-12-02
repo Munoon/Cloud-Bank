@@ -7,6 +7,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/bank-users
     username: postgres
     password: password
+    initialization-mode: always
+    schema: classpath:db/schema.sql
+    data: classpath:db/data.sql
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        keyValue: SimpleKey
 
 eureka:
   client:

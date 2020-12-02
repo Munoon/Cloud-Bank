@@ -13,6 +13,7 @@
         <module>config-service</module>
         <module>discovery-service</module>
         <module>auth-service</module>
+        <module>user-resource-service</module>
     </modules>
 
     <properties>
@@ -21,6 +22,9 @@
         <spring-cloud.version>2020.0.0-M5</spring-cloud.version>
         <mapstruct.version>1.3.1.Final</mapstruct.version>
         <common.version>1.0-SNAPSHOT</common.version>
+        <kotlin.version>1.4.10</kotlin.version>
+        <mapstruct.kotlin.processor>1.4.0.0</mapstruct.kotlin.processor>
+        <maven.compiler-plugin.version>3.8.1</maven.compiler-plugin.version>
     </properties>
 
     <parent>

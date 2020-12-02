@@ -1,0 +1,19 @@
+server:
+  port: 0
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        keyValue: ${jwt.keyValue}
+
+spring:
+  application:
+    name: user-resource-service
+
+  datasource:
+    url: ${databases.users.url}
+    username: ${databases.users.username}
+    password: ${databases.users.password}
+    driver-class-name: org.postgresql.Driver
+    initialization-mode: never

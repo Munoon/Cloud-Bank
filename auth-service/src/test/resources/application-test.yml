@@ -1,0 +1,27 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank-users
+    username: postgres
+    password: password
+    initialization-mode: always
+
+oauth2:
+  clients:
+    - id: web
+      secret: "{noop}password"
+      redirectUri: http://localhost:8080/login
+      authorizedGrantTypes:
+        - authorization_code
+        - refresh_token
+      scopes: user_info
+      autoApprove: true
+      accessTokenValiditySeconds: 3600
+      refreshTokenValiditySeconds: 86400
+
+eureka:
+  client:
+    enabled: false

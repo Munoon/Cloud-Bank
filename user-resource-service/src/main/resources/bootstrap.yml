@@ -1,7 +1,7 @@
 spring:
   cloud:
     config:
-      name: auth-service
+      name: user-resource-service
       uri: "http://localhost:8010"
       username: test
       password: test

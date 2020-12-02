@@ -7,6 +7,8 @@ spring:
       server:
         native:
           search-locations: "file:${CONFIG_FILE_PATH}"
+        git:
+          search-paths: "{application}"
 
   security:
     user:

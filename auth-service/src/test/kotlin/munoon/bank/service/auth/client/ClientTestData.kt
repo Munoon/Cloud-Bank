@@ -1,0 +1,24 @@
+package munoon.bank.service.auth.client
+
+object ClientTestData {
+    const val DEFAULT_CLIENT_ID = "web"
+    const val DEFAULT_CLIENT_SECRET = "{noop}password"
+    const val DEFAULT_CLIENT_REDIRECT_URL = "http://localhost:8080/login"
+    const val DEFAULT_CLIENT_AUTHORIZED_GRANT_TYPE_1 = "authorization_code"
+    const val DEFAULT_CLIENT_AUTHORIZED_GRANT_TYPE_2 = "refresh_token"
+    const val DEFAULT_CLIENT_SCOPE = "user_info"
+    const val DEFAULT_CLIENT_AUTO_APPROVE = true
+    const val DEFAULT_CLIENT_ACCESS_TOKEN_VALIDITY_SECONDS = 3600
+    const val DEFAULT_CLIENT_REFRESH_TOKEN_VALIDITY_SECONDS = 86400
+
+    val DEFAULT_CLIENT_CONFIGURATION = OAuth2Clients.ClientConfiguration(
+            DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET,
+            setOf(DEFAULT_CLIENT_REDIRECT_URL),
+            setOf(DEFAULT_CLIENT_AUTHORIZED_GRANT_TYPE_1, DEFAULT_CLIENT_AUTHORIZED_GRANT_TYPE_2),
+            setOf(DEFAULT_CLIENT_SCOPE), DEFAULT_CLIENT_AUTO_APPROVE,
+            DEFAULT_CLIENT_ACCESS_TOKEN_VALIDITY_SECONDS,
+            DEFAULT_CLIENT_REFRESH_TOKEN_VALIDITY_SECONDS
+    )
+
+    val DEFAULT_CLIENT = CustomClientDetails(DEFAULT_CLIENT_CONFIGURATION)
+}

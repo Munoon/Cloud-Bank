@@ -10,6 +10,19 @@ databases:
     url: jdbc:postgresql://localhost:5432/bank-users
     username: postgres
     password: password
+    initialization-mode: always
+
+jwt:
+  keyValue: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkS82g+/yvGzR9i0DwUlp
+    FYiyZE6EsBKIL9UnQHkBfRva4xvDjfSdFbG1rEf337NAFnzUjPYrfHTtvZ6Zf7k/
+    8ZhMyiJnL153rXPM66caO7cSAafin2w67CsC61Gl7unOsYlGi8wxah5G3m2LPvcJ
+    Nw7xD9lp/NmPZuSbmMAeFYVUt2EkSZwyF5P6OIVBWXYB9X/54Vp5C6x7UyI2gQJn
+    59lRPbnYkK92iV7KFefh5cjK5jxmHksm+06Nt6iew7QmLJRzRvnorw7kBylxueMd
+    AGLA436592E/EpL+wI+bnXtyfYI4abhdOyy6VbVs5z0JeBL8wfHzKfE5XVq5dIfW
+    mwIDAQAB
+    -----END PUBLIC KEY-----
 
 services:
   config-service:

@@ -3,7 +3,9 @@ package munoon.bank.service.auth.user
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.user.UserMapper
 import munoon.bank.service.auth.AbstractTest
+import munoon.bank.service.auth.user.UserTestData.USER_ID
 import munoon.bank.service.auth.user.UserTestData.USER_USERNAME
+import munoon.bank.service.auth.util.NotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -27,5 +29,16 @@ internal class UserServiceTest : AbstractTest() {
     @Test
     fun loadUserByUsernameNotFound() {
         assertThrows(UsernameNotFoundException::class.java) { userService.loadUserByUsername("UNKNOWN") }
+    }
+
+    @Test
+    fun getById() {
+        val user = userService.getById(USER_ID)
+        assertThat(user).usingRecursiveComparison().ignoringFields("registered").isEqualTo(DEFAULT_USER)
+    }
+
+    @Test
+    fun getByIdNotFound() {
+        assertThrows(NotFoundException::class.java) { userService.getById(999) }
     }
 }

@@ -3,7 +3,28 @@ server:
   servlet:
     context-path: /uaa
 
+# For generating certificate (alias and passwords in lower case):
+# keytool -genkeypair -alias <jwt.certificate.key.alias>
+#      -keyalg RSA
+#      -keypass <jwt.certificate.key.password>
+#      -keystore <new certificate file name>.jks
+#      -storepass <jwt.certificate.store.password>
+
+# For generating public key from certificate:
+# keytool -list -rfc --keystore <certificate file name>.jks | openssl x509 -inform pem -pubkey
+jwt:
+  certificate:
+    store:
+      file: classpath:/cert/certificate.jks
+      password: "grandstrongpass"
+    key:
+      alias: "bankauthkey"
+      password: "grandstrongpass"
+
 spring:
+  application:
+    name: auth-service
+
   datasource:
     url: ${databases.users.url}
     username: ${databases.users.username}
@@ -11,4 +32,4 @@ spring:
     driver-class-name: org.postgresql.Driver
     schema: classpath:db/schema.sql
     data: classpath:db/data.sql
-    initialization-mode: always
+    initialization-mode: ${databases.users.initialization-mode}
