@@ -49,6 +49,11 @@
             <groupId>munoon.bank</groupId>
             <artifactId>common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.pozo</groupId>
+            <artifactId>mapstruct-kotlin</artifactId>
+            <version>${mapstruct.kotlin.processor.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -111,6 +116,11 @@
                                 <sourceDir>src/main/kotlin</sourceDir>
                             </sourceDirs>
                             <annotationProcessorPaths>
+                                <annotationProcessorPath>
+                                    <groupId>com.github.pozo</groupId>
+                                    <artifactId>mapstruct-kotlin-processor</artifactId>
+                                    <version>${mapstruct.kotlin.processor.version}</version>
+                                </annotationProcessorPath>
                                 <annotationProcessorPath>
                                     <groupId>org.mapstruct</groupId>
                                     <artifactId>mapstruct-processor</artifactId>

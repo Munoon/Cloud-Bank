@@ -1,39 +1,41 @@
 package munoon.bank.service.resource.user.user
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
 import munoon.bank.common.user.UserRoles
 import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
+@KotlinBuilder
 @NoArgsConstructor
 @Table(name = "users")
 data class UserEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Int?,
+        var id: Int?,
 
         @Column(name = "name", nullable = false)
-        val name: String,
+        var name: String,
 
         @Column(name = "surname", nullable = false)
-        val surname: String,
+        var surname: String,
 
         @Column(name = "username", nullable = false)
-        val username: String,
+        var username: String,
 
         @Column(name = "password", nullable = false)
-        val password: String,
+        var password: String,
 
         @Column(name = "registered", nullable = false, columnDefinition = "TIMESTAMP DEFAULT now() NOT NULL")
-        val registered: LocalDateTime,
+        var registered: LocalDateTime,
 
         @JsonInclude
         @Enumerated(EnumType.STRING)
         @Column(name = "role", nullable = false)
-        @CollectionTable(name = "users_role", joinColumns = [JoinColumn(name = "user_id")])
         @ElementCollection(fetch = FetchType.EAGER)
+        @CollectionTable(name = "users_role", joinColumns = [JoinColumn(name = "user_id")])
         val roles: Set<UserRoles>
 ) {
         override fun toString() =

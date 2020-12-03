@@ -23,7 +23,7 @@
         <mapstruct.version>1.3.1.Final</mapstruct.version>
         <common.version>1.0-SNAPSHOT</common.version>
         <kotlin.version>1.4.10</kotlin.version>
-        <mapstruct.kotlin.processor>1.4.0.0</mapstruct.kotlin.processor>
+        <mapstruct.kotlin.processor.version>1.4.0.0</mapstruct.kotlin.processor.version>
         <maven.compiler-plugin.version>3.8.1</maven.compiler-plugin.version>
     </properties>
 

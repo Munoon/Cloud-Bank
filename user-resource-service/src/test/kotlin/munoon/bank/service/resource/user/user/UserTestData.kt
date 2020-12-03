@@ -1,10 +1,13 @@
 package munoon.bank.service.resource.user.user
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import munoon.bank.common.user.User
 import munoon.bank.common.user.UserRoles
 import munoon.bank.common.user.UserTo
 import munoon.bank.service.resource.user.util.JsonUtils
+import munoon.bank.service.resource.user.util.JsonUtils.getContent
 import org.assertj.core.api.Assertions.assertThat
+import org.springframework.data.domain.Page
 import org.springframework.test.web.servlet.ResultMatcher
 import java.time.LocalDateTime
 
@@ -16,5 +19,11 @@ object UserTestData {
     fun contentJson(expected: UserTo) = ResultMatcher {
         val actual = JsonUtils.readFromJson(it, UserTo::class.java)
         assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
+    }
+
+    fun contentJsonPage(vararg expected: UserTo) = ResultMatcher {
+        val node = JsonUtils.OBJECT_MAPPER.readTree(getContent(it)).at("/content")
+        val actual = JsonUtils.OBJECT_MAPPER.readValue<List<UserTo>>(node.toString())
+        assertThat(actual).usingElementComparatorIgnoringFields("registered").isEqualTo(expected.toList())
     }
 }
