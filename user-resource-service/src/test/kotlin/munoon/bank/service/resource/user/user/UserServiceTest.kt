@@ -4,7 +4,9 @@ import munoon.bank.common.user.User
 import munoon.bank.service.resource.user.AbstractTest
 import munoon.bank.service.resource.user.user.UserTestData.DEFAULT_USER
 import munoon.bank.service.resource.user.user.UserTestData.USER_ID
+import munoon.bank.service.resource.user.user.UserTestData.USER_PASSWORD
 import munoon.bank.service.resource.user.user.UserTestData.assertMatch
+import munoon.bank.service.resource.user.util.FieldValidationException
 import munoon.bank.service.resource.user.util.NotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDateTime
+import javax.validation.ValidationException
 
 internal class UserServiceTest : AbstractTest() {
     @Autowired
@@ -72,7 +75,7 @@ internal class UserServiceTest : AbstractTest() {
     }
 
     @Test
-    fun updateUserPassword() {
+    fun updateUserPasswordAdmin() {
         userService.updateUser(USER_ID, AdminUpdateUserPasswordTo("newPassword"))
 
         val userPassword = userService.getById(USER_ID).password
@@ -80,10 +83,57 @@ internal class UserServiceTest : AbstractTest() {
     }
 
     @Test
-    fun updateUserPasswordNotFound() {
+    fun updateUserPasswordAdminNotFound() {
         assertThrows(NotFoundException::class.java) {
             userService.updateUser(999, AdminUpdateUserPasswordTo("newPassword"))
         }
+    }
+
+    @Test
+    fun updateUserPassword() {
+        val newPassword = "newPassword"
+        val userTo = UpdatePasswordTo(newPassword, USER_PASSWORD)
+        userService.updateUser(USER_ID, userTo)
+
+        val actual = userService.getById(USER_ID)
+        assertThat(passwordEncoder.matches(newPassword, actual.password)).isTrue()
+    }
+
+    @Test
+    fun updateUserPasswordNotFound() {
+        val userTo = UpdatePasswordTo("newPassword", USER_PASSWORD)
+        assertThrows(NotFoundException::class.java) { userService.updateUser(999, userTo) }
+    }
+
+    @Test
+    fun updateUserPasswordOldPasswordIncorrect() {
+        val userTo = UpdatePasswordTo("newPassword", "incorrectPassword")
+        val ex = assertThrows(FieldValidationException::class.java) { userService.updateUser(USER_ID, userTo) }
+        assertThat(ex.field).isEqualTo("oldPassword")
+    }
+
+    @Test
+    fun updateUserUsername() {
+        val newUsername = "newUsername"
+        val userTo = UpdateUsernameTo(USER_PASSWORD, newUsername)
+        userService.updateUser(USER_ID, userTo)
+
+        val actual = userService.getById(USER_ID)
+        val expected = User(100, "Nikita", "Ivchenko", newUsername, "", LocalDateTime.now(), DEFAULT_USER.roles)
+        assertMatch(actual, expected)
+    }
+
+    @Test
+    fun updateUserUsernameNotFound() {
+        val userTo = UpdateUsernameTo(USER_PASSWORD, "newUsername")
+        assertThrows(NotFoundException::class.java) { userService.updateUser(999, userTo) }
+    }
+
+    @Test
+    fun updateUserUsernamePasswordIncorrect() {
+        val userTo = UpdateUsernameTo("newPassword", "newUsername")
+        val ex = assertThrows(FieldValidationException::class.java) { userService.updateUser(USER_ID, userTo) }
+        assertThat(ex.field).isEqualTo("password")
     }
 
     @Test

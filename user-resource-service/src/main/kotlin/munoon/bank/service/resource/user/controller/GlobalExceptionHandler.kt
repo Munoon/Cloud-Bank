@@ -2,16 +2,18 @@ package munoon.bank.service.resource.user.controller
 
 import munoon.bank.common.SecurityUtils
 import munoon.bank.common.error.ErrorInfo
+import munoon.bank.common.error.ErrorInfoField
 import munoon.bank.common.error.ErrorType
+import munoon.bank.service.resource.user.util.FieldValidationException
 import munoon.bank.service.resource.user.util.NotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import javax.servlet.http.HttpServletRequest
 
-@ControllerAdvice
+@RestControllerAdvice
 class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
@@ -20,5 +22,12 @@ class GlobalExceptionHandler {
     fun notFoundExceptionHandler(e: NotFoundException, req: HttpServletRequest): ErrorInfo {
         log.warn("Not found exception on request ${req.requestURL} for user ${SecurityUtils.authUserId()}", e)
         return ErrorInfo(req.requestURL, ErrorType.NOT_FOUND, e.message)
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(FieldValidationException::class)
+    fun fieldValidationExceptionHandler(e: FieldValidationException, req: HttpServletRequest): ErrorInfo {
+        log.warn("Field validation exception on request ${req.requestURL} for user ${SecurityUtils.authUserId()}", e)
+        return ErrorInfoField(req.requestURL, mapOf(e.field to listOf(e.message)))
     }
 }

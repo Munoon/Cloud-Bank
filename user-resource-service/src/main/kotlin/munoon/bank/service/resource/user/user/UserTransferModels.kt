@@ -65,4 +65,30 @@ data class AdminUpdateUserPasswordTo(
         @field:NotEmpty
         @field:Length(min = 8)
         val password: String,
-)
+) {
+        override fun toString() = "AdminUpdateUserPasswordTo()"
+}
+
+@NoArgsConstructor
+data class UpdatePasswordTo(
+        @field:NotNull
+        @field:NotEmpty
+        @field:Length(min = 8)
+        val newPassword: String,
+
+        val oldPassword: String
+) {
+        override fun toString() = "UpdatePasswordTo()"
+}
+
+@NoArgsConstructor
+data class UpdateUsernameTo(
+        val password: String,
+
+        @field:NotNull
+        @field:NotEmpty
+        @field:Length(min = 3, max = 20)
+        val newUsername: String
+) {
+        override fun toString() = "UpdateUsernameTo(newUsername='$newUsername')"
+}
