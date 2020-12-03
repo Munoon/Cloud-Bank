@@ -11,7 +11,7 @@ internal class LocalUserMapperTest {
     fun asUser() {
         val entity = UserEntity(100, "Nikita", "Ivchenko", "munoon", "{noop}password", LocalDateTime.now(), hashSetOf(UserRoles.ROLE_COURIER, UserRoles.ROLE_BARMEN, UserRoles.ROLE_TEACHER, UserRoles.ROLE_ADMIN))
         val user = entity.asUser()
-        val expected = User(100, "Nikita", "Ivchenko", "munoon", "{noop}password", LocalDateTime.now(), hashSetOf(UserRoles.ROLE_ADMIN, UserRoles.ROLE_BARMEN, UserRoles.ROLE_COURIER, UserRoles.ROLE_TEACHER))
+        val expected = User(UserTestData.USER)
         assertMatch(user, expected)
     }
 }

@@ -12,7 +12,7 @@ internal class LocalUserMapperTest {
     @Test
     fun asUser() {
         val user = LocalUserMapper.INSTANCE.asUser(DEFAULT_USER_ENTITY)
-        val expected = User(100, "Nikita", "Ivchenko", "munoon", "{noop}password", LocalDateTime.now(), hashSetOf(UserRoles.ROLE_ADMIN, UserRoles.ROLE_BARMEN, UserRoles.ROLE_COURIER, UserRoles.ROLE_TEACHER))
+        val expected = User(UserTestData.DEFAULT_USER)
         assertMatch(user, expected)
     }
 

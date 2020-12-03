@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.LocalDateTime
 import javax.ws.rs.core.MediaType
 
 internal class ProfileControllerTest : AbstractWebTest() {
@@ -63,7 +62,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
     fun updateUsername() {
         val newUsername = "newUsername"
         val userTo = UpdateUsernameTo(UserTestData.USER_PASSWORD, newUsername)
-        val expected = User(100, "Nikita", "Ivchenko", newUsername, "", LocalDateTime.now(), UserTestData.DEFAULT_USER.roles)
+        val expected = User(UserTestData.DEFAULT_USER).apply { username = newUsername }
 
         mockMvc.perform(post("/profile")
                 .contentType(MediaType.APPLICATION_JSON)

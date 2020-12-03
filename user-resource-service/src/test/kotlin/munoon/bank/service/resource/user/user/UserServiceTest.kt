@@ -119,7 +119,7 @@ internal class UserServiceTest : AbstractTest() {
         userService.updateUser(USER_ID, userTo)
 
         val actual = userService.getById(USER_ID)
-        val expected = User(100, "Nikita", "Ivchenko", newUsername, "", LocalDateTime.now(), DEFAULT_USER.roles)
+        val expected = User(DEFAULT_USER).apply { username = newUsername }
         assertMatch(actual, expected)
     }
 

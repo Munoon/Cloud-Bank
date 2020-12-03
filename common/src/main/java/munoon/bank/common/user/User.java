@@ -29,4 +29,8 @@ public class User implements Serializable {
     private LocalDateTime registered;
 
     private Set<UserRoles> roles;
+
+    public User(User u) {
+        this(u.getId(), u.getName(), u.getSurname(), u.getUsername(), u.getPassword(), LocalDateTime.from(u.getRegistered()), Set.copyOf(u.getRoles()));
+    }
 }
