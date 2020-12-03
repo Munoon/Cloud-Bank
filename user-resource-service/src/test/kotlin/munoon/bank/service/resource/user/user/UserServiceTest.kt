@@ -4,6 +4,7 @@ import munoon.bank.common.user.User
 import munoon.bank.service.resource.user.AbstractTest
 import munoon.bank.service.resource.user.user.UserTestData.DEFAULT_USER
 import munoon.bank.service.resource.user.user.UserTestData.USER_ID
+import munoon.bank.service.resource.user.user.UserTestData.assertMatch
 import munoon.bank.service.resource.user.util.NotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -22,8 +23,8 @@ internal class UserServiceTest : AbstractTest() {
 
     @Test
     fun getById() {
-        val user = userService.getById(UserTestData.USER_ID)
-        assertThat(user).usingRecursiveComparison().ignoringFields("registered").isEqualTo(DEFAULT_USER)
+        val user = userService.getById(USER_ID)
+        assertMatch(user, DEFAULT_USER)
     }
 
     @Test
@@ -35,7 +36,7 @@ internal class UserServiceTest : AbstractTest() {
     fun getAll() {
         with(userService.getAll(PageRequest.of(0, 1))) {
             assertThat(totalElements).isEqualTo(1)
-            assertThat(content).usingElementComparatorIgnoringFields("registered").isEqualTo(listOf(DEFAULT_USER))
+            assertMatch(content, DEFAULT_USER)
         }
 
         val emptyRequest = userService.getAll(PageRequest.of(1, 1))
@@ -49,10 +50,8 @@ internal class UserServiceTest : AbstractTest() {
         val createUser = userService.createUser(userTo)
 
         val expected = User(createUser.id, "New", "User", "username", createUser.password, createUser.registered, emptySet())
-        assertThat(userService.getAll(PageRequest.of(0, 10)))
-                .usingElementComparatorIgnoringFields("password", "registered")
-                .isEqualTo(listOf(DEFAULT_USER, expected))
 
+        assertMatch(userService.getAll(PageRequest.of(0, 10)).content, DEFAULT_USER, expected)
         assertThat(passwordEncoder.matches("password", createUser.password)).isTrue()
     }
 
@@ -63,7 +62,7 @@ internal class UserServiceTest : AbstractTest() {
 
         val expected = User(100, "NewName", "NewSurname", "test", "password", LocalDateTime.now(), emptySet())
         val actual = userService.getById(USER_ID)
-        assertThat(actual).usingRecursiveComparison().ignoringFields("password", "registered").isEqualTo(expected)
+        assertMatch(actual, expected)
     }
 
     @Test

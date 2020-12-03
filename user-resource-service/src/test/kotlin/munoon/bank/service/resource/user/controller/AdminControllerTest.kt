@@ -4,7 +4,9 @@ import munoon.bank.common.user.User
 import munoon.bank.common.user.UserTo
 import munoon.bank.service.resource.user.AbstractWebTest
 import munoon.bank.service.resource.user.user.*
+import munoon.bank.service.resource.user.user.UserTestData.DEFAULT_USER
 import munoon.bank.service.resource.user.user.UserTestData.USER_ID
+import munoon.bank.service.resource.user.user.UserTestData.assertMatch
 import munoon.bank.service.resource.user.user.UserTestData.contentJson
 import munoon.bank.service.resource.user.user.UserTestData.contentJsonPage
 import munoon.bank.service.resource.user.util.JsonUtils
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
+import kotlin.math.exp
 
 internal class AdminControllerTest : AbstractWebTest() {
     @Autowired
@@ -32,7 +35,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .param("size", "1")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonPage(UserTestData.DEFAULT_USER.asTo()))
+                .andExpect(contentJsonPage(DEFAULT_USER.asTo()))
 
         mockMvc.perform(get("/admin")
                 .param("page", "1")
@@ -47,7 +50,7 @@ internal class AdminControllerTest : AbstractWebTest() {
         mockMvc.perform(get("/admin/$USER_ID")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(UserTestData.DEFAULT_USER.asTo()))
+                .andExpect(contentJson(DEFAULT_USER.asTo()))
     }
 
     @Test
@@ -71,10 +74,7 @@ internal class AdminControllerTest : AbstractWebTest() {
         val created = JsonUtils.readFromJson(result, UserTo::class.java)
 
         val expected = User(created.id, "New", "User", "username", "password", created.registered, emptySet())
-        assertThat(userService.getAll(PageRequest.of(0, 10)))
-                .usingElementComparatorIgnoringFields("password", "registered")
-                .isEqualTo(listOf(UserTestData.DEFAULT_USER, expected))
-
+        assertMatch(userService.getAll(PageRequest.of(0, 10)).content, DEFAULT_USER, expected)
         assertThat(passwordEncoder.matches("password", userService.getById(created.id).password)).isTrue()
     }
 
@@ -89,7 +89,7 @@ internal class AdminControllerTest : AbstractWebTest() {
 
         val expected = User(100, "NewName", "NewSurname", "test", "password", LocalDateTime.now(), emptySet())
         val actual = userService.getById(USER_ID)
-        assertThat(actual).usingRecursiveComparison().ignoringFields("password", "registered").isEqualTo(expected)
+        assertMatch(actual, expected)
     }
 
     @Test
