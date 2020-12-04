@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import javax.validation.Validator
 
-internal class PageableSizeValidatorTest : AbstractTest() {
+internal class PageableSizeTest : AbstractTest() {
     @Autowired
     private lateinit var validator: Validator
 
