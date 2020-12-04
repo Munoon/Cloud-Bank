@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import javax.ws.rs.core.MediaType
@@ -38,7 +38,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
         val newPassword = "newPassword"
         val userTo = UpdatePasswordTo(newPassword, USER_PASSWORD)
 
-        mockMvc.perform(post("/profile/password")
+        mockMvc.perform(put("/profile/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(userTo))
                 .with(authUser()))
@@ -50,7 +50,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
     @Test
     fun updatePasswordInvalid() {
-        mockMvc.perform(post("/profile/password")
+        mockMvc.perform(put("/profile/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(UpdatePasswordTo("", USER_PASSWORD)))
                 .with(authUser()))
@@ -61,7 +61,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
     @Test
     fun updatePasswordOldPasswordIncorrect() {
-        mockMvc.perform(post("/profile/password")
+        mockMvc.perform(put("/profile/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(UpdatePasswordTo("newPassword", "incorrectPassword")))
                 .with(authUser()))
@@ -76,7 +76,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
         val userTo = UpdateUsernameTo(USER_PASSWORD, newUsername)
         val expected = User(UserTestData.DEFAULT_USER).apply { username = newUsername }
 
-        mockMvc.perform(post("/profile")
+        mockMvc.perform(put("/profile")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(userTo))
                 .with(authUser()))
@@ -89,7 +89,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
     @Test
     fun updateUsernameInvalid() {
-        mockMvc.perform(post("/profile")
+        mockMvc.perform(put("/profile")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(UpdateUsernameTo(USER_PASSWORD, "")))
                 .with(authUser()))
@@ -99,7 +99,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
     @Test
     fun updateUsernamePasswordIncorrect() {
-        mockMvc.perform(post("/profile")
+        mockMvc.perform(put("/profile")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(UpdateUsernameTo("incorrectPassword", "newUsername")))
                 .with(authUser()))

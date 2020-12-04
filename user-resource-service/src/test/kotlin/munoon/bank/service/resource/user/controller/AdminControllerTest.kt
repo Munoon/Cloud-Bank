@@ -131,7 +131,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(userTo))
                 .with(authUser()))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn()
 
         val created = JsonUtils.readFromJson(result, UserTo::class.java)

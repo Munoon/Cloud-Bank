@@ -55,6 +55,7 @@ class AdminController(private val userService: UserService, private val classesP
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     fun createUser(@Valid @RequestBody adminRegisterUserTo: AdminRegisterUserTo): UserTo {
         log.info("Admin ${authUserId()} create user: $adminRegisterUserTo")
         return userService.createUser(adminRegisterUserTo).asTo()

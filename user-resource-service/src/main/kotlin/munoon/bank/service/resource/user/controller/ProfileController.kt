@@ -24,14 +24,14 @@ class ProfileController(private val userService: UserService) {
         return userService.getById(authorizedUser.id).asTo()
     }
 
-    @PostMapping("/password")
+    @PutMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updatePassword(@Valid @RequestBody updatePasswordTo: UpdatePasswordTo) {
         log.info("User ${authUserId()} updated his password")
         userService.updateUser(authUserId(), updatePasswordTo)
     }
 
-    @PostMapping
+    @PutMapping
     fun updateUsername(@Valid @RequestBody updateUsernameTo: UpdateUsernameTo): UserTo {
         log.info("User ${authUserId()} updated his username to '${updateUsernameTo.newUsername}'")
         return userService.updateUser(authUserId(), updateUsernameTo).asTo()
