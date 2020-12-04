@@ -31,4 +31,12 @@ public class SecurityUtils {
     public static int authUserId() {
         return authUser().getId();
     }
+
+    public static String authUserIdOrAnonymous() {
+        try {
+            return authUser().getId().toString();
+        } catch (IllegalArgumentException e) {
+            return "[anonymous]";
+        }
+    }
 }

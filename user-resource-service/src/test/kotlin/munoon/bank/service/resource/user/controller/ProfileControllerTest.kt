@@ -3,6 +3,7 @@ package munoon.bank.service.resource.user.controller
 import munoon.bank.common.user.User
 import munoon.bank.service.resource.user.AbstractWebTest
 import munoon.bank.service.resource.user.user.*
+import munoon.bank.service.resource.user.user.UserTestData.USER_PASSWORD
 import munoon.bank.service.resource.user.user.UserTestData.assertMatch
 import munoon.bank.service.resource.user.user.UserTestData.contentJson
 import munoon.bank.service.resource.user.util.JsonUtils
@@ -35,7 +36,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
     @Test
     fun updatePassword() {
         val newPassword = "newPassword"
-        val userTo = UpdatePasswordTo(newPassword, UserTestData.USER_PASSWORD)
+        val userTo = UpdatePasswordTo(newPassword, USER_PASSWORD)
 
         mockMvc.perform(post("/profile/password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -45,6 +46,17 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
         val actual = userService.getById(UserTestData.USER_ID)
         assertThat(passwordEncoder.matches(newPassword, actual.password)).isTrue()
+    }
+
+    @Test
+    fun updatePasswordInvalid() {
+        mockMvc.perform(post("/profile/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtils.writeValue(UpdatePasswordTo("", USER_PASSWORD)))
+                .with(authUser()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("newPassword"))
     }
 
     @Test
@@ -61,7 +73,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
     @Test
     fun updateUsername() {
         val newUsername = "newUsername"
-        val userTo = UpdateUsernameTo(UserTestData.USER_PASSWORD, newUsername)
+        val userTo = UpdateUsernameTo(USER_PASSWORD, newUsername)
         val expected = User(UserTestData.DEFAULT_USER).apply { username = newUsername }
 
         mockMvc.perform(post("/profile")
@@ -73,6 +85,16 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
         val actual = userService.getById(UserTestData.USER_ID)
         assertMatch(actual, expected)
+    }
+
+    @Test
+    fun updateUsernameInvalid() {
+        mockMvc.perform(post("/profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtils.writeValue(UpdateUsernameTo(USER_PASSWORD, "")))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("newUsername"))
     }
 
     @Test

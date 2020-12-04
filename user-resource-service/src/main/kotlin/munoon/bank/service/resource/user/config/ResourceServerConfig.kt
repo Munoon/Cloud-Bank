@@ -16,7 +16,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter
+import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
+@EnableWebMvc
 @Configuration
 @EnableWebSecurity
 @EnableResourceServer
@@ -31,9 +33,7 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
     }
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder()
-    }
+    fun passwordEncoder(): PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 
     @Bean
     fun accessTokenConverter(jwtAccessTokenConverter: JwtAccessTokenConverter): AccessTokenConverter {
@@ -44,12 +44,10 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
     }
 
     @Bean
-    fun customUserAuthenticationConverter(userService: UserService?): CustomUserAuthenticationConverter {
-        return object : CustomUserAuthenticationConverter() {
-            override fun getAuthorizedUser(userId: Int): AuthorizedUser {
-                val user = userService!!.getById(userId)
-                return AuthorizedUser(user)
-            }
+    fun customUserAuthenticationConverter(userService: UserService?) = object : CustomUserAuthenticationConverter() {
+        override fun getAuthorizedUser(userId: Int): AuthorizedUser {
+            val user = userService!!.getById(userId)
+            return AuthorizedUser(user)
         }
     }
 }

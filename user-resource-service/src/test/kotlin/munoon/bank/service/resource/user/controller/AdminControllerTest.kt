@@ -1,5 +1,6 @@
 package munoon.bank.service.resource.user.controller
 
+import munoon.bank.common.error.ErrorType
 import munoon.bank.common.user.User
 import munoon.bank.common.user.UserTo
 import munoon.bank.service.resource.user.AbstractWebTest
@@ -10,6 +11,9 @@ import munoon.bank.service.resource.user.user.UserTestData.assertMatch
 import munoon.bank.service.resource.user.user.UserTestData.contentJson
 import munoon.bank.service.resource.user.user.UserTestData.contentJsonPage
 import munoon.bank.service.resource.user.util.JsonUtils
+import munoon.bank.service.resource.user.util.ResponseExceptionValidator
+import munoon.bank.service.resource.user.util.ResponseExceptionValidator.error
+import munoon.bank.service.resource.user.util.ResponseExceptionValidator.fieldError
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
-import kotlin.math.exp
 
 internal class AdminControllerTest : AbstractWebTest() {
     @Autowired
@@ -46,6 +49,16 @@ internal class AdminControllerTest : AbstractWebTest() {
     }
 
     @Test
+    fun getUsersListInvalid() {
+        mockMvc.perform(get("/admin")
+                .param("page", "0")
+                .param("size", "30")
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("getUsersList.pageable"))
+    }
+
+    @Test
     fun getUser() {
         mockMvc.perform(get("/admin/$USER_ID")
                 .with(authUser()))
@@ -58,6 +71,7 @@ internal class AdminControllerTest : AbstractWebTest() {
         mockMvc.perform(get("/admin/999")
                 .with(authUser()))
                 .andExpect(status().isNotFound())
+                .andExpect(error(ErrorType.NOT_FOUND))
     }
 
     @Test
@@ -79,6 +93,18 @@ internal class AdminControllerTest : AbstractWebTest() {
     }
 
     @Test
+    fun createUserInvalid() {
+        val userTo = AdminRegisterUserTo("", "", "", "", emptySet())
+
+        mockMvc.perform(post("/admin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtils.writeValue(userTo))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("name", "surname", "username", "password"))
+    }
+
+    @Test
     fun updateUser() {
         val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", emptySet())
         mockMvc.perform(put("/admin/$USER_ID")
@@ -93,6 +119,17 @@ internal class AdminControllerTest : AbstractWebTest() {
     }
 
     @Test
+    fun updateUserInvalid() {
+        val userTo = AdminUpdateUserTo("", "", "", emptySet())
+        mockMvc.perform(put("/admin/$USER_ID")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtils.writeValue(userTo))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("name", "surname", "username"))
+    }
+
+    @Test
     fun updateUserNotFound() {
         val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", emptySet())
         mockMvc.perform(put("/admin/999")
@@ -100,6 +137,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .content(JsonUtils.writeValue(userTo))
                 .with(authUser()))
                 .andExpect(status().isNotFound())
+                .andExpect(error(ErrorType.NOT_FOUND))
     }
 
     @Test
@@ -115,12 +153,23 @@ internal class AdminControllerTest : AbstractWebTest() {
     }
 
     @Test
+    fun updateUserPasswordInvalid() {
+        mockMvc.perform(put("/admin/$USER_ID/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtils.writeValue(AdminUpdateUserPasswordTo("")))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("password"))
+    }
+
+    @Test
     fun updateUserPasswordNotFound() {
         mockMvc.perform(put("/admin/999/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(AdminUpdateUserPasswordTo("newPassword")))
                 .with(authUser()))
                 .andExpect(status().isNotFound())
+                .andExpect(error(ErrorType.NOT_FOUND))
     }
 
     @Test
@@ -145,5 +194,6 @@ internal class AdminControllerTest : AbstractWebTest() {
         mockMvc.perform(delete("/admin/999")
                 .with(authUser()))
                 .andExpect(status().isNotFound())
+                .andExpect(error(ErrorType.NOT_FOUND))
     }
 }

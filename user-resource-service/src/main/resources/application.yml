@@ -1,11 +1,10 @@
 server:
   port: 0
-
-security:
-  oauth2:
-    resource:
-      jwt:
-        keyValue: ${jwt.keyValue}
+  error:
+    whitelabel:
+      enabled: false
+    include-exception: true
+    path: ""
 
 spring:
   application:
@@ -17,3 +16,12 @@ spring:
     password: ${databases.users.password}
     driver-class-name: org.postgresql.Driver
     initialization-mode: never
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        keyValue: ${jwt.keyValue}
