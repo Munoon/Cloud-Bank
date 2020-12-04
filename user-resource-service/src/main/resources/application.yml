@@ -24,9 +24,6 @@ spring:
     hibernate:
       ddl-auto: validate
 
-application:
-  classes: "5-а, 5-б, 6, 7, 8, 9, 10, 11"
-
 security:
   oauth2:
     resource:

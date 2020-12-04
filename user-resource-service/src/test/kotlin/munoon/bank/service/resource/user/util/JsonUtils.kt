@@ -4,15 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.jayway.jsonpath.JsonPath
-import munoon.bank.common.user.UserTo
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
+import org.assertj.core.api.Assertions.assertThat
 import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.ResultMatcher
 import java.io.IOException
-import java.lang.IllegalStateException
 
 object JsonUtils {
     val OBJECT_MAPPER = ObjectMapper().apply {
@@ -33,4 +28,9 @@ object JsonUtils {
 
     fun <T> readFromJson(mvcResult: MvcResult, clazz: Class<T>) = readValue(getContent(mvcResult), clazz)
     fun getContent(result: MvcResult): String = result.response.contentAsString
+
+    fun <T> contentJsonList(vararg obj: T) = ResultMatcher {
+        val data = OBJECT_MAPPER.readValue(getContent(it), object : TypeReference<List<T>>() {})
+        assertThat(data).usingDefaultComparator().isEqualTo(obj.toList())
+    }
 }

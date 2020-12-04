@@ -12,6 +12,7 @@ import munoon.bank.service.resource.user.user.UserTestData.assertMatch
 import munoon.bank.service.resource.user.user.UserTestData.contentJson
 import munoon.bank.service.resource.user.user.UserTestData.contentJsonPage
 import munoon.bank.service.resource.user.util.JsonUtils
+import munoon.bank.service.resource.user.util.JsonUtils.contentJsonList
 import munoon.bank.service.resource.user.util.ResponseExceptionValidator.error
 import munoon.bank.service.resource.user.util.ResponseExceptionValidator.fieldError
 import org.assertj.core.api.Assertions.assertThat
@@ -112,6 +113,14 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(fieldError("findUser.pageable", "findUser.query"))
+    }
+
+    @Test
+    fun getClassesList() {
+        mockMvc.perform(get("/admin/classes")
+                .with(authUser()))
+                .andExpect(status().isOk())
+                .andExpect(contentJsonList("5", "6", "7", "8", "9", "10", "11"))
     }
 
     @Test
