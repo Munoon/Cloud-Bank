@@ -89,6 +89,32 @@ internal class AdminControllerTest : AbstractWebTest() {
     }
 
     @Test
+    fun findUsers() {
+        fun find(query: String) = mockMvc.perform(get("/admin/find")
+                .param("page", "0")
+                .param("size", "1")
+                .param("query", query)
+                .with(authUser()))
+                .andExpect(status().isOk())
+
+        find("kit").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
+        find("che").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
+        find("${DEFAULT_USER.name} ${DEFAULT_USER.surname}").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
+        find("${DEFAULT_USER.surname} ${DEFAULT_USER.name}").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
+    }
+
+    @Test
+    fun findUsersInvalid() {
+        mockMvc.perform(get("/admin/find")
+                .param("page", "0")
+                .param("size", "30")
+                .param("query", "q")
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("findUser.pageable", "findUser.query"))
+    }
+
+    @Test
     fun createUser() {
         val userTo = AdminRegisterUserTo("New", "User", "username", "password", "10", emptySet())
 

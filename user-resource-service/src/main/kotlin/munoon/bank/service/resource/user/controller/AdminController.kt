@@ -6,6 +6,7 @@ import munoon.bank.service.resource.user.config.ClassesProperties
 import munoon.bank.service.resource.user.user.*
 import munoon.bank.service.resource.user.util.validator.PageableSize
 import munoon.bank.service.resource.user.util.validator.ValidClass
+import org.hibernate.validator.constraints.Length
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -24,21 +25,32 @@ class AdminController(private val userService: UserService, private val classesP
     private val log = LoggerFactory.getLogger(AdminController::class.java)
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun getUsersList(@Valid @PageableSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
                      @Valid @ValidClass @RequestParam("class") clazz: String): Page<UserTo> {
-        log.info("Admin ${authUserId()} get users list: $pageable")
+        log.info("User ${authUserId()} get users list by class $clazz: $pageable")
         return userService.getAll(pageable, clazz).map { it.asTo() }
     }
 
     @GetMapping("/classes")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun getClassesList(): List<String> {
-        log.info("Admin ${authUserId()} get classes list")
+        log.info("User ${authUserId()} get classes list")
         return classesProperties.classes
     }
 
+    @GetMapping("/find")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
+    fun findUser(@Valid @PageableSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
+                 @Valid @Length(min = 3, max = 30) @RequestParam query: String): Page<UserTo> {
+        log.info("User ${authUserId()} find user by query '$query' (page: $pageable)")
+        return userService.findUser(pageable, query).map { it.asTo() }
+    }
+
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun getUser(@PathVariable id: Int): UserTo {
-        log.info("Admin ${authUserId()} get user with id $id")
+        log.info("User ${authUserId()} get user with id $id")
         return userService.getById(id).asTo()
     }
 

@@ -16,6 +16,9 @@ class UserService(private val userRepository: UserRepository, private val passwo
     fun getAll(pageable: Pageable, clazz: String): Page<User> = userRepository.findAllByClazz(pageable, clazz)
             .map { it.asUser() }
 
+    fun findUser(pageable: Pageable, query: String) = userRepository.findByQuery(query.toLowerCase(), pageable)
+            .map { it.asUser() }
+
     fun createUser(adminRegisterUserTo: AdminRegisterUserTo): User {
         val entity = adminRegisterUserTo.asEntity(passwordEncoder)
         return userRepository.save(entity).asUser()

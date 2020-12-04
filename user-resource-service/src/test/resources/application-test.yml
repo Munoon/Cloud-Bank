@@ -11,6 +11,9 @@ spring:
     schema: classpath:db/schema.sql
     data: classpath:db/data.sql
 
+  jpa:
+    show-sql: true
+
 security:
   oauth2:
     resource:

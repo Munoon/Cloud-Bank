@@ -48,6 +48,15 @@ internal class UserServiceTest : AbstractTest() {
     }
 
     @Test
+    fun findUser() {
+        val pageable = PageRequest.of(0, 1)
+        assertMatch(userService.findUser(pageable, "kit").content, DEFAULT_USER) // find by name
+        assertMatch(userService.findUser(pageable, "che").content, DEFAULT_USER) // find by surname
+        assertMatch(userService.findUser(pageable, "${DEFAULT_USER.name} ${DEFAULT_USER.surname}").content, DEFAULT_USER) // find by name + surname
+        assertMatch(userService.findUser(pageable, "${DEFAULT_USER.surname} ${DEFAULT_USER.name}").content, DEFAULT_USER) // find by surname + name
+    }
+
+    @Test
     fun createUser() {
         val userTo = AdminRegisterUserTo("New", "User", "username", "password", "10", emptySet())
         val createUser = userService.createUser(userTo)
