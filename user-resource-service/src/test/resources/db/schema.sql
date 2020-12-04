@@ -11,6 +11,7 @@ CREATE TABLE users (
     name             VARCHAR                        NOT NULL,
     surname          VARCHAR                        NOT NULL,
     username         VARCHAR                        NOT NULL,
+    class            VARCHAR                        NOT NULL,
     password         VARCHAR                        NOT NULL,
     registered       TIMESTAMP DEFAULT now()        NOT NULL,
     UNIQUE (username)

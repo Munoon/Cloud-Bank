@@ -1,5 +1,6 @@
 package munoon.bank.common.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,9 @@ public class UserTo {
     private String surname;
 
     private String username;
+
+    @JsonProperty("class")
+    private String clazz;
 
     private LocalDateTime registered;
 

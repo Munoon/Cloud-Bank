@@ -1,5 +1,6 @@
 package munoon.bank.service.auth.user
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import lombok.NoArgsConstructor
 import munoon.bank.common.user.UserRoles
@@ -23,11 +24,15 @@ data class UserEntity(
         @Column(name = "username", nullable = false)
         val username: String,
 
+        @JsonIgnore
         @Column(name = "password", nullable = false)
         val password: String,
 
         @Column(name = "registered", nullable = false, columnDefinition = "TIMESTAMP DEFAULT now() NOT NULL")
         val registered: LocalDateTime,
+
+        @Column(name = "class", nullable = false)
+        val clazz: String,
 
         @JsonInclude
         @Enumerated(EnumType.STRING)
@@ -37,5 +42,5 @@ data class UserEntity(
         val roles: Set<UserRoles>
 ) {
         override fun toString() =
-                "UserEntity(id=$id, name='$name', surname='$surname', username='$username', registered=$registered, roles=$roles)"
+                "UserEntity(id=$id, name='$name', surname='$surname', username='$username', registered=$registered, class='$clazz', roles=$roles)"
 }

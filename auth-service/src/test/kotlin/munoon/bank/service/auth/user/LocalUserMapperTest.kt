@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 internal class LocalUserMapperTest {
     @Test
     fun asUser() {
-        val entity = UserEntity(100, "Nikita", "Ivchenko", "munoon", "{noop}password", LocalDateTime.now(), hashSetOf(UserRoles.ROLE_COURIER, UserRoles.ROLE_BARMEN, UserRoles.ROLE_TEACHER, UserRoles.ROLE_ADMIN))
+        val entity = UserEntity(100, "Nikita", "Ivchenko", "munoon", "{noop}password", LocalDateTime.now(), "10", hashSetOf(UserRoles.ROLE_COURIER, UserRoles.ROLE_BARMEN, UserRoles.ROLE_TEACHER, UserRoles.ROLE_ADMIN))
         val user = entity.asUser()
         val expected = User(UserTestData.USER)
         assertMatch(user, expected)

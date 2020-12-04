@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomUserAuthenticationConverterTest {
-    private static final User USER = new User(100, "Nikita", "Ivcheko", "munoon", "{noop}password", LocalDateTime.now(), Set.of(UserRoles.ROLE_ADMIN, UserRoles.ROLE_TEACHER, UserRoles.ROLE_BARMEN, UserRoles.ROLE_COURIER));
+    private static final User USER = new User(100, "Nikita", "Ivcheko", "munoon", "{noop}password", "10", LocalDateTime.now(), Set.of(UserRoles.ROLE_ADMIN, UserRoles.ROLE_TEACHER, UserRoles.ROLE_BARMEN, UserRoles.ROLE_COURIER));
 
     @Test
     void convertUserAuthentication() {

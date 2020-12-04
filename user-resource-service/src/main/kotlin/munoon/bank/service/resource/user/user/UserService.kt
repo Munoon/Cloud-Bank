@@ -13,7 +13,8 @@ import javax.validation.ValidationException
 class UserService(private val userRepository: UserRepository, private val passwordEncoder: PasswordEncoder) {
     fun getById(id: Int): User = getEntityById(id).asUser()
 
-    fun getAll(pageable: Pageable): Page<User> = userRepository.findAll(pageable).map { it.asUser() }
+    fun getAll(pageable: Pageable, clazz: String): Page<User> = userRepository.findAllByClazz(pageable, clazz)
+            .map { it.asUser() }
 
     fun createUser(adminRegisterUserTo: AdminRegisterUserTo): User {
         val entity = adminRegisterUserTo.asEntity(passwordEncoder)

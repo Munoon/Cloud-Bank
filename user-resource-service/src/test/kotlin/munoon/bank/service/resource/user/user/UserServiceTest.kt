@@ -37,40 +37,40 @@ internal class UserServiceTest : AbstractTest() {
 
     @Test
     fun getAll() {
-        with(userService.getAll(PageRequest.of(0, 1))) {
+        with(userService.getAll(PageRequest.of(0, 1), UserTestData.USER_CLASS)) {
             assertThat(totalElements).isEqualTo(1)
             assertMatch(content, DEFAULT_USER)
         }
 
-        val emptyRequest = userService.getAll(PageRequest.of(1, 1))
+        val emptyRequest = userService.getAll(PageRequest.of(1, 1), UserTestData.USER_CLASS)
         assertThat(emptyRequest.totalElements).isEqualTo(1)
         assertThat(emptyRequest.content.size).isEqualTo(0)
     }
 
     @Test
     fun createUser() {
-        val userTo = AdminRegisterUserTo("New", "User", "username", "password", emptySet())
+        val userTo = AdminRegisterUserTo("New", "User", "username", "password", "10", emptySet())
         val createUser = userService.createUser(userTo)
 
-        val expected = User(createUser.id, "New", "User", "username", createUser.password, createUser.registered, emptySet())
+        val expected = User(createUser.id, "New", "User", "username", createUser.password, "10", createUser.registered, emptySet())
 
-        assertMatch(userService.getAll(PageRequest.of(0, 10)).content, DEFAULT_USER, expected)
+        assertMatch(userService.getAll(PageRequest.of(0, 10), UserTestData.USER_CLASS).content, DEFAULT_USER, expected)
         assertThat(passwordEncoder.matches("password", createUser.password)).isTrue()
     }
 
     @Test
     fun updateUser() {
-        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", emptySet())
+        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", emptySet())
         userService.updateUser(USER_ID, userTo)
 
-        val expected = User(100, "NewName", "NewSurname", "test", "password", LocalDateTime.now(), emptySet())
+        val expected = User(100, "NewName", "NewSurname", "test", "password", "10", LocalDateTime.now(), emptySet())
         val actual = userService.getById(USER_ID)
         assertMatch(actual, expected)
     }
 
     @Test
     fun updateUserNotFound() {
-        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", emptySet())
+        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", emptySet())
         assertThrows(NotFoundException::class.java) { userService.updateUser(999, userTo) }
     }
 
@@ -138,14 +138,14 @@ internal class UserServiceTest : AbstractTest() {
 
     @Test
     fun removeUser() {
-        with (userService.getAll(PageRequest.of(0, 1))) {
+        with (userService.getAll(PageRequest.of(0, 1), UserTestData.USER_CLASS)) {
             assertThat(totalElements).isEqualTo(1)
             assertThat(content.size).isEqualTo(1)
         }
 
         userService.removeUser(USER_ID)
 
-        with (userService.getAll(PageRequest.of(0, 1))) {
+        with (userService.getAll(PageRequest.of(0, 1), UserTestData.USER_CLASS)) {
             assertThat(totalElements).isEqualTo(0)
             assertThat(content.size).isEqualTo(0)
         }

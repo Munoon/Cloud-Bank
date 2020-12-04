@@ -1,8 +1,10 @@
 package munoon.bank.service.resource.user.user
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
 import munoon.bank.common.user.UserRoles
+import munoon.bank.service.resource.user.util.validator.ValidClass
 import org.hibernate.validator.constraints.Length
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
@@ -31,10 +33,17 @@ data class AdminRegisterUserTo(
         val password: String,
 
         @field:NotNull
+        @field:NotEmpty
+        @field:ValidClass
+        @field:Length(min = 1, max = 20)
+        @field:JsonProperty("class")
+        val clazz: String,
+
+        @field:NotNull
         val roles: Set<UserRoles>
 ) {
-    override fun toString() =
-        "AdminRegisterUser(name='$name', surname='$surname', username='$username', roles=$roles)"
+        override fun toString() =
+                "AdminRegisterUserTo(name='$name', surname='$surname', username='$username', class='$clazz', roles=$roles)"
 }
 
 @KotlinBuilder
@@ -56,7 +65,14 @@ data class AdminUpdateUserTo(
         val username: String,
 
         @field:NotNull
-        val roles: Set<UserRoles>
+        @field:NotEmpty
+        @field:ValidClass
+        @field:Length(min = 1, max = 20)
+        @field:JsonProperty("class")
+        var clazz: String,
+
+        @field:NotNull
+        val roles: Set<UserRoles>,
 )
 
 @NoArgsConstructor

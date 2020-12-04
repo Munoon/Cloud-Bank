@@ -2,8 +2,10 @@ package munoon.bank.service.resource.user.controller
 
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.user.UserTo
+import munoon.bank.service.resource.user.config.ClassesProperties
 import munoon.bank.service.resource.user.user.*
 import munoon.bank.service.resource.user.util.validator.PageableSize
+import munoon.bank.service.resource.user.util.validator.ValidClass
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -18,13 +20,20 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
-class AdminController(private val userService: UserService) {
+class AdminController(private val userService: UserService, private val classesProperties: ClassesProperties) {
     private val log = LoggerFactory.getLogger(AdminController::class.java)
 
     @GetMapping
-    fun getUsersList(@Valid @PageableSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable): Page<UserTo> {
+    fun getUsersList(@Valid @PageableSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
+                     @Valid @ValidClass @RequestParam("class") clazz: String): Page<UserTo> {
         log.info("Admin ${authUserId()} get users list: $pageable")
-        return userService.getAll(pageable).map { it.asTo() }
+        return userService.getAll(pageable, clazz).map { it.asTo() }
+    }
+
+    @GetMapping("/classes")
+    fun getClassesList(): List<String> {
+        log.info("Admin ${authUserId()} get classes list")
+        return classesProperties.classes
     }
 
     @GetMapping("/{id}")
