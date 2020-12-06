@@ -1,5 +1,8 @@
 package munoon.bank.service.resource.user
 
+import io.restassured.config.EncoderConfig
+import io.restassured.module.mockmvc.RestAssuredMockMvc
+import io.restassured.module.mockmvc.config.RestAssuredMockMvcConfig
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.user.User
 import munoon.bank.service.resource.user.user.UserTestData
@@ -23,7 +26,9 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import java.nio.charset.StandardCharsets
 import java.util.*
+import javax.servlet.Filter
 import org.mockito.Mockito.`when` as mockWhen
 
 @SpringBootTest
@@ -40,12 +45,15 @@ abstract class AbstractWebTest : AbstractTest() {
 
     protected lateinit var mockMvc: MockMvc
 
+    protected fun getNewMockMvc(vararg filters: Filter) = MockMvcBuilders
+            .webAppContextSetup(webApplicationContext)
+            .apply<DefaultMockMvcBuilder>(springSecurity())
+            .addFilters<DefaultMockMvcBuilder>(*filters)
+            .build()
+
     @BeforeEach
     fun setup() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-                .apply<DefaultMockMvcBuilder>(springSecurity())
-                .build()
+        mockMvc = getNewMockMvc()
     }
 
     private fun getAccessToken(user: User = UserTestData.DEFAULT_USER,
@@ -70,5 +78,15 @@ abstract class AbstractWebTest : AbstractTest() {
             it.addHeader(HttpHeaders.AUTHORIZATION, headerToken)
             it
         }
+    }
+}
+
+abstract class AbstractContractTest : AbstractWebTest() {
+    @BeforeEach
+    fun contractSetup() {
+        authUser(token = "DEFAULT_USER")
+        RestAssuredMockMvc.mockMvc(mockMvc)
+        RestAssuredMockMvc.config = RestAssuredMockMvcConfig()
+                .encoderConfig(EncoderConfig(StandardCharsets.UTF_8.name(), StandardCharsets.UTF_8.name()))
     }
 }

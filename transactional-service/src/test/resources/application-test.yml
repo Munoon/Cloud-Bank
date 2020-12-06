@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        keyValue: SimpleKey
+
+eureka:
+  client:
+    enabled: false

@@ -1,26 +1,20 @@
-package munoon.bank.common;
+package munoon.bank.common.auth.user;
 
-import munoon.bank.common.user.User;
-import munoon.bank.common.user.UserRoles;
+import munoon.bank.common.AuthorizedUser;
+import munoon.bank.common.user.UseTestData;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-class CustomUserAuthenticationConverterTest {
-    private static final User USER = new User(100, "Nikita", "Ivcheko", "munoon", "{noop}password", "10", LocalDateTime.now(), Set.of(UserRoles.ROLE_ADMIN, UserRoles.ROLE_TEACHER, UserRoles.ROLE_BARMEN, UserRoles.ROLE_COURIER));
-
+class UserIdAuthenticationConverterTest {
     @Test
     void convertUserAuthentication() {
-        var authUser = new AuthorizedUser(USER);
+        var authUser = new AuthorizedUser(UseTestData.USER);
         var token = new UsernamePasswordAuthenticationToken(authUser, "N/A", authUser.getAuthorities());
 
         CustomUserAuthenticationConverter converter = new TestConverter();
@@ -34,17 +28,17 @@ class CustomUserAuthenticationConverterTest {
         CustomUserAuthenticationConverter converter = new TestConverter();
         Authentication authentication = converter.extractAuthentication(map);
 
-        AuthorizedUser authorizedUser = new AuthorizedUser(USER);
+        AuthorizedUser authorizedUser = new AuthorizedUser(UseTestData.USER);
         var token = new UsernamePasswordAuthenticationToken(authorizedUser, authorizedUser.getPassword(), authentication.getAuthorities());
 
         assertThat(authentication).usingRecursiveComparison().isEqualTo(token);
     }
 
-    class TestConverter extends CustomUserAuthenticationConverter {
+    class TestConverter extends UserIdAuthenticationConverter {
         @Override
         public AuthorizedUser getAuthorizedUser(int userId) {
             if (userId == 100) {
-                return new AuthorizedUser(USER);
+                return new AuthorizedUser(UseTestData.USER);
             }
             return null;
         }

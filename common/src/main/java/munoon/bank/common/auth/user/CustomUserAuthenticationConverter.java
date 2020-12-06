@@ -1,5 +1,6 @@
-package munoon.bank.common;
+package munoon.bank.common.auth.user;
 
+import munoon.bank.common.AuthorizedUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
@@ -8,7 +9,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public abstract class CustomUserAuthenticationConverter implements UserAuthenticationConverter {
-    private static final String USER_ID_KEY = "user_id";
+    public static final String USER_ID_KEY = "user_id";
 
     @Override
     public Map<String, ?> convertUserAuthentication(Authentication userAuthentication) {
@@ -22,13 +23,9 @@ public abstract class CustomUserAuthenticationConverter implements UserAuthentic
 
     @Override
     public Authentication extractAuthentication(Map<String, ?> map) {
-        if (map.containsKey(USER_ID_KEY)) {
-            int userId = (int) map.get(USER_ID_KEY);
-            AuthorizedUser user = getAuthorizedUser(userId);
-            return new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
-        }
-        return null;
+        AuthorizedUser user = getAuthorizedUser(map);
+        return new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
     }
 
-    public abstract AuthorizedUser getAuthorizedUser(int userId);
+    public abstract AuthorizedUser getAuthorizedUser(Map<String, ?> map);
 }

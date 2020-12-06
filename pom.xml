@@ -14,6 +14,7 @@
         <module>discovery-service</module>
         <module>auth-service</module>
         <module>user-resource-service</module>
+        <module>transactional-service</module>
     </modules>
 
     <properties>
@@ -25,6 +26,8 @@
         <kotlin.version>1.4.10</kotlin.version>
         <mapstruct.kotlin.processor.version>1.4.0.0</mapstruct.kotlin.processor.version>
         <maven.compiler-plugin.version>3.8.1</maven.compiler-plugin.version>
+        <spring.feign.version>1.4.7.RELEASE</spring.feign.version>
+        <spring.cloud.contract.version>2.2.5.RELEASE</spring.cloud.contract.version>
     </properties>
 
     <parent>

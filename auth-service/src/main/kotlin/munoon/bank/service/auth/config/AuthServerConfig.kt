@@ -1,20 +1,16 @@
 package munoon.bank.service.auth.config
 
 import munoon.bank.common.AuthorizedUser
-import munoon.bank.common.CustomUserAuthenticationConverter
+import munoon.bank.common.auth.user.UserIdAuthenticationConverter
 import munoon.bank.common.user.User
 import munoon.bank.service.auth.client.CustomClientDetailsService
 import munoon.bank.service.auth.user.UserService
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
-import org.springframework.core.io.Resource
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer
-import org.springframework.security.oauth2.provider.ClientDetailsService
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter
@@ -49,13 +45,13 @@ class AuthServerConfig(private val clientDetailsService: CustomClientDetailsServ
     @Bean
     fun accessTokenConverter(): AccessTokenConverter {
         val accessTokenConverter = DefaultAccessTokenConverter()
-        accessTokenConverter.setUserTokenConverter(customUserAuthenticationConverter())
+        accessTokenConverter.setUserTokenConverter(userIdAuthenticationConverter())
         return accessTokenConverter
     }
 
     @Bean
-    fun customUserAuthenticationConverter(): CustomUserAuthenticationConverter {
-        return object : CustomUserAuthenticationConverter() {
+    fun userIdAuthenticationConverter(): UserIdAuthenticationConverter {
+        return object : UserIdAuthenticationConverter() {
             override fun getAuthorizedUser(userId: Int): AuthorizedUser? {
                 val user: User = userService.getById(userId)
                 return AuthorizedUser(user)

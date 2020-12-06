@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: transactional-service
+
+server:
+  port: ${PORT:0}
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        keyValue: ${jwt.keyValue}

@@ -3,9 +3,9 @@ server:
   servlet:
     context-path: /uaa
 
-# For generating certificate (alias and passwords in lower case):
-# keytool -genkeypair -alias <jwt.certificate.key.alias>
-#      -keyalg RSA
+# For generating certificate (alias and password's in lower case):
+# keytool -genkeypair -keyalg RSA
+#      -alias <jwt.certificate.key.alias>
 #      -keypass <jwt.certificate.key.password>
 #      -keystore <new certificate file name>.jks
 #      -storepass <jwt.certificate.store.password>
@@ -33,3 +33,6 @@ spring:
     schema: classpath:db/schema.sql
     data: classpath:db/data.sql
     initialization-mode: ${databases.users.initialization-mode}
+  jpa:
+    hibernate:
+      ddl-auto: validate
