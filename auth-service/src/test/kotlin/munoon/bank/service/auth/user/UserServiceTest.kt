@@ -2,11 +2,11 @@ package munoon.bank.service.auth.user
 
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.user.UserMapper
+import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.auth.AbstractTest
 import munoon.bank.service.auth.user.UserTestData.USER_ID
 import munoon.bank.service.auth.user.UserTestData.USER_USERNAME
 import munoon.bank.service.auth.user.UserTestData.assertMatch
-import munoon.bank.service.auth.util.NotFoundException
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

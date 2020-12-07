@@ -2,6 +2,15 @@ spring:
   application:
     name: transactional-service
 
+  data:
+    mongodb:
+      host: ${databases.transactions.host}
+      port: ${databases.transactions.port}
+      authentication-database: ${databases.transactions.authentication-database}
+      database: ${databases.transactions.database}
+      username: ${databases.transactions.username}
+      password: ${databases.transactions.password}
+
 server:
   port: ${PORT:0}
 

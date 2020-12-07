@@ -1,14 +1,13 @@
-package munoon.bank.service.resource.user.controller
+package munoon.bank.service.transactional.controller
 
 import munoon.bank.common.SecurityUtils
 import munoon.bank.common.error.ErrorInfo
 import munoon.bank.common.error.ErrorInfoField
 import munoon.bank.common.error.ErrorType
 import munoon.bank.common.util.exception.NotFoundException
-import munoon.bank.service.resource.user.util.FieldValidationException
+import munoon.bank.service.transactional.util.NotEnoughBalanceException
 import munoon.bank.common.util.ValidationUtils
 import org.slf4j.LoggerFactory
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.BindException
@@ -18,10 +17,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.NoHandlerFoundException
-import java.lang.IllegalArgumentException
 import javax.servlet.http.HttpServletRequest
 import javax.validation.ConstraintViolationException
-import org.hibernate.exception.ConstraintViolationException as HibernateConstraintViolationException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -35,10 +32,10 @@ class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    @ExceptionHandler(FieldValidationException::class)
-    fun fieldValidationExceptionHandler(e: FieldValidationException, req: HttpServletRequest): ErrorInfo {
-        log.warn("Field validation exception on request '${req.requestURL}' for user ${SecurityUtils.authUserIdOrAnonymous()}", e)
-        return ErrorInfoField(req.requestURL, mapOf(e.field to listOf(e.message)))
+    @ExceptionHandler(NotEnoughBalanceException::class)
+    fun notEnoughBalanceExceptionHandler(e: NotEnoughBalanceException, req: HttpServletRequest): ErrorInfo {
+        log.warn(" on request '${req.requestURL}' for user ${SecurityUtils.authUserIdOrAnonymous()}", e)
+        return ErrorInfo(req.requestURL, ErrorType.NOT_ENOUGH_BALANCE, e.message)
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -53,19 +50,6 @@ class GlobalExceptionHandler {
     fun accessDeniedExceptionHandler(e: AccessDeniedException, req: HttpServletRequest): ErrorInfo {
         log.warn("Access denied exception on request '${req.requestURL}' for user ${SecurityUtils.authUserIdOrAnonymous()}", e)
         return ErrorInfo(req.requestURL, ErrorType.ACCESS_DENIED, e.message)
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(DataIntegrityViolationException::class)
-    fun dataIntegrityViolationExceptionHandler(e: DataIntegrityViolationException, req: HttpServletRequest): ErrorInfo {
-        log.warn("DataIntegrityViolationException on request '${req.requestURL}' for user ${SecurityUtils.authUserIdOrAnonymous()}", e)
-        return when (e.cause) {
-            is HibernateConstraintViolationException -> {
-                val constraintName = (e.cause as HibernateConstraintViolationException).constraintName
-                ErrorInfo(req.requestURL, ErrorType.DATA_ERROR, DATABASE_ERROR_MAP[constraintName])
-            }
-            else -> ErrorInfo(req.requestURL, ErrorType.DATA_ERROR, e.message)
-        }
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -104,12 +88,5 @@ class GlobalExceptionHandler {
     fun exceptionHandler(e: Exception, req: HttpServletRequest): ErrorInfo {
         log.error("Unknown exception on request '${req.requestURL}' for user ${SecurityUtils.authUserIdOrAnonymous()}", e)
         return ErrorInfo(req.requestURL, ErrorType.APPLICATION_EXCEPTION, e.message)
-    }
-
-    companion object {
-        private val DATABASE_ERROR_MAP = mapOf(
-                "users_username_key" to "Пользователь с таким логином уже существует",
-                "users_role_user_id_role_key" to "Роль пользователя повторяется"
-        )
     }
 }

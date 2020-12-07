@@ -7,5 +7,6 @@ public enum ErrorType {
     NOT_UNIQUE_ERROR,
     APPLICATION_EXCEPTION,
     ACCESS_DENIED,
-    NOT_FOUND
+    NOT_FOUND,
+    NOT_ENOUGH_BALANCE
 }

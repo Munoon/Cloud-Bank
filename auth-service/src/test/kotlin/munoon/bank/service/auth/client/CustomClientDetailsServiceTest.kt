@@ -1,7 +1,7 @@
 package munoon.bank.service.auth.client
 
+import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.auth.AbstractTest
-import munoon.bank.service.auth.util.NotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

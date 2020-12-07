@@ -49,12 +49,14 @@
         <dependency>
             <groupId>com.github.pozo</groupId>
             <artifactId>mapstruct-kotlin</artifactId>
-            <version>${mapstruct.kotlin.processor.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-feign</artifactId>
-            <version>${spring.feign.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
         <dependency>

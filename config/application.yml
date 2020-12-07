@@ -7,6 +7,16 @@ spring:
 
 application:
   classes: "5-а, 5-б, 6, 7, 8, 9, 10, 11"
+  cards:
+    - name: "Classic"
+      codeName: default
+      price: 0
+      ableToBuy: true
+      clientLimit: 1
+    - name: "Gold"
+      codeName: gold
+      price: 100
+      ableToBuy: true
 
 databases:
   users:
@@ -14,6 +24,13 @@ databases:
     username: postgres
     password: password
     initialization-mode: always
+  transactions:
+    host: localhost
+    port: 27017
+    authentication-database: admin
+    database: bank-transactions
+    username: mongodb
+    password: password
 
 jwt:
   keyValue: |

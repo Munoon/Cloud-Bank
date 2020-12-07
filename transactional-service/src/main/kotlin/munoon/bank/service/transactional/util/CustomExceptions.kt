@@ -1,6 +1,6 @@
-package munoon.bank.service.auth.util
+package munoon.bank.service.transactional.util
 
-class NotFoundException : RuntimeException {
+class NotEnoughBalanceException : RuntimeException {
     constructor(message: String) : super(message)
     constructor(message: String, cause: Throwable) : super(message, cause)
 }

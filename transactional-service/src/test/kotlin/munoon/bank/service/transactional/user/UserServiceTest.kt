@@ -13,6 +13,6 @@ internal class UserServiceTest : AbstractTest() {
     @Test
     fun getProfileByToken() {
         val profile = userService.getProfileByToken("DEFAULT_USER")
-        assertMatch(profile, UserTestData.DEFAULT_USER)
+        assertMatch(profile, UserTestData.DEFAULT_USER_TO)
     }
 }

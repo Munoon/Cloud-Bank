@@ -14,3 +14,13 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=bank-users
+
+  mongo:
+    image: mongo:4.4.0
+    container_name: cloud-bank-mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=bank-transactions
+      - MONGO_INITDB_ROOT_USERNAME=mongodb
+      - MONGO_INITDB_ROOT_PASSWORD=password

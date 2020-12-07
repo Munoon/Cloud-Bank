@@ -1,6 +1,6 @@
 package munoon.bank.service.auth.client
 
-import munoon.bank.service.auth.util.NotFoundException
+import munoon.bank.common.util.exception.NotFoundException
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.security.oauth2.provider.ClientDetails
 import org.springframework.security.oauth2.provider.ClientDetailsService

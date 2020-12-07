@@ -52,7 +52,6 @@
         <dependency>
             <groupId>com.github.pozo</groupId>
             <artifactId>mapstruct-kotlin</artifactId>
-            <version>${mapstruct.kotlin.processor.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

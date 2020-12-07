@@ -3,6 +3,15 @@ spring:
     config:
       enabled: false
 
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      authentication-database: admin
+      database: bank-transactions
+      username: mongodb
+      password: password
+
 security:
   oauth2:
     resource:
@@ -12,3 +21,19 @@ security:
 eureka:
   client:
     enabled: false
+
+application:
+  cards:
+    - name: "Classic"
+      codeName: default
+      price: 0
+      ableToBuy: true
+      clientLimit: 1
+    - name: "Gold"
+      codeName: gold
+      price: 100
+      ableToBuy: true
+    - name: "Parliament"
+      codeName: parliament
+      price: 100
+      ableToBuy: false

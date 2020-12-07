@@ -2,7 +2,7 @@ package munoon.bank.service.auth.user
 
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.user.User
-import munoon.bank.service.auth.util.NotFoundException
+import munoon.bank.common.util.exception.NotFoundException
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException

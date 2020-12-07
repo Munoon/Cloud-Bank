@@ -1,7 +1,7 @@
 package munoon.bank.service.resource.user.user
 
 import munoon.bank.common.user.User
-import munoon.bank.service.resource.user.util.NotFoundException
+import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.resource.user.util.UserUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
