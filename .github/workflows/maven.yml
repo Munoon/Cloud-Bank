@@ -17,10 +17,10 @@ jobs:
         image: mongo:4.4.0
         ports:
           - 27017:27017
-        environment:
-          - MONGO_INITDB_DATABASE=bank-transactions
-          - MONGO_INITDB_ROOT_USERNAME=mongodb
-          - MONGO_INITDB_ROOT_PASSWORD=password
+        env:
+          MONGO_INITDB_DATABASE: bank-transactions
+          MONGO_INITDB_ROOT_USERNAME: mongodb
+          MONGO_INITDB_ROOT_PASSWORD: password
 
     steps:
       - uses: actions/checkout@v1
