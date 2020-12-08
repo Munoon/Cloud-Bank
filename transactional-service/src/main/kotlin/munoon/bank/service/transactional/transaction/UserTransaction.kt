@@ -4,6 +4,7 @@ import munoon.bank.service.transactional.card.Card
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDateTime
 
 @Document
 data class UserTransaction(
@@ -16,6 +17,8 @@ data class UserTransaction(
         val price: Double,
 
         val leftBalance: Double,
+
+        val registered: LocalDateTime,
 
         val type: UserTransactionType,
 

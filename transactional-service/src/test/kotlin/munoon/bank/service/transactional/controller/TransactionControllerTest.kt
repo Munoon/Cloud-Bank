@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDateTime
 
 internal class TransactionControllerTest : AbstractTest() {
     @Autowired
@@ -31,7 +32,7 @@ internal class TransactionControllerTest : AbstractTest() {
         }
 
         val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 900.0), 100.0, 900.0, UserTransactionType.CARD_BUY, null)
+        val expected = UserTransaction(transaction.id, card.copy(balance = 900.0), 100.0, 900.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
 
         mockMvc.perform(get("/transaction/" + card.id)
                 .with(authUser()))

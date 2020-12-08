@@ -3,6 +3,7 @@ package munoon.bank.service.transactional.transaction
 import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
 import munoon.bank.service.transactional.card.CardTo
+import java.time.LocalDateTime
 
 @KotlinBuilder
 @NoArgsConstructor
@@ -14,6 +15,8 @@ data class UserTransactionTo(
         val price: Double,
 
         val leftBalance: Double,
+
+        val registered: LocalDateTime,
 
         val type: UserTransactionType,
 

@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.ResultMatcher
 
 object UserTransactionTestData {
     fun assertMatchTo(actual: Iterable<UserTransactionTo>, expected: Iterable<UserTransactionTo>) {
-        assertThat(actual).usingElementComparatorIgnoringFields("card", "info").isEqualTo(expected)
+        assertThat(actual).usingElementComparatorIgnoringFields("card", "info", "registered").isEqualTo(expected)
         assertThat(actual.map { it.card }).usingElementComparatorIgnoringFields("registered").isEqualTo(expected.map { it.card })
         assertThat(actual.map { it.info }).usingElementComparatorIgnoringFields("buyCard.registered").isEqualTo(expected.map { it.info })
     }
@@ -17,7 +17,7 @@ object UserTransactionTestData {
     fun assertMatch(actual: UserTransaction, expected: UserTransaction) {
         assertThat(actual)
                 .usingRecursiveComparison()
-                .ignoringFields("card.registered", "card.pinCode", "info.buyCard.pinCode", "info.buyCard.registered")
+                .ignoringFields("card.registered", "card.pinCode", "info.buyCard.pinCode", "info.buyCard.registered", "registered")
                 .isEqualTo(expected);
     }
 

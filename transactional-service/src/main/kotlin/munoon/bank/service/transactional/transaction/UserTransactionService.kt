@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class UserTransactionService(private val userTransactionRepository: UserTransactionRepository,
@@ -16,7 +17,7 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
         val card = cardService.getCardByNumberAndValidatePinCode(cardDataTo.card, cardDataTo.pinCode).let {
             cardService.minusMoney(it, cardPrice)
         }
-        val transaction = UserTransaction(null, card, cardPrice, card.balance, UserTransactionType.CARD_BUY, null)
+        val transaction = UserTransaction(null, card, cardPrice, card.balance, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
         return userTransactionRepository.save(transaction)
     }
 
