@@ -4,6 +4,7 @@ import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
 import munoon.bank.service.transactional.util.validation.CardType
 import org.hibernate.validator.constraints.Length
+import java.time.LocalDateTime
 
 @KotlinBuilder
 @NoArgsConstructor
@@ -14,7 +15,9 @@ data class CardTo(
 
         val number: String?,
 
-        val balance: Double
+        val balance: Double,
+
+        val registered: LocalDateTime
 )
 
 @NoArgsConstructor

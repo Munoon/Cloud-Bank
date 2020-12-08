@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDateTime
 import javax.ws.rs.core.MediaType
 
 internal class CardsControllerTest : AbstractTest() {
@@ -33,7 +34,7 @@ internal class CardsControllerTest : AbstractTest() {
                 .andReturn()
 
         val card = JsonUtil.readFromJson(result, CardTo::class.java)
-        val expected = Card(card.id, 100, "default", null, "", 0.0)
+        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCards(100), expected)
 
         val actualCard = cardService.getCardById(card.id)
@@ -53,7 +54,7 @@ internal class CardsControllerTest : AbstractTest() {
     @Test
     fun getCards() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0)
+        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
 
         mockMvc.perform(get("/cards")
                 .with(authUser()))

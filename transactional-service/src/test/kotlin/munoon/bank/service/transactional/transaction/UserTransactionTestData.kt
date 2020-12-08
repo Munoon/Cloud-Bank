@@ -9,14 +9,24 @@ import org.springframework.test.web.servlet.ResultMatcher
 
 object UserTransactionTestData {
     fun assertMatchTo(actual: Iterable<UserTransactionTo>, expected: Iterable<UserTransactionTo>) {
-        assertThat(actual).usingDefaultElementComparator().isEqualTo(expected)
+        assertThat(actual).usingElementComparatorIgnoringFields("card", "info").isEqualTo(expected)
+        assertThat(actual.map { it.card }).usingElementComparatorIgnoringFields("registered").isEqualTo(expected.map { it.card })
+        assertThat(actual.map { it.info }).usingElementComparatorIgnoringFields("buyCard.registered").isEqualTo(expected.map { it.info })
     }
 
-    fun assertMatch(actual: Iterable<UserTransaction>, expected: Iterable<UserTransaction>) {
-        assertThat(actual).usingElementComparatorIgnoringFields("card.pinCode", "info.buyCard.pinCode").isEqualTo(expected)
+    fun assertMatch(actual: UserTransaction, expected: UserTransaction) {
+        assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringFields("card.registered", "card.pinCode", "info.buyCard.pinCode", "info.buyCard.registered")
+                .isEqualTo(expected);
     }
 
-    fun assertMatch(actual: Iterable<UserTransaction>, vararg expected: UserTransaction) {
+    fun assertMatch(actual: List<UserTransaction>, expected: List<UserTransaction>) {
+        assertThat(actual).hasSize(expected.size)
+        actual.forEachIndexed { index, it -> assertMatch(it, expected[index]) }
+    }
+
+    fun assertMatch(actual: List<UserTransaction>, vararg expected: UserTransaction) {
         assertMatch(actual, expected.toList())
     }
 

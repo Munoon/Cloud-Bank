@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
+import java.time.LocalDateTime
 
 internal class CardServiceTest : AbstractTest() {
     @Autowired
@@ -32,7 +33,7 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun buyFreeCard() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0)
+        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCards(100), expected)
 
         val actualCard = cardService.getCardById(card.id!!)
@@ -86,7 +87,7 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun getCards() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0)
+        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCards(100), expected)
     }
 
@@ -97,7 +98,7 @@ internal class CardServiceTest : AbstractTest() {
             cardRepository.save(it.copy(number = cardNumber))
         }
 
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0)
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCardByNumberAndValidatePinCode(cardNumber, "1111"), expected)
     }
 
@@ -118,7 +119,7 @@ internal class CardServiceTest : AbstractTest() {
             cardRepository.save(it.copy(number = cardNumber))
         }
 
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0)
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCardByNumber(cardNumber), expected)
     }
 
@@ -129,7 +130,7 @@ internal class CardServiceTest : AbstractTest() {
         }
         cardService.minusMoney(card, 100.0)
 
-        val expected = Card(card.id, 100, "default", null, "", 0.0)
+        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCardById(card.id!!), expected)
     }
 
@@ -144,7 +145,7 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun getCardById() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0)
+        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCardById(card.id!!), expected)
     }
 }

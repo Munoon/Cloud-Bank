@@ -6,6 +6,7 @@ import munoon.bank.service.transactional.util.NotEnoughBalanceException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class CardService(private val cardRepository: CardRepository,
@@ -34,7 +35,7 @@ class CardService(private val cardRepository: CardRepository,
         }
 
         val pinCode = passwordEncoder.encode(buyCardTo.pinCode)
-        val buyCard = cardRepository.save(Card(null, userId, cardType.codeName, null, pinCode, 0.0))
+        val buyCard = cardRepository.save(Card(null, userId, cardType.codeName, null, pinCode, 0.0, LocalDateTime.now()))
         if (userTransaction != null) {
             userTransactionService.addCardToCardTransaction(userTransaction, buyCard)
         }

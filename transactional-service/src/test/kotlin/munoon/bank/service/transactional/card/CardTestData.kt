@@ -7,11 +7,11 @@ import org.springframework.test.web.servlet.ResultMatcher
 
 object CardTestData {
     fun assertMatch(actual: Card, expected: Card) {
-        assertThat(actual).usingRecursiveComparison().ignoringFields("pinCode").isEqualTo(expected)
+        assertThat(actual).usingRecursiveComparison().ignoringFields("pinCode", "registered").isEqualTo(expected)
     }
 
     fun assertMatch(actual: Iterable<Card>, expected: Iterable<Card>) {
-        assertThat(actual).usingElementComparatorIgnoringFields("pinCode").isEqualTo(expected)
+        assertThat(actual).usingElementComparatorIgnoringFields("pinCode", "registered").isEqualTo(expected)
     }
 
     fun assertMatch(actual: Iterable<Card>, vararg expected: Card) {
@@ -19,11 +19,11 @@ object CardTestData {
     }
 
     fun assertMatch(actual: CardTo, expected: CardTo) {
-        assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
+        assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
     }
 
     fun assertMatchTo(actual: Iterable<CardTo>, expected: Iterable<CardTo>) {
-        assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
+        assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
     }
 
     fun contentJson(vararg expected: CardTo) = ResultMatcher {

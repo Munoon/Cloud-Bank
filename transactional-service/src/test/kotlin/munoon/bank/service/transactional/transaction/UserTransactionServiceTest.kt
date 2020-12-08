@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
+import java.time.LocalDateTime
 
 internal class UserTransactionServiceTest : AbstractTest() {
     @Autowired
@@ -38,7 +39,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
 
         val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
 
-        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0))
+        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, LocalDateTime.now()))
         userTransactionService.addCardToCardTransaction(transaction, createdCard)
 
         val expected = UserTransaction(transaction.id, card.copy(balance = 900.0), 100.0, 900.0, UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard))
