@@ -11,8 +11,16 @@ spring:
       username: ${databases.transactions.username}
       password: ${databases.transactions.password}
 
+  mvc:
+    throw-exception-if-no-handler-found: true
+
 server:
   port: ${PORT:0}
+  error:
+    whitelabel:
+      enabled: false
+    include-exception: true
+    path: ""
 
 security:
   oauth2:
