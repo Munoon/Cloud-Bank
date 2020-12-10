@@ -56,6 +56,18 @@ internal class CardServiceTest : AbstractTest() {
     }
 
     @Test
+    fun buyPaymentCardNotOwnCard() {
+        val defaultCardNumber = "123456789012"
+        val defaultCardPinCode = "1111"
+        cardService.buyCard(100, BuyCardTo("default", defaultCardPinCode, null)).let {
+            cardRepository.save(it.copy(balance =  1000.0, number = defaultCardNumber))
+        }
+        assertThrows<AccessDeniedException> {
+            cardService.buyCard(101, BuyCardTo("gold", "1111", CardDataTo(defaultCardNumber, defaultCardPinCode)))
+        }
+    }
+
+    @Test
     fun buyCardCantBuy() {
         assertThrows<AccessDeniedException> { cardService.buyCard(100, BuyCardTo("parliament", "1111", null)) }
     }

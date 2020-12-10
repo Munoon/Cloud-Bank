@@ -6,8 +6,10 @@ import munoon.bank.service.transactional.transaction.UserTransactionTestData.ass
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
+import org.springframework.security.access.AccessDeniedException
 import java.time.LocalDateTime
 
 internal class UserTransactionServiceTest : AbstractTest() {
@@ -29,6 +31,17 @@ internal class UserTransactionServiceTest : AbstractTest() {
         val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
         val expected = UserTransaction(transaction.id, card.copy(balance = 900.0), 100.0, 900.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
         assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
+    }
+
+    @Test
+    fun buyCardTransactionNotOwnCard() {
+        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
+            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
+        }
+
+        assertThrows<AccessDeniedException> {
+            userTransactionService.buyCardTransaction(101, 100.0, CardDataTo(card.number!!, "1111"))
+        }
     }
 
     @Test

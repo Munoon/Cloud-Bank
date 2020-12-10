@@ -3,6 +3,7 @@ package munoon.bank.service.transactional.transaction
 import munoon.bank.service.transactional.card.Card
 import munoon.bank.service.transactional.card.CardDataTo
 import munoon.bank.service.transactional.card.CardService
+import munoon.bank.service.transactional.util.CardUtils
 import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,6 +16,7 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
                              @Lazy private val cardService: CardService) {
     fun buyCardTransaction(userId: Int, cardPrice: Double, cardDataTo: CardDataTo): UserTransaction {
         val card = cardService.getCardByNumberAndValidatePinCode(cardDataTo.card, cardDataTo.pinCode).let {
+            CardUtils.checkCardOwner(userId, it)
             cardService.minusMoney(it, cardPrice)
         }
         val transaction = UserTransaction(null, card, cardPrice, card.balance, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
