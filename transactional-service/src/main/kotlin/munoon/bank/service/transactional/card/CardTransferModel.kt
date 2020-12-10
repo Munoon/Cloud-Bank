@@ -42,3 +42,28 @@ data class CardDataTo(
 ) {
         override fun toString() = "CardDataTo(card=$card)"
 }
+
+@NoArgsConstructor
+data class AdminUpdateCardTo(
+        val userId: Int,
+
+        @field:Length(min = 2)
+        val type: String,
+
+        @field:Length(min = 12, max = 12)
+        val number: String?
+)
+
+@NoArgsConstructor
+data class AdminCreateCardTo(
+        val userId: Int,
+
+        @field:Length(min = 2)
+        val type: String,
+
+        @field:Length(min = 12, max = 12)
+        val number: String?,
+
+        @field:Length(min = 4, max = 4)
+        val pinCode: String
+)

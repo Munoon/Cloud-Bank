@@ -4,12 +4,14 @@ import munoon.bank.common.SecurityUtils
 import munoon.bank.common.error.ErrorInfo
 import munoon.bank.common.error.ErrorInfoField
 import munoon.bank.common.error.ErrorType
+import munoon.bank.common.util.ValidationUtils
+import munoon.bank.common.util.exception.FieldValidationException
 import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.transactional.util.NotEnoughBalanceException
-import munoon.bank.common.util.ValidationUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.validation.BindException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -36,6 +38,13 @@ class GlobalExceptionHandler {
     fun notEnoughBalanceExceptionHandler(e: NotEnoughBalanceException, req: HttpServletRequest): ErrorInfo {
         log.warn(" on request '${req.requestURL}' for user ${SecurityUtils.authUserIdOrAnonymous()}", e)
         return ErrorInfo(req.requestURL, ErrorType.NOT_ENOUGH_BALANCE, e.message)
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(FieldValidationException::class)
+    fun fieldValidationExceptionHandler(e: FieldValidationException, req: HttpServletRequest): ErrorInfo {
+        log.warn("Field validation exception on request '${req.requestURL}' for user ${SecurityUtils.authUserIdOrAnonymous()}", e)
+        return ErrorInfoField(req.requestURL, mapOf(e.field to listOf(e.message)))
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)

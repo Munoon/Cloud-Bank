@@ -3,7 +3,7 @@ package munoon.bank.service.transactional.controller
 import munoon.bank.service.transactional.AbstractTest
 import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
-import munoon.bank.service.transactional.card.CardTestData.contentJson
+import munoon.bank.service.transactional.card.CardTestData.contentJsonList
 import munoon.bank.service.transactional.util.JsonUtil
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
 import org.assertj.core.api.Assertions.assertThat
@@ -35,7 +35,7 @@ internal class CardsControllerTest : AbstractTest() {
 
         val card = JsonUtil.readFromJson(result, CardTo::class.java)
         val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
-        assertMatch(cardService.getCards(100), expected)
+        assertMatch(cardService.getCardsByUserId(100), expected)
 
         val actualCard = cardService.getCardById(card.id)
         assertThat(passwordEncoder.matches("1111", actualCard.pinCode)).isTrue()
@@ -59,8 +59,8 @@ internal class CardsControllerTest : AbstractTest() {
         mockMvc.perform(get("/cards")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(expected.asTo()))
+                .andExpect(contentJsonList(expected.asTo()))
 
-        assertMatch(cardService.getCards(100), expected)
+        assertMatch(cardService.getCardsByUserId(100), expected)
     }
 }

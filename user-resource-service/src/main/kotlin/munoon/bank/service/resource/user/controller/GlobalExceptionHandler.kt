@@ -5,8 +5,8 @@ import munoon.bank.common.error.ErrorInfo
 import munoon.bank.common.error.ErrorInfoField
 import munoon.bank.common.error.ErrorType
 import munoon.bank.common.util.exception.NotFoundException
-import munoon.bank.service.resource.user.util.FieldValidationException
 import munoon.bank.common.util.ValidationUtils
+import munoon.bank.common.util.exception.FieldValidationException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus

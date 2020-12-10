@@ -2,6 +2,7 @@ package munoon.bank.service.transactional
 
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.user.User
+import munoon.bank.service.transactional.config.MongoConfig
 import munoon.bank.service.transactional.user.UserTestData
 import munoon.bank.service.transactional.util.OAuth2TestData
 import org.junit.jupiter.api.BeforeEach
@@ -38,9 +39,13 @@ abstract class AbstractTest {
     @Autowired
     private lateinit var mongoTemplate: MongoTemplate
 
+    @Autowired
+    private lateinit var mongoConfig: MongoConfig
+
     @BeforeEach
     fun init() {
         mongoTemplate.db.drop()
+        mongoConfig.createIndexes(mongoTemplate).run()
     }
 
     @Autowired

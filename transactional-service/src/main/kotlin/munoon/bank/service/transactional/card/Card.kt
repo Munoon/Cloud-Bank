@@ -1,27 +1,31 @@
 package munoon.bank.service.transactional.card
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.github.pozo.KotlinBuilder
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
 @Document
+@KotlinBuilder
 data class Card(
         @Id
-        val id: String?,
+        var id: String?,
 
-        val userId: Int,
+        var userId: Int,
 
-        val type: String,
+        var type: String,
 
-        val number: String?,
+        @Indexed(unique = true)
+        var number: String?,
 
         @JsonIgnore
-        val pinCode: String,
+        var pinCode: String,
 
-        val balance: Double,
+        var balance: Double,
 
-        val registered: LocalDateTime
+        var registered: LocalDateTime
 ) {
         override fun toString() = "Card(id=$id, userId=$userId, type='$type', number=$number, balance=$balance)"
 }

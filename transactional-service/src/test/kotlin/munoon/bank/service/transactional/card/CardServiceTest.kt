@@ -1,5 +1,7 @@
 package munoon.bank.service.transactional.card
 
+import munoon.bank.common.util.exception.FieldValidationException
+import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.transactional.AbstractTest
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
 import munoon.bank.service.transactional.transaction.BuyCardUserTransactionInfo
@@ -10,12 +12,14 @@ import munoon.bank.service.transactional.transaction.UserTransactionType
 import munoon.bank.service.transactional.util.NotEnoughBalanceException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDateTime
+import javax.validation.ValidationException
 
 internal class CardServiceTest : AbstractTest() {
     @Autowired
@@ -34,7 +38,7 @@ internal class CardServiceTest : AbstractTest() {
     fun buyFreeCard() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
         val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
-        assertMatch(cardService.getCards(100), expected)
+        assertMatch(cardService.getCardsByUserId(100), expected)
 
         val actualCard = cardService.getCardById(card.id!!)
         assertThat(passwordEncoder.matches("1111", actualCard.pinCode)).isTrue()
@@ -97,10 +101,10 @@ internal class CardServiceTest : AbstractTest() {
     }
 
     @Test
-    fun getCards() {
+    fun getCardsByUserId() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
         val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
-        assertMatch(cardService.getCards(100), expected)
+        assertMatch(cardService.getCardsByUserId(100), expected)
     }
 
     @Test
@@ -159,5 +163,86 @@ internal class CardServiceTest : AbstractTest() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
         val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
         assertMatch(cardService.getCardById(card.id!!), expected)
+    }
+
+    @Test
+    fun createCard() {
+        val createCard = AdminCreateCardTo(100, "default", "111111111111", "1111")
+        val card = cardService.createCard(createCard)
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, LocalDateTime.now())
+        assertMatch(cardService.getCardsByUserId(100), expected)
+        assertThat(passwordEncoder.matches("1111", cardService.getCardById(card.id!!).pinCode)).isTrue()
+    }
+
+    @Test
+    fun createCardNotUniqueNumber() {
+        val cardNumber = "111111111111"
+        cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111"))
+        assertThrows<FieldValidationException> {
+            cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111"))
+        }
+    }
+
+    @Test
+    fun updateCard() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", "111111111111"))
+        val expected = Card(card.id, 101, "gold", "111111111111", "", 0.0, card.registered)
+        assertMatch(cardService.getCardsByUserId(101), expected)
+    }
+
+    @Test
+    fun updateCardNotFound() {
+        assertThrows<NotFoundException> {
+            cardService.updateCard(100, "123", AdminUpdateCardTo(101, "gold", "111111111111"))
+        }
+    }
+
+    @Test
+    fun updateCardBelongToOtherUser() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        assertThrows<AccessDeniedException> {
+            cardService.updateCard(101, card.id!!, AdminUpdateCardTo(101, "gold", "111111111111"))
+        }
+    }
+
+    @Test
+    fun updateCardNotUniqueNumber() {
+        val number = "111111111111"
+        cardService.createCard(AdminCreateCardTo(100, "default", number, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        assertThrows<FieldValidationException> {
+            cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", number))
+        }
+    }
+
+    @Test
+    fun updateCardPinCode() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        cardService.updateCardPinCode(100, card.id!!, "2222")
+        assertThat(passwordEncoder.matches("2222", cardService.getCardById(card.id!!).pinCode)).isTrue()
+    }
+
+    @Test
+    fun updateCardPinCodeCardNotFound() {
+        assertThrows<NotFoundException> {
+            cardService.updateCardPinCode(100, "123456", "2222")
+        }
+    }
+
+    @Test
+    fun updateCardPinCodeCardBelongToOtherUser() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        assertThrows<AccessDeniedException> {
+            cardService.updateCardPinCode(101, card.id!!, "2222")
+        }
+    }
+
+    @Test
+    fun cardWithOutNumberNotUnique() {
+        assertDoesNotThrow {
+            cardRepository.save(Card(null, 100, "default", null, "", 0.0, LocalDateTime.now()))
+            cardRepository.save(Card(null, 100, "default", null, "", 0.0, LocalDateTime.now()))
+        }
     }
 }

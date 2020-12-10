@@ -25,6 +25,6 @@ class CardsController(private val cardService: CardService) {
     @GetMapping
     fun getCards(): List<CardTo> {
         log.info("User ${authUserId()} get his cards list")
-        return cardService.getCards(authUserId()).asTo()
+        return cardService.getCardsByUserId(authUserId()).asTo()
     }
 }

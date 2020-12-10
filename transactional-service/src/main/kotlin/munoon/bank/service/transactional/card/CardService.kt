@@ -1,8 +1,12 @@
 package munoon.bank.service.transactional.card
 
+import munoon.bank.common.util.exception.FieldValidationException
 import munoon.bank.common.util.exception.NotFoundException
+import munoon.bank.service.transactional.config.MongoConfig
 import munoon.bank.service.transactional.transaction.UserTransactionService
+import munoon.bank.service.transactional.util.CardUtils
 import munoon.bank.service.transactional.util.NotEnoughBalanceException
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -35,7 +39,7 @@ class CardService(private val cardRepository: CardRepository,
         }
 
         val pinCode = passwordEncoder.encode(buyCardTo.pinCode)
-        val buyCard = cardRepository.save(Card(null, userId, cardType.codeName, null, pinCode, 0.0, LocalDateTime.now()))
+        val buyCard = cardRepository.save(buyCardTo.asCard(userId, pinCode))
         if (userTransaction != null) {
             userTransactionService.addCardToCardTransaction(userTransaction, buyCard)
         }
@@ -43,7 +47,40 @@ class CardService(private val cardRepository: CardRepository,
         return buyCard
     }
 
-    fun getCards(userId: Int): List<Card> {
+    fun updateCard(userId: Int, cardId: String, adminUpdateCardTo: AdminUpdateCardTo): Card {
+        val card = getCardById(cardId)
+        CardUtils.checkCardOwner(userId, card)
+        CardMapper.INSTANCE.updateCard(adminUpdateCardTo, card)
+        return try {
+            cardRepository.save(card)
+        } catch (e: DuplicateKeyException) {
+            if (e.message!!.contains(MongoConfig.UNIQUE_CARD_NUMBER_INDEX)) {
+                throw FieldValidationException("number", "Такой номер карты уже существует!")
+            }
+            throw e
+        }
+    }
+
+    fun updateCardPinCode(userId: Int, cardId: String, pinCode: String) {
+        val card = getCardById(cardId)
+        CardUtils.checkCardOwner(userId, card)
+        val newPinCode = passwordEncoder.encode(pinCode)
+        cardRepository.save(card.copy(pinCode = newPinCode))
+    }
+
+    fun createCard(adminCreateCardTo: AdminCreateCardTo): Card {
+        val card = CardMapper.INSTANCE.asCard(adminCreateCardTo, passwordEncoder)
+        return try {
+            cardRepository.save(card)
+        } catch (e: DuplicateKeyException) {
+            if (e.message!!.contains(MongoConfig.UNIQUE_CARD_NUMBER_INDEX)) {
+                throw FieldValidationException("number", "Такой номер карты уже существует!")
+            }
+            throw e
+        }
+    }
+
+    fun getCardsByUserId(userId: Int): List<Card> {
         return cardRepository.findAllByUserId(userId)
     }
 

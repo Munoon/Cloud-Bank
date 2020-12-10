@@ -26,7 +26,12 @@ object CardTestData {
         assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
     }
 
-    fun contentJson(vararg expected: CardTo) = ResultMatcher {
+    fun contentJson(expected: CardTo) = ResultMatcher {
+        val actual = JsonUtil.OBJECT_MAPPER.readValue<CardTo>(JsonUtil.getContent(it))
+        assertMatch(actual, expected)
+    }
+
+    fun contentJsonList(vararg expected: CardTo) = ResultMatcher {
         val actual = JsonUtil.OBJECT_MAPPER.readValue<List<CardTo>>(JsonUtil.getContent(it))
         assertMatchTo(actual, expected.toList())
     }
