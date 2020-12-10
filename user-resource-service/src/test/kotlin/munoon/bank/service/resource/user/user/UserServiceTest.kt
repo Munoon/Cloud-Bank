@@ -1,13 +1,13 @@
 package munoon.bank.service.resource.user.user
 
 import munoon.bank.common.user.User
+import munoon.bank.common.util.exception.FieldValidationException
 import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.resource.user.AbstractTest
 import munoon.bank.service.resource.user.user.UserTestData.DEFAULT_USER
 import munoon.bank.service.resource.user.user.UserTestData.USER_ID
 import munoon.bank.service.resource.user.user.UserTestData.USER_PASSWORD
 import munoon.bank.service.resource.user.user.UserTestData.assertMatch
-import munoon.bank.service.resource.user.util.FieldValidationException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test

@@ -1,5 +1,6 @@
 package munoon.bank.service.resource.user.util
 
+import munoon.bank.common.util.exception.FieldValidationException
 import org.springframework.security.crypto.password.PasswordEncoder
 
 object UserUtils {
