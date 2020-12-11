@@ -217,14 +217,14 @@ internal class CardServiceTest : AbstractTest() {
     }
 
     @Test
-    fun updateCardPinCode() {
+    fun updateCardPinCodeAdmin() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
         cardService.updateCardPinCode(100, card.id!!, "2222")
         assertThat(passwordEncoder.matches("2222", cardService.getCardById(card.id!!).pinCode)).isTrue()
     }
 
     @Test
-    fun updateCardPinCodeCardNotFound() {
+    fun updateCardPinCodeCardNotFoundAdmin() {
         assertThrows<NotFoundException> {
             cardService.updateCardPinCode(100, "123456", "2222")
         }
@@ -243,6 +243,38 @@ internal class CardServiceTest : AbstractTest() {
         assertDoesNotThrow {
             cardRepository.save(Card(null, 100, "default", null, "", 0.0, LocalDateTime.now()))
             cardRepository.save(Card(null, 100, "default", null, "", 0.0, LocalDateTime.now()))
+        }
+    }
+
+    @Test
+    fun updateCardPinCode() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        cardService.updateCardPinCode(100, card.id!!, UserUpdateCardPinCode("1111", "2222"))
+
+        val actual = cardService.getCardById(card.id!!)
+        assertThat(passwordEncoder.matches("2222", actual.pinCode)).isTrue()
+    }
+
+    @Test
+    fun updateCardPinCodeOldPinCodeIncorrect() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        assertThrows<AccessDeniedException> {
+            cardService.updateCardPinCode(100, card.id!!, UserUpdateCardPinCode("2222", "2222"))
+        }
+    }
+
+    @Test
+    fun updateCardPinCodeCardNotFound() {
+        assertThrows<NotFoundException> {
+            cardService.updateCardPinCode(100, "abc", UserUpdateCardPinCode("2222", "2222"))
+        }
+    }
+
+    @Test
+    fun updateCardPinCodeNotOwnCard() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        assertThrows<AccessDeniedException> {
+            cardService.updateCardPinCode(101, card.id!!, UserUpdateCardPinCode("1111", "2222"))
         }
     }
 }

@@ -1,10 +1,12 @@
 package munoon.bank.service.transactional.controller
 
+import munoon.bank.common.error.ErrorType
 import munoon.bank.service.transactional.AbstractTest
 import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
 import munoon.bank.service.transactional.card.CardTestData.contentJsonList
 import munoon.bank.service.transactional.util.JsonUtil
+import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -62,5 +64,51 @@ internal class CardsControllerTest : AbstractTest() {
                 .andExpect(contentJsonList(expected.asTo()))
 
         assertMatch(cardService.getCardsByUserId(100), expected)
+    }
+
+    @Test
+    fun updateCardPinCode() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+
+        mockMvc.perform(post("/cards/${card.id}/pinCode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(UserUpdateCardPinCode("1111", "2222")))
+                .with(authUser()))
+                .andExpect(status().isNoContent())
+
+        val actual = cardService.getCardById(card.id!!)
+        assertThat(passwordEncoder.matches("2222", actual.pinCode)).isTrue()
+    }
+
+    @Test
+    fun updateCardPinCodeValidationError() {
+        mockMvc.perform(post("/cards/1111/pinCode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(UserUpdateCardPinCode("1", "1")))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("oldPinCode", "newPinCode"))
+    }
+
+    @Test
+    fun updateCardPinCodeCardNotFound() {
+        mockMvc.perform(post("/cards/abc/pinCode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(UserUpdateCardPinCode("1111", "2222")))
+                .with(authUser()))
+                .andExpect(status().isNotFound())
+                .andExpect(error(ErrorType.NOT_FOUND))
+    }
+
+    @Test
+    fun updateCardPinCodeOldPinCodeIncorrect() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+
+        mockMvc.perform(post("/cards/${card.id}/pinCode")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(UserUpdateCardPinCode("2222", "2222")))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("oldPinCode"))
     }
 }

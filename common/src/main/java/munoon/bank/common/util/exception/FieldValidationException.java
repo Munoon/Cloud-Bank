@@ -6,7 +6,7 @@ public class FieldValidationException extends RuntimeException {
     @Getter
     private final String field;
 
-    public FieldValidationException(String message, String field) {
+    public FieldValidationException(String field, String message) {
         super(message);
         this.field = field;
     }

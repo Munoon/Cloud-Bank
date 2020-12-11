@@ -67,3 +67,12 @@ data class AdminCreateCardTo(
         @field:Length(min = 4, max = 4)
         val pinCode: String
 )
+
+@NoArgsConstructor
+data class UserUpdateCardPinCode(
+        @field:Length(min = 4, max = 4)
+        val oldPinCode: String,
+
+        @field:Length(min = 4, max = 4)
+        val newPinCode: String
+)

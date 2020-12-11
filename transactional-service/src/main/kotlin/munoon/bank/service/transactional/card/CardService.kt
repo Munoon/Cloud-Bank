@@ -68,6 +68,16 @@ class CardService(private val cardRepository: CardRepository,
         cardRepository.save(card.copy(pinCode = newPinCode))
     }
 
+    fun updateCardPinCode(userId: Int, cardId: String, userUpdateCardPinCode: UserUpdateCardPinCode) {
+        val card = getCardById(cardId)
+        CardUtils.checkCardOwner(userId, card)
+        if (!passwordEncoder.matches(userUpdateCardPinCode.oldPinCode, card.pinCode)) {
+            throw FieldValidationException("oldPinCode", "Старый пин-код введен не верно!")
+        }
+        val newPinCode = passwordEncoder.encode(userUpdateCardPinCode.newPinCode)
+        cardRepository.save(card.copy(pinCode = newPinCode))
+    }
+
     fun createCard(adminCreateCardTo: AdminCreateCardTo): Card {
         val card = CardMapper.INSTANCE.asCard(adminCreateCardTo, passwordEncoder)
         return try {
@@ -89,7 +99,7 @@ class CardService(private val cardRepository: CardRepository,
         if (!passwordEncoder.matches(pinCode, card.pinCode)) {
             throw AccessDeniedException("Incorrect pin code!")
         }
-        return card;
+        return card
     }
 
     fun getCardByNumber(cardNumber: String): Card = cardRepository.findByNumber(cardNumber)
