@@ -16,6 +16,7 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
                              @Lazy private val cardService: CardService) {
     fun buyCardTransaction(userId: Int, cardPrice: Double, cardDataTo: CardDataTo): UserTransaction {
         val card = cardService.getCardByNumberAndValidatePinCode(cardDataTo.card, cardDataTo.pinCode).let {
+            CardUtils.checkCardActive(it)
             CardUtils.checkCardOwner(userId, it)
             cardService.minusMoney(it, cardPrice)
         }

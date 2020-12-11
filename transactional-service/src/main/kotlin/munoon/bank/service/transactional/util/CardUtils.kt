@@ -9,4 +9,10 @@ object CardUtils {
             throw AccessDeniedException(message)
         }
     }
+
+    fun checkCardActive(card: Card, message: String = "This card is not active") {
+        if (!card.active) {
+            throw AccessDeniedException(message)
+        }
+    }
 }

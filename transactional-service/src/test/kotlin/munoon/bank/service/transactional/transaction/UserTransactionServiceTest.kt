@@ -45,6 +45,17 @@ internal class UserTransactionServiceTest : AbstractTest() {
     }
 
     @Test
+    fun buyCardTransactionNotActive() {
+        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
+            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012", active = false))
+        }
+
+        assertThrows<AccessDeniedException> {
+            userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
+        }
+    }
+
+    @Test
     fun addCardToCardTransaction() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
             cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
@@ -52,7 +63,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
 
         val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
 
-        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, LocalDateTime.now()))
+        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, true, LocalDateTime.now()))
         userTransactionService.addCardToCardTransaction(transaction, createdCard)
 
         val expected = UserTransaction(transaction.id, card.copy(balance = 900.0), 100.0, 900.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard))

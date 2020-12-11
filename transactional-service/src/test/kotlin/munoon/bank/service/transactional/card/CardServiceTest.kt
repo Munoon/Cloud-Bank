@@ -37,7 +37,7 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun buyFreeCard() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
 
         val actualCard = cardService.getCardById(card.id!!)
@@ -101,9 +101,22 @@ internal class CardServiceTest : AbstractTest() {
     }
 
     @Test
+    fun buyCardPaymentCardNotActive() {
+        val defaultCardNumber = "123456789012"
+        val defaultCardPinCode = "1111"
+        cardService.buyCard(100, BuyCardTo("default", defaultCardPinCode, null)).let {
+            cardRepository.save(it.copy(balance =  1000.0, number = defaultCardNumber, active = false))
+        }
+
+        assertThrows<AccessDeniedException> {
+            cardService.buyCard(100, BuyCardTo("gold", "1111", CardDataTo(defaultCardNumber, defaultCardPinCode)))
+        }
+    }
+
+    @Test
     fun getCardsByUserId() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
     }
 
@@ -114,7 +127,7 @@ internal class CardServiceTest : AbstractTest() {
             cardRepository.save(it.copy(number = cardNumber))
         }
 
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardByNumberAndValidatePinCode(cardNumber, "1111"), expected)
     }
 
@@ -135,7 +148,7 @@ internal class CardServiceTest : AbstractTest() {
             cardRepository.save(it.copy(number = cardNumber))
         }
 
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardByNumber(cardNumber), expected)
     }
 
@@ -146,7 +159,7 @@ internal class CardServiceTest : AbstractTest() {
         }
         cardService.minusMoney(card, 100.0)
 
-        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardById(card.id!!), expected)
     }
 
@@ -161,15 +174,15 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun getCardById() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardById(card.id!!), expected)
     }
 
     @Test
     fun createCard() {
-        val createCard = AdminCreateCardTo(100, "default", "111111111111", "1111")
+        val createCard = AdminCreateCardTo(100, "default", "111111111111", "1111", true)
         val card = cardService.createCard(createCard)
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
         assertThat(passwordEncoder.matches("1111", cardService.getCardById(card.id!!).pinCode)).isTrue()
     }
@@ -177,48 +190,48 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun createCardNotUniqueNumber() {
         val cardNumber = "111111111111"
-        cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111"))
+        cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111", true))
         assertThrows<FieldValidationException> {
-            cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111"))
+            cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111", true))
         }
     }
 
     @Test
     fun updateCard() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
-        cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", "111111111111"))
-        val expected = Card(card.id, 101, "gold", "111111111111", "", 0.0, card.registered)
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", "111111111111", true))
+        val expected = Card(card.id, 101, "gold", "111111111111", "", 0.0, true, card.registered)
         assertMatch(cardService.getCardsByUserId(101), expected)
     }
 
     @Test
     fun updateCardNotFound() {
         assertThrows<NotFoundException> {
-            cardService.updateCard(100, "123", AdminUpdateCardTo(101, "gold", "111111111111"))
+            cardService.updateCard(100, "123", AdminUpdateCardTo(101, "gold", "111111111111", true))
         }
     }
 
     @Test
     fun updateCardBelongToOtherUser() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         assertThrows<AccessDeniedException> {
-            cardService.updateCard(101, card.id!!, AdminUpdateCardTo(101, "gold", "111111111111"))
+            cardService.updateCard(101, card.id!!, AdminUpdateCardTo(101, "gold", "111111111111", true))
         }
     }
 
     @Test
     fun updateCardNotUniqueNumber() {
         val number = "111111111111"
-        cardService.createCard(AdminCreateCardTo(100, "default", number, "1111"))
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        cardService.createCard(AdminCreateCardTo(100, "default", number, "1111", true))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         assertThrows<FieldValidationException> {
-            cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", number))
+            cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", number, true))
         }
     }
 
     @Test
     fun updateCardPinCodeAdmin() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         cardService.updateCardPinCode(100, card.id!!, "2222")
         assertThat(passwordEncoder.matches("2222", cardService.getCardById(card.id!!).pinCode)).isTrue()
     }
@@ -232,7 +245,7 @@ internal class CardServiceTest : AbstractTest() {
 
     @Test
     fun updateCardPinCodeCardBelongToOtherUser() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         assertThrows<AccessDeniedException> {
             cardService.updateCardPinCode(101, card.id!!, "2222")
         }
@@ -241,14 +254,14 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun cardWithOutNumberNotUnique() {
         assertDoesNotThrow {
-            cardRepository.save(Card(null, 100, "default", null, "", 0.0, LocalDateTime.now()))
-            cardRepository.save(Card(null, 100, "default", null, "", 0.0, LocalDateTime.now()))
+            cardRepository.save(Card(null, 100, "default", null, "", 0.0, true, LocalDateTime.now()))
+            cardRepository.save(Card(null, 100, "default", null, "", 0.0, true, LocalDateTime.now()))
         }
     }
 
     @Test
     fun updateCardPinCode() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         cardService.updateCardPinCode(100, card.id!!, UserUpdateCardPinCode("1111", "2222"))
 
         val actual = cardService.getCardById(card.id!!)
@@ -257,8 +270,8 @@ internal class CardServiceTest : AbstractTest() {
 
     @Test
     fun updateCardPinCodeOldPinCodeIncorrect() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
-        assertThrows<AccessDeniedException> {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        assertThrows<FieldValidationException> {
             cardService.updateCardPinCode(100, card.id!!, UserUpdateCardPinCode("2222", "2222"))
         }
     }
@@ -272,7 +285,7 @@ internal class CardServiceTest : AbstractTest() {
 
     @Test
     fun updateCardPinCodeNotOwnCard() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         assertThrows<AccessDeniedException> {
             cardService.updateCardPinCode(101, card.id!!, UserUpdateCardPinCode("1111", "2222"))
         }

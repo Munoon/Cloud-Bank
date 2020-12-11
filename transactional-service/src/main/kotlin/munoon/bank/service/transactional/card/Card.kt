@@ -25,6 +25,8 @@ data class Card(
 
         var balance: Double,
 
+        var active: Boolean,
+
         var registered: LocalDateTime
 ) {
         override fun toString() = "Card(id=$id, userId=$userId, type='$type', number=$number, balance=$balance)"

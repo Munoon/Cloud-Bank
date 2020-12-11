@@ -17,6 +17,8 @@ data class CardTo(
 
         val balance: Double,
 
+        val active: Boolean,
+
         val registered: LocalDateTime
 )
 
@@ -51,7 +53,9 @@ data class AdminUpdateCardTo(
         val type: String,
 
         @field:Length(min = 12, max = 12)
-        val number: String?
+        val number: String?,
+
+        val active: Boolean
 )
 
 @NoArgsConstructor
@@ -65,7 +69,9 @@ data class AdminCreateCardTo(
         val number: String?,
 
         @field:Length(min = 4, max = 4)
-        val pinCode: String
+        val pinCode: String,
+
+        val active: Boolean
 )
 
 @NoArgsConstructor

@@ -36,7 +36,7 @@ internal class CardsControllerTest : AbstractTest() {
                 .andReturn()
 
         val card = JsonUtil.readFromJson(result, CardTo::class.java)
-        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
 
         val actualCard = cardService.getCardById(card.id)
@@ -56,7 +56,7 @@ internal class CardsControllerTest : AbstractTest() {
     @Test
     fun getCards() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
 
         mockMvc.perform(get("/cards")
                 .with(authUser()))
@@ -68,7 +68,7 @@ internal class CardsControllerTest : AbstractTest() {
 
     @Test
     fun updateCardPinCode() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
 
         mockMvc.perform(post("/cards/${card.id}/pinCode")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +102,7 @@ internal class CardsControllerTest : AbstractTest() {
 
     @Test
     fun updateCardPinCodeOldPinCodeIncorrect() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
 
         mockMvc.perform(post("/cards/${card.id}/pinCode")
                 .contentType(MediaType.APPLICATION_JSON)

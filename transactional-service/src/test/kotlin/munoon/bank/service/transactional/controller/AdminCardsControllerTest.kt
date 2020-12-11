@@ -26,8 +26,8 @@ internal class AdminCardsControllerTest : AbstractTest() {
 
     @Test
     fun getCardsByUser() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111"))
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, card.registered)
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
 
         mockMvc.perform(get("/admin/cards/100")
                 .with(authUser()))
@@ -38,8 +38,8 @@ internal class AdminCardsControllerTest : AbstractTest() {
     @Test
     fun getCardByNumber() {
         val cardNumber = "123456789012"
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111"))
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, card.registered)
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111", true))
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, true, card.registered)
 
         mockMvc.perform(get("/admin/cards/number/$cardNumber")
                 .with(authUser()))
@@ -65,8 +65,8 @@ internal class AdminCardsControllerTest : AbstractTest() {
 
     @Test
     fun getCardById() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111"))
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, card.registered)
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
 
         mockMvc.perform(get("/admin/cards/100/${card.id}")
                 .with(authUser()))
@@ -84,7 +84,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
 
     @Test
     fun getCardByIdOtherOwner() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
 
         mockMvc.perform(get("/admin/cards/101/${card.id}")
                 .with(authUser()))
@@ -94,15 +94,15 @@ internal class AdminCardsControllerTest : AbstractTest() {
 
     @Test
     fun updateCard() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
 
         mockMvc.perform(put("/admin/cards/100/${card.id}")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "gold", "222222222222")))
+                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "gold", "222222222222", false)))
                 .with(authUser()))
                 .andExpect(status().isOk())
 
-        val expected = Card(card.id, 101, "gold", "222222222222", "", 0.0, card.registered)
+        val expected = Card(card.id, 101, "gold", "222222222222", "", 0.0, false, card.registered)
         assertMatch(cardService.getCardsByUserId(101), expected)
     }
 
@@ -110,7 +110,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
     fun updateCardNotFound() {
         mockMvc.perform(put("/admin/cards/100/abc")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "gold", "222222222222")))
+                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "gold", "222222222222", true)))
                 .with(authUser()))
                 .andExpect(status().isNotFound())
                 .andExpect(error(ErrorType.NOT_FOUND))
@@ -118,10 +118,10 @@ internal class AdminCardsControllerTest : AbstractTest() {
 
     @Test
     fun updateCardOtherOwner() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         mockMvc.perform(put("/admin/cards/101/${card.id}")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "gold", "222222222222")))
+                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "gold", "222222222222", true)))
                 .with(authUser()))
                 .andExpect(status().isForbidden())
                 .andExpect(error(ErrorType.ACCESS_DENIED))
@@ -131,7 +131,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
     fun updateCardValidationException() {
         mockMvc.perform(put("/admin/cards/100/1111")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "", "")))
+                .content(JsonUtil.writeValue(AdminUpdateCardTo(101, "", "", true)))
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(fieldError("type", "number"))
@@ -139,7 +139,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
 
     @Test
     fun updateCardPinCode() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         mockMvc.perform(put("/admin/cards/100/${card.id}/pinCode")
                 .param("pinCode", "2222")
                 .with(authUser()))
@@ -158,7 +158,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
 
     @Test
     fun updateCardPinCodeOtherOwner() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111"))
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         mockMvc.perform(put("/admin/cards/101/${card.id}/pinCode")
                 .param("pinCode", "2222")
                 .with(authUser()))
@@ -179,13 +179,13 @@ internal class AdminCardsControllerTest : AbstractTest() {
     fun createCard() {
         val result = mockMvc.perform(post("/admin/cards")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(AdminCreateCardTo(100, "default", "111111111111", "1111")))
+                .content(JsonUtil.writeValue(AdminCreateCardTo(100, "default", "111111111111", "1111", true)))
                 .with(authUser()))
                 .andExpect(status().isOk())
                 .andReturn()
 
         val card = JsonUtil.readFromJson(result, CardTo::class.java)
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, card.registered)
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
         assertMatch(cardService.getCardsByUserId(100), expected)
         assertThat(passwordEncoder.matches("1111", cardService.getCardById(card.id).pinCode)).isTrue()
     }
@@ -194,7 +194,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
     fun createCardValidationException() {
         mockMvc.perform(post("/admin/cards")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(AdminCreateCardTo(100, "", "", "")))
+                .content(JsonUtil.writeValue(AdminCreateCardTo(100, "", "", "", true)))
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(fieldError("type", "number", "pinCode"))

@@ -17,6 +17,7 @@ interface CardMapper {
             Mapping(target = "number", expression = "java(null)"),
             Mapping(target = "pinCode", source = "pinCode"),
             Mapping(target = "balance", constant = "0.0"),
+            Mapping(target = "active", constant = "true"),
             Mapping(target = "registered", expression = "java(java.time.LocalDateTime.now())")
     )
     fun asCard(buyCardTo: BuyCardTo, userId: Int, pinCode: String): Card
