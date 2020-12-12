@@ -12,10 +12,14 @@ abstract class UserTransactionMapper {
 
     fun mapInfo(userTransaction: UserTransaction): UserTransactionInfoTo? = when (userTransaction.info) {
         is BuyCardUserTransactionInfo -> asTo(userTransaction.info)
+        is AwardUserTransactionInfo -> asTo(userTransaction.info)
+        is FineUserTransactionInfo -> asTo(userTransaction.info)
         else -> null
     }
 
     abstract fun asTo(buyCardUserTransactionInfo: BuyCardUserTransactionInfo): BuyCardUserTransactionInfoTo
+    abstract fun asTo(awardUserTransactionInfo: AwardUserTransactionInfo): AwardUserTransactionInfoTo
+    abstract fun asTo(fineUserTransactionInfo: FineUserTransactionInfo): FineUserTransactionInfoTo
 
     companion object {
         val INSTANCE = Mappers.getMapper(UserTransactionMapper::class.java)

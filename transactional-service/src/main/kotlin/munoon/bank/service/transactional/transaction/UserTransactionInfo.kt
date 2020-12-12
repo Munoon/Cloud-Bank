@@ -9,3 +9,13 @@ data class BuyCardUserTransactionInfo(
         @DBRef
         var buyCard: Card
 ) : UserTransactionInfo
+
+data class AwardUserTransactionInfo(
+        var userId: Int,
+        var message: String?
+) : UserTransactionInfo
+
+data class FineUserTransactionInfo(
+        var userId: Int,
+        var message: String?
+) : UserTransactionInfo

@@ -7,6 +7,7 @@ import munoon.bank.service.transactional.card.CardDataTo
 import munoon.bank.service.transactional.card.CardRepository
 import munoon.bank.service.transactional.card.CardService
 import munoon.bank.service.transactional.transaction.*
+import munoon.bank.service.transactional.transaction.UserTransactionTestData.contentJsonList
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
 import org.junit.jupiter.api.Test
@@ -31,13 +32,13 @@ internal class TransactionControllerTest : AbstractTest() {
             cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
         }
 
-        val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 900.0), 100.0, 900.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
+        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 10.0, FineAwardType.AWARD, "abc"))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 1010.0), 10.0, 1010.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"))
 
         mockMvc.perform(get("/transaction/" + card.id)
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(UserTransactionTestData.contentJsonList(expected.asTo()))
+                .andExpect(contentJsonList(expected.asTo()))
     }
 
     @Test

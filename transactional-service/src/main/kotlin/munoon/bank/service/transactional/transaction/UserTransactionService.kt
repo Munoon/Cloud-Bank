@@ -29,6 +29,28 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
         return userTransactionRepository.save(newTransaction)
     }
 
+    fun fineAwardTransaction(userId: Int, fineAwardData: FineAwardDataTo): UserTransaction {
+        var transactionType: UserTransactionType
+        var transactionInfo: UserTransactionInfo
+        val card = cardService.getCardByNumber(fineAwardData.card).let {
+            CardUtils.checkCardActive(it)
+            when (fineAwardData.type) {
+                FineAwardType.AWARD -> {
+                    transactionType = UserTransactionType.AWARD
+                    transactionInfo = AwardUserTransactionInfo(userId, fineAwardData.message)
+                    cardService.plusMoney(it, fineAwardData.count)
+                }
+                FineAwardType.FINE -> {
+                    transactionType = UserTransactionType.FINE
+                    transactionInfo = FineUserTransactionInfo(userId, fineAwardData.message)
+                    cardService.minusMoney(it, fineAwardData.count, checkBalance = false)
+                }
+            }
+        }
+        val transaction = UserTransaction(null, card, fineAwardData.count, card.balance, LocalDateTime.now(), transactionType, transactionInfo)
+        return userTransactionRepository.save(transaction)
+    }
+
     fun getTransactions(cardId: String, userId: Int, pageable: Pageable): Page<UserTransaction> {
         val card = cardService.getCardById(cardId)
         if (card.userId != userId) {

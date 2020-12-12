@@ -1,17 +1,18 @@
 package munoon.bank.service.transactional.transaction
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.readValue
-import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.util.JsonUtil
 import munoon.bank.service.transactional.util.JsonUtil.getContent
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.test.web.servlet.ResultMatcher
 
 object UserTransactionTestData {
-    fun assertMatchTo(actual: Iterable<UserTransactionTo>, expected: Iterable<UserTransactionTo>) {
-        assertThat(actual).usingElementComparatorIgnoringFields("card", "info", "registered").isEqualTo(expected)
-        assertThat(actual.map { it.card }).usingElementComparatorIgnoringFields("registered").isEqualTo(expected.map { it.card })
-        assertThat(actual.map { it.info }).usingElementComparatorIgnoringFields("buyCard.registered").isEqualTo(expected.map { it.info })
+    fun assertMatch(actual: UserTransactionTo, expected: UserTransactionTo) {
+        assertThat(actual).usingRecursiveComparison().ignoringFields("card", "info", "registered").isEqualTo(expected)
+        assertThat(actual.card).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected.card)
+        assertThat(actual.info).usingRecursiveComparison().ignoringFields("buyCard.registered").isEqualTo(expected.info)
     }
 
     fun assertMatch(actual: UserTransaction, expected: UserTransaction) {
@@ -19,6 +20,11 @@ object UserTransactionTestData {
                 .usingRecursiveComparison()
                 .ignoringFields("card.registered", "card.pinCode", "info.buyCard.pinCode", "info.buyCard.registered", "registered")
                 .isEqualTo(expected);
+    }
+
+    fun assertMatchTo(actual: List<UserTransactionTo>, expected: List<UserTransactionTo>) {
+        assertThat(actual).hasSize(expected.size)
+        actual.forEachIndexed { index, it -> assertMatch(it, expected[index]) }
     }
 
     fun assertMatch(actual: List<UserTransaction>, expected: List<UserTransaction>) {
@@ -31,8 +37,24 @@ object UserTransactionTestData {
     }
 
     fun contentJsonList(vararg expected: UserTransactionTo) = ResultMatcher {
-        val node = JsonUtil.OBJECT_MAPPER.readTree(getContent(it)).at("/content")
-        val actual = JsonUtil.OBJECT_MAPPER.readValue<List<UserTransactionTo>>(node.toString())
+        val actual = readFromJsonList(getContent(it))
         assertMatchTo(actual, expected.toList())
+    }
+
+    fun readFromJsonList(json: String): List<UserTransactionTo> = JsonUtil.OBJECT_MAPPER.readTree(json)
+            .at("/content")
+            .map { readFromJson(it.toString()) }
+
+    fun readFromJson(json: String): UserTransactionTo {
+        val objectNode = (JsonUtil.OBJECT_MAPPER.readTree(json) as ObjectNode)
+        val info = objectNode.remove("info").toString()
+        val result = JsonUtil.OBJECT_MAPPER.readValue<UserTransactionTo>(objectNode.toString())
+        return result.copy(info = getTransactionInfo(result.type, info))
+    }
+
+    private fun getTransactionInfo(type: UserTransactionType, info: String) = when (type) {
+        UserTransactionType.CARD_BUY -> JsonUtil.OBJECT_MAPPER.readValue<BuyCardUserTransactionInfoTo>(info)
+        UserTransactionType.AWARD -> JsonUtil.OBJECT_MAPPER.readValue<AwardUserTransactionInfoTo>(info)
+        UserTransactionType.FINE -> JsonUtil.OBJECT_MAPPER.readValue<FineUserTransactionInfoTo>(info)
     }
 }

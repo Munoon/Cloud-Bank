@@ -30,3 +30,17 @@ interface UserTransactionInfoTo
 data class BuyCardUserTransactionInfoTo(
         var buyCard: CardTo
 ) : UserTransactionInfoTo
+
+@KotlinBuilder
+@NoArgsConstructor
+data class AwardUserTransactionInfoTo(
+        var userId: Int,
+        var message: String?
+) : UserTransactionInfoTo
+
+@KotlinBuilder
+@NoArgsConstructor
+data class FineUserTransactionInfoTo(
+        var userId: Int,
+        var message: String?
+) : UserTransactionInfoTo

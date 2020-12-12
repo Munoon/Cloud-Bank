@@ -105,12 +105,16 @@ class CardService(private val cardRepository: CardRepository,
     fun getCardByNumber(cardNumber: String): Card = cardRepository.findByNumber(cardNumber)
                 .orElseThrow { NotFoundException("Card with number '$cardNumber' is not found!") }
 
-    fun minusMoney(card: Card, price: Double): Card {
-        if (card.balance < price) {
+    fun minusMoney(card: Card, price: Double, checkBalance: Boolean = true): Card {
+        if (checkBalance && card.balance < price) {
             throw NotEnoughBalanceException("На карте недостаточно средств!")
         }
 
         return cardRepository.save(card.copy(balance = card.balance - price))
+    }
+
+    fun plusMoney(card: Card, price: Double): Card {
+        return cardRepository.save(card.copy(balance = card.balance + price))
     }
 
     fun getCardById(cardId: String): Card = cardRepository.findById(cardId)

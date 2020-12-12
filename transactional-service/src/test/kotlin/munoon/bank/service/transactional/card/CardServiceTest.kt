@@ -172,6 +172,21 @@ internal class CardServiceTest : AbstractTest() {
     }
 
     @Test
+    fun minusMoneyNotChecked() {
+        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
+            cardRepository.save(it.copy(balance = 100.0))
+        }
+        assertDoesNotThrow { cardService.minusMoney(card, 999.0, checkBalance = false) }
+    }
+
+    @Test
+    fun plusMoney() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        cardService.plusMoney(card, 100.0)
+        assertMatch(cardService.getCardsByUserId(100), card.copy(balance = 100.0))
+    }
+
+    @Test
     fun getCardById() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
         val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
