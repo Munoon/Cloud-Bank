@@ -10,7 +10,7 @@ object UserUtils {
                          message: String = "Неверный пароль",
                          fieldName: String = "password") {
         if (!passwordEncoder.matches(password, actual)) {
-            throw FieldValidationException(message, fieldName)
+            throw FieldValidationException(fieldName, message)
         }
     }
 }
