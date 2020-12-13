@@ -45,6 +45,11 @@
             <version>${spring.security.oauth.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

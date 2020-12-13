@@ -2,9 +2,11 @@ package munoon.bank.service.resource.user.config
 
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.auth.user.UserIdAuthenticationConverter
+import munoon.bank.common.config.JsonConfig
 import munoon.bank.service.resource.user.user.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @Configuration
 @EnableWebSecurity
 @EnableResourceServer
+@Import(JsonConfig::class)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class ResourceServerConfig : ResourceServerConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
