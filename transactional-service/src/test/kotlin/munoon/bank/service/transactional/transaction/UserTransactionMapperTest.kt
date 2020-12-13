@@ -13,33 +13,33 @@ internal class UserTransactionMapperTest {
     @Test
     fun asTo() {
         val card = Card("111", 100, "default", "111111111111", "1111", 100.0, true, LocalDateTime.now())
-        val transaction = UserTransaction("123", card, 10.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "test"))
-        val expected = UserTransactionTo("123", card.asTo(), 10.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfoTo(101, "test"))
+        val transaction = UserTransaction("123", card, 10.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "test", 100.0))
+        val expected = UserTransactionTo("123", card.asTo(), 10.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfoTo(101, "test", 100.0))
         assertMatch(UserTransactionMapper.INSTANCE.asTo(transaction), expected)
     }
 
     @Test
     fun buyCardAsTo() {
         val card = Card("111", 100, "default", "111111111111", "1111", 100.0, true, LocalDateTime.now())
-        val info = BuyCardUserTransactionInfo(card)
+        val info = BuyCardUserTransactionInfo(card, 100.0)
         val actual = UserTransactionMapper.INSTANCE.asTo(info)
-        val expected = BuyCardUserTransactionInfoTo(card.asTo())
+        val expected = BuyCardUserTransactionInfoTo(card.asTo(), 100.0)
         assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     }
 
     @Test
     fun awardAsTo() {
-        val info = AwardUserTransactionInfo(100, "test")
+        val info = AwardUserTransactionInfo(100, "test", 100.0)
         val actual = UserTransactionMapper.INSTANCE.asTo(info)
-        val expected = AwardUserTransactionInfoTo(100, "test")
+        val expected = AwardUserTransactionInfoTo(100, "test", 100.0)
         assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     }
 
     @Test
     fun fineAsTo() {
-        val info = FineUserTransactionInfo(100, "test")
+        val info = FineUserTransactionInfo(100, "test", 100.0)
         val actual = UserTransactionMapper.INSTANCE.asTo(info)
-        val expected = FineUserTransactionInfoTo(100, "test")
+        val expected = FineUserTransactionInfoTo(100, "test", 100.0)
         assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     }
 }

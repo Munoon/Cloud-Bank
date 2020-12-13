@@ -10,7 +10,6 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class CardService(private val cardRepository: CardRepository,
@@ -18,8 +17,7 @@ class CardService(private val cardRepository: CardRepository,
                   private val passwordEncoder: PasswordEncoder,
                   private val userTransactionService: UserTransactionService) {
     fun buyCard(userId: Int, buyCardTo: BuyCardTo): Card {
-        val cardType = cardsProperties.cards.find { it.codeName == buyCardTo.type }
-                ?: throw NotFoundException("Card with code name ${buyCardTo.type} is not found!")
+        val cardType = getCardType(buyCardTo.type)
 
         if (!cardType.ableToBuy) {
             throw AccessDeniedException("You can't buy ${cardType.name} card!")
@@ -41,7 +39,7 @@ class CardService(private val cardRepository: CardRepository,
         val pinCode = passwordEncoder.encode(buyCardTo.pinCode)
         val buyCard = cardRepository.save(buyCardTo.asCard(userId, pinCode))
         if (userTransaction != null) {
-            userTransactionService.addCardToCardTransaction(userTransaction, buyCard)
+            userTransactionService.addCardToCardTransaction(userTransaction, buyCard, cardType.price)
         }
 
         return buyCard
@@ -119,4 +117,7 @@ class CardService(private val cardRepository: CardRepository,
 
     fun getCardById(cardId: String): Card = cardRepository.findById(cardId)
             .orElseThrow { NotFoundException("Card with id '$cardId' is not found!") }
+
+    fun getCardType(type: String) = cardsProperties.cards.find { it.codeName == type }
+            ?: throw NotFoundException("Card with code name '$type' is not found!")
 }

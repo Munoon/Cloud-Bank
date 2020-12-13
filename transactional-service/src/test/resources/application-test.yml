@@ -29,11 +29,20 @@ application:
       price: 0
       ableToBuy: true
       clientLimit: 1
+      awardTax: 15.0
+      fineTax: 15.0
+      otherTax: 15.0
     - name: "Gold"
       codeName: gold
       price: 100
       ableToBuy: true
+      awardTax: 0.0
+      fineTax: 0.0
+      otherTax: 0.0
     - name: "Parliament"
       codeName: parliament
       price: 100
       ableToBuy: false
+      awardTax: 5.0
+      fineTax: 5.0
+      otherTax: 5.0

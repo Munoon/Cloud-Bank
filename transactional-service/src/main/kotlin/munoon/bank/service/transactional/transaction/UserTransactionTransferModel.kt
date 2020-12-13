@@ -28,19 +28,22 @@ interface UserTransactionInfoTo
 @KotlinBuilder
 @NoArgsConstructor
 data class BuyCardUserTransactionInfoTo(
-        var buyCard: CardTo
+        var buyCard: CardTo,
+        var actualPrice: Double
 ) : UserTransactionInfoTo
 
 @KotlinBuilder
 @NoArgsConstructor
 data class AwardUserTransactionInfoTo(
         var userId: Int,
-        var message: String?
+        var message: String?,
+        var actualPrice: Double
 ) : UserTransactionInfoTo
 
 @KotlinBuilder
 @NoArgsConstructor
 data class FineUserTransactionInfoTo(
         var userId: Int,
-        var message: String?
+        var message: String?,
+        var actualPrice: Double
 ) : UserTransactionInfoTo

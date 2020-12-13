@@ -32,8 +32,8 @@ internal class TransactionControllerTest : AbstractTest() {
             cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
         }
 
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 10.0, FineAwardType.AWARD, "abc"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 1010.0), 10.0, 1010.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"))
+        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc", 100.0))
 
         mockMvc.perform(get("/transaction/" + card.id)
                 .with(authUser()))

@@ -19,5 +19,8 @@ class CardsProperties {
         var price: Double = 0.0
         var ableToBuy: Boolean = false
         var clientLimit: Int? = null
+        var awardTax: Double = 0.0
+        var fineTax: Double = 0.0
+        var otherTax: Double = 0.0
     }
 }
