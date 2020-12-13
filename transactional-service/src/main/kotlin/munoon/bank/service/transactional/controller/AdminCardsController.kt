@@ -51,9 +51,9 @@ class AdminCardsController(private val cardService: CardService) {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{userId}/{cardId}/pinCode")
     fun updateCardPinCode(@PathVariable userId: Int, @PathVariable cardId: String,
-                          @Valid @Length(min = 4, max = 4) @RequestParam pinCode: String) {
+                          @Valid @RequestBody adminUpdateCardPinCode: AdminUpdateCardPinCode) {
         log.info("Admin ${authUserId()} updated pinCode of card '$cardId' of user $userId")
-        cardService.updateCardPinCode(userId, cardId, pinCode)
+        cardService.updateCardPinCode(userId, cardId, adminUpdateCardPinCode.pinCode)
     }
 
     @PostMapping

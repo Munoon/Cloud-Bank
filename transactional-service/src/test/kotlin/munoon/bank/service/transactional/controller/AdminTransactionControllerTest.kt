@@ -9,6 +9,7 @@ import munoon.bank.service.transactional.transaction.*
 import munoon.bank.service.transactional.util.JsonUtil
 import munoon.bank.service.transactional.util.ResponseExceptionValidator
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
+import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -72,7 +73,7 @@ internal class AdminTransactionControllerTest : AbstractTest() {
     fun makeFineOrAwardCardNotFound() {
         mockMvc.perform(post("/admin/transaction/fine-award")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(FineAwardDataTo("abc", 10.0, FineAwardType.FINE, "message")))
+                .content(JsonUtil.writeValue(FineAwardDataTo("111111111111", 10.0, FineAwardType.FINE, "message")))
                 .with(authUser()))
                 .andExpect(status().isNotFound())
                 .andExpect(error(ErrorType.NOT_FOUND))
@@ -87,5 +88,15 @@ internal class AdminTransactionControllerTest : AbstractTest() {
                 .with(authUser()))
                 .andExpect(status().isForbidden())
                 .andExpect(error(ErrorType.ACCESS_DENIED))
+    }
+
+    @Test
+    fun makeFineOrAwardValidationError() {
+        mockMvc.perform(post("/admin/transaction/fine-award")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(FineAwardDataTo("11111111111", 10.0001, FineAwardType.FINE, "message")))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("card", "count"))
     }
 }

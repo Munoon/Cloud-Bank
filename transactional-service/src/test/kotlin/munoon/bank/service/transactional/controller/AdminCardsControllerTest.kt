@@ -141,7 +141,8 @@ internal class AdminCardsControllerTest : AbstractTest() {
     fun updateCardPinCode() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         mockMvc.perform(put("/admin/cards/100/${card.id}/pinCode")
-                .param("pinCode", "2222")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(AdminUpdateCardPinCode("2222")))
                 .with(authUser()))
                 .andExpect(status().isNoContent())
         assertThat(passwordEncoder.matches("2222", cardService.getCardById(card.id!!).pinCode)).isTrue()
@@ -150,7 +151,8 @@ internal class AdminCardsControllerTest : AbstractTest() {
     @Test
     fun updateCardPinCodeCardNotFound() {
         mockMvc.perform(put("/admin/cards/100/abc/pinCode")
-                .param("pinCode", "2222")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(AdminUpdateCardPinCode("2222")))
                 .with(authUser()))
                 .andExpect(status().isNotFound())
                 .andExpect(error(ErrorType.NOT_FOUND))
@@ -160,7 +162,8 @@ internal class AdminCardsControllerTest : AbstractTest() {
     fun updateCardPinCodeOtherOwner() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         mockMvc.perform(put("/admin/cards/101/${card.id}/pinCode")
-                .param("pinCode", "2222")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(AdminUpdateCardPinCode("2222")))
                 .with(authUser()))
                 .andExpect(status().isForbidden())
                 .andExpect(error(ErrorType.ACCESS_DENIED))
@@ -169,10 +172,11 @@ internal class AdminCardsControllerTest : AbstractTest() {
     @Test
     fun updateCardPinCodeValidationException() {
         mockMvc.perform(put("/admin/cards/100/1111/pinCode")
-                .param("pinCode", "222")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(AdminUpdateCardPinCode("222")))
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(fieldError("updateCardPinCode.pinCode"))
+                .andExpect(fieldError("pinCode"))
     }
 
     @Test

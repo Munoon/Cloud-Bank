@@ -1,6 +1,7 @@
 package munoon.bank.service.transactional.transaction
 
 import munoon.bank.service.transactional.card.Card
+import org.hibernate.validator.constraints.Length
 import org.springframework.data.mongodb.core.mapping.DBRef
 
 interface UserTransactionInfo
@@ -12,10 +13,14 @@ data class BuyCardUserTransactionInfo(
 
 data class AwardUserTransactionInfo(
         var userId: Int,
+
+        @field:Length(max = 200, message = "Сообщение слишком большое")
         var message: String?
 ) : UserTransactionInfo
 
 data class FineUserTransactionInfo(
         var userId: Int,
+
+        @field:Length(max = 200, message = "Сообщение слишком большое")
         var message: String?
 ) : UserTransactionInfo

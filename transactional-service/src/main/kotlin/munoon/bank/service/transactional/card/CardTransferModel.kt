@@ -25,6 +25,7 @@ data class CardTo(
 @NoArgsConstructor
 data class BuyCardTo(
         @field:CardType
+        @field:Length(min = 2, max = 20)
         val type: String,
 
         @field:Length(min = 4, max = 4)
@@ -49,7 +50,8 @@ data class CardDataTo(
 data class AdminUpdateCardTo(
         val userId: Int,
 
-        @field:Length(min = 2)
+        @field:CardType
+        @field:Length(min = 2, max = 20)
         val type: String,
 
         @field:Length(min = 12, max = 12)
@@ -62,7 +64,8 @@ data class AdminUpdateCardTo(
 data class AdminCreateCardTo(
         val userId: Int,
 
-        @field:Length(min = 2)
+        @field:CardType
+        @field:Length(min = 2, max = 20)
         val type: String,
 
         @field:Length(min = 12, max = 12)
@@ -72,7 +75,9 @@ data class AdminCreateCardTo(
         val pinCode: String,
 
         val active: Boolean
-)
+) {
+        override fun toString() = "AdminCreateCardTo(userId=$userId, type='$type', number=$number, active=$active)"
+}
 
 @NoArgsConstructor
 data class UserUpdateCardPinCode(
@@ -81,4 +86,14 @@ data class UserUpdateCardPinCode(
 
         @field:Length(min = 4, max = 4)
         val newPinCode: String
-)
+) {
+        override fun toString() = "UserUpdateCardPinCode()"
+}
+
+@NoArgsConstructor
+data class AdminUpdateCardPinCode(
+        @field:Length(min = 4, max = 4)
+        val pinCode: String
+) {
+        override fun toString() = "AdminUpdateCardPinCode()"
+}
