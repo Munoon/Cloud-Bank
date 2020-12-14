@@ -2,6 +2,7 @@ package munoon.bank.service.resource.user.controller
 
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.user.UserTo
+import munoon.bank.common.validation.pageable.size.PageSize
 import munoon.bank.service.resource.user.config.ClassesProperties
 import munoon.bank.service.resource.user.user.*
 import munoon.bank.service.resource.user.util.validator.PageableSize
@@ -26,7 +27,7 @@ class AdminController(private val userService: UserService, private val classesP
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
-    fun getUsersList(@Valid @PageableSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
+    fun getUsersList(@Valid @PageSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
                      @Valid @ValidClass @RequestParam("class") clazz: String): Page<UserTo> {
         log.info("User ${authUserId()} get users list by class $clazz: $pageable")
         return userService.getAll(pageable, clazz).map { it.asTo() }
@@ -41,7 +42,7 @@ class AdminController(private val userService: UserService, private val classesP
 
     @GetMapping("/find")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
-    fun findUser(@Valid @PageableSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
+    fun findUser(@Valid @PageSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
                  @Valid @Length(min = 3, max = 30) @RequestParam query: String): Page<UserTo> {
         log.info("User ${authUserId()} find user by query '$query' (page: $pageable)")
         return userService.findUser(pageable, query).map { it.asTo() }
