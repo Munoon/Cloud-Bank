@@ -5,7 +5,6 @@ import munoon.bank.common.user.UserTo
 import munoon.bank.common.validation.pageable.size.PageSize
 import munoon.bank.service.resource.user.config.ClassesProperties
 import munoon.bank.service.resource.user.user.*
-import munoon.bank.service.resource.user.util.validator.PageableSize
 import munoon.bank.service.resource.user.util.validator.ValidClass
 import org.hibernate.validator.constraints.Length
 import org.slf4j.LoggerFactory
