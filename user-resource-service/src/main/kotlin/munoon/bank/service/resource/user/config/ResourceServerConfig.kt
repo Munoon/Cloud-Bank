@@ -3,6 +3,7 @@ package munoon.bank.service.resource.user.config
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.auth.user.UserIdAuthenticationConverter
 import munoon.bank.common.config.JsonConfig
+import munoon.bank.common.error.RestExceptionHandler
 import munoon.bank.service.resource.user.user.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -54,4 +55,7 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
             return AuthorizedUser(user)
         }
     }
+
+    @Bean
+    fun restExceptionHandler() = RestExceptionHandler()
 }

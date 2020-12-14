@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -206,7 +207,7 @@ internal class CardServiceTest : AbstractTest() {
     fun createCardNotUniqueNumber() {
         val cardNumber = "111111111111"
         cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111", true))
-        assertThrows<FieldValidationException> {
+        assertThrows<DuplicateKeyException> {
             cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111", true))
         }
     }
@@ -239,7 +240,7 @@ internal class CardServiceTest : AbstractTest() {
         val number = "111111111111"
         cardService.createCard(AdminCreateCardTo(100, "default", number, "1111", true))
         val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
-        assertThrows<FieldValidationException> {
+        assertThrows<DuplicateKeyException> {
             cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", number, true))
         }
     }

@@ -49,14 +49,7 @@ class CardService(private val cardRepository: CardRepository,
         val card = getCardById(cardId)
         CardUtils.checkCardOwner(userId, card)
         CardMapper.INSTANCE.updateCard(adminUpdateCardTo, card)
-        return try {
-            cardRepository.save(card)
-        } catch (e: DuplicateKeyException) {
-            if (e.message!!.contains(MongoConfig.UNIQUE_CARD_NUMBER_INDEX)) {
-                throw FieldValidationException("number", "Такой номер карты уже существует!")
-            }
-            throw e
-        }
+        return cardRepository.save(card)
     }
 
     fun updateCardPinCode(userId: Int, cardId: String, pinCode: String) {
@@ -78,14 +71,7 @@ class CardService(private val cardRepository: CardRepository,
 
     fun createCard(adminCreateCardTo: AdminCreateCardTo): Card {
         val card = CardMapper.INSTANCE.asCard(adminCreateCardTo, passwordEncoder)
-        return try {
-            cardRepository.save(card)
-        } catch (e: DuplicateKeyException) {
-            if (e.message!!.contains(MongoConfig.UNIQUE_CARD_NUMBER_INDEX)) {
-                throw FieldValidationException("number", "Такой номер карты уже существует!")
-            }
-            throw e
-        }
+        return cardRepository.save(card)
     }
 
     fun getCardsByUserId(userId: Int): List<Card> {
