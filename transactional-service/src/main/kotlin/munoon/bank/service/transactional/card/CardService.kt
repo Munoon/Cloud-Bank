@@ -104,6 +104,6 @@ class CardService(private val cardRepository: CardRepository,
     fun getCardById(cardId: String): Card = cardRepository.findById(cardId)
             .orElseThrow { NotFoundException("Card with id '$cardId' is not found!") }
 
-    fun getCardType(type: String) = cardsProperties.cards.find { it.codeName == type }
+    fun getCardType(type: String) = cardsProperties.cards[type]
             ?: throw NotFoundException("Card with code name '$type' is not found!")
 }

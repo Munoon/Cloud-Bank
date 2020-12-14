@@ -18,7 +18,6 @@ annotation class CardType(
 )
 
 class CardTypeValidator(private val cardProperties: CardsProperties) : ConstraintValidator<CardType, String> {
-    override fun isValid(value: String, context: ConstraintValidatorContext?) = cardProperties.cards.stream().anyMatch {
-        it.codeName == value
-    }
+    override fun isValid(value: String, context: ConstraintValidatorContext?) =
+            cardProperties.cards[value] != null
 }

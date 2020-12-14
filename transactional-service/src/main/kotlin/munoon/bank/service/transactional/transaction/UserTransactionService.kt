@@ -22,7 +22,7 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
             CardUtils.checkCardActive(it)
             CardUtils.checkCardOwner(userId, it)
             val type = cardService.getCardType(it.type)
-            price = MoneyUtils.countWithTax(cardPrice, type.otherTax, TaxType.PLUS)
+            price = MoneyUtils.countWithTax(cardPrice, type.tax.other, TaxType.PLUS)
             cardService.minusMoney(it, price)
         }
         val transaction = UserTransaction(null, card, price, card.balance, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
@@ -46,13 +46,13 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
                 FineAwardType.AWARD -> {
                     transactionType = UserTransactionType.AWARD
                     transactionInfo = AwardUserTransactionInfo(userId, fineAwardData.message, fineAwardData.count)
-                    count = MoneyUtils.countWithTax(fineAwardData.count, type.awardTax, TaxType.MINUS)
+                    count = MoneyUtils.countWithTax(fineAwardData.count, type.tax.fine, TaxType.MINUS)
                     cardService.plusMoney(it, count)
                 }
                 FineAwardType.FINE -> {
                     transactionType = UserTransactionType.FINE
                     transactionInfo = FineUserTransactionInfo(userId, fineAwardData.message, fineAwardData.count)
-                    count = MoneyUtils.countWithTax(fineAwardData.count, type.fineTax, TaxType.PLUS)
+                    count = MoneyUtils.countWithTax(fineAwardData.count, type.tax.award, TaxType.PLUS)
                     cardService.minusMoney(it, count, checkBalance = false)
                 }
             }

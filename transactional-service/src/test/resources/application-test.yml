@@ -24,25 +24,28 @@ eureka:
 
 application:
   cards:
-    - name: "Classic"
-      codeName: default
+    default:
+      name: "Classic"
       price: 0
       ableToBuy: true
       clientLimit: 1
-      awardTax: 15.0
-      fineTax: 15.0
-      otherTax: 15.0
-    - name: "Gold"
-      codeName: gold
+      tax:
+        award: 15.0
+        fine: 15.0
+        other: 15.0
+    gold:
+      name: "Gold"
       price: 100
       ableToBuy: true
-      awardTax: 0.0
-      fineTax: 0.0
-      otherTax: 0.0
-    - name: "Parliament"
-      codeName: parliament
+      tax:
+        award: 0.0
+        fine: 0.0
+        other: 0.0
+    parliament:
+      name: "Parliament"
       price: 100
       ableToBuy: false
-      awardTax: 5.0
-      fineTax: 5.0
-      otherTax: 5.0
+      tax:
+        award: 5.0
+        fine: 5.0
+        other: 5.0

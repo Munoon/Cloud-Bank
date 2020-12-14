@@ -8,21 +8,23 @@ spring:
 application:
   classes: "5-а, 5-б, 6, 7, 8, 9, 10, 11"
   cards:
-    - name: "Classic"
-      codeName: default
+    default:
+      name: "Classic"
       price: 0
       ableToBuy: true
       clientLimit: 1
-      awardTax: 5.0
-      fineTax: 5.0
-      otherTax: 5.0
-    - name: "Gold"
-      codeName: gold
+      tax:
+        award: 5.0
+        fine: 5.0
+        other: 5.0
+    gold:
+      name: "Gold"
       price: 100
       ableToBuy: true
-      awardTax: 0.0
-      fineTax: 0.0
-      otherTax: 0.0
+      tax:
+        award: 0.0
+        fine: 0.0
+        other: 0.0
 
 databases:
   users:
