@@ -9,7 +9,6 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.Mappings
 import org.mapstruct.factory.Mappers
 import org.springframework.security.crypto.password.PasswordEncoder
-import java.time.LocalDateTime
 
 @Mapper
 interface LocalUserMapper {
@@ -17,7 +16,8 @@ interface LocalUserMapper {
 
     @Mappings(
             Mapping(target = "registered", expression = "java(java.time.LocalDateTime.now())"),
-            Mapping(target = "password", expression = "java(passwordEncoder.encode(user.getPassword()))")
+            Mapping(target = "password", expression = "java(passwordEncoder.encode(user.getPassword()))"),
+            Mapping(target = "id", expression = "java(null)")
     )
     fun asUserEntity(user: AdminRegisterUserTo, passwordEncoder: PasswordEncoder): UserEntity
 

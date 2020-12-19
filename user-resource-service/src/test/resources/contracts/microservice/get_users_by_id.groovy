@@ -9,11 +9,7 @@ Contract.make {
     description "get user's by microservice"
 
     request {
-        url urlPath("/microservices/users") {
-            queryParameters {
-                parameter 'ids': 100
-            }
-        }
+        url "/microservices/users?ids=100"
         method GET()
         headers {
             contentType applicationJson()
