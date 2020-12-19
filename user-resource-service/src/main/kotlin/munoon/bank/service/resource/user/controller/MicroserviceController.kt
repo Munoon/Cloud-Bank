@@ -1,6 +1,7 @@
 package munoon.bank.service.resource.user.controller
 
 import munoon.bank.common.user.UserTo
+import munoon.bank.common.util.MicroserviceUtils.getMicroserviceName
 import munoon.bank.service.resource.user.user.UserService
 import munoon.bank.service.resource.user.user.asTo
 import org.slf4j.LoggerFactory
@@ -16,7 +17,7 @@ class MicroserviceController(private val userService: UserService) {
 
     @GetMapping
     fun getUsersById(@RequestParam("ids") ids: List<Int>): List<UserTo> {
-        log.info("Microservice get users with ids $ids")
+        log.info("Microservice ${getMicroserviceName()} get users with ids $ids")
         return userService.getUsersByIds(ids).map { it.asTo() }
     }
 }

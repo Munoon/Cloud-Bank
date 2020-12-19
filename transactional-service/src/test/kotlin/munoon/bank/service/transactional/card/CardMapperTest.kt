@@ -37,6 +37,14 @@ internal class CardMapperTest : AbstractTest() {
     }
 
     @Test
+    fun asToWithNullUser() {
+        val card = Card("CARD_ID", 999, "default", "123456789012", "1111", 100.0, true, LocalDateTime.now())
+        val expected = CardToWithOwner("CARD_ID", "default", "123456789012", null, 100.0, true, card.registered)
+        val actual = cardMapper.asToWithUser(card)
+        assertMatch(actual, expected)
+    }
+
+    @Test
     fun updateCardByAdmin() {
         val card = Card("CARD_ID", 100, "default", "123456789012", "1111", 100.0, true, LocalDateTime.now())
         val update = AdminUpdateCardTo(101, "gold", "111111111111", true)

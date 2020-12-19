@@ -1,6 +1,8 @@
 package munoon.bank.service.transactional.config
 
 import feign.RequestInterceptor
+import munoon.bank.common.util.MicroserviceUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 
 class DefaultFeignConfig {
@@ -16,4 +18,10 @@ class DefaultFeignConfig {
         it.queries(null)
         it.queries(queries)
     }
+
+    @Bean
+    fun microserviceNameToHeaderRequestInterceptor(@Value("\${spring.application.name:transactional-service}") applicationName: String) =
+            RequestInterceptor {
+                it.header(MicroserviceUtils.MICROSERVICE_HEADER_NAME, applicationName)
+            }
 }
