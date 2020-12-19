@@ -15,21 +15,23 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/admin/cards")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
-class AdminCardsController(private val cardService: CardService) {
+class AdminCardsController(private val cardService: CardService,
+                           private val cardMapper: CardMapper) {
     private val log = LoggerFactory.getLogger(AdminCardsController::class.java)
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun getCardsByUser(@PathVariable userId: Int): List<CardTo> {
         log.info("User ${authUserId()} request cards of user $userId")
-        return cardService.getCardsByUserId(userId).asTo()
+        return cardService.getCardsByUserId(userId).map { cardMapper.asTo(it) }
     }
 
     @GetMapping("/number/{cardNumber}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
-    fun getCardByNumber(@Valid @Length(min = 12, max = 12) @PathVariable cardNumber: String): CardTo {
+    fun getCardByNumber(@Valid @Length(min = 12, max = 12) @PathVariable cardNumber: String): CardToWithOwner {
         log.info("User ${authUserId()} request card by number '$cardNumber'")
-        return cardService.getCardByNumber(cardNumber).asTo()
+        val card = cardService.getCardByNumber(cardNumber)
+        return cardMapper.asToWithUser(card)
     }
 
     @GetMapping("/{userId}/{cardId}")
@@ -38,14 +40,15 @@ class AdminCardsController(private val cardService: CardService) {
         log.info("User ${authUserId()} request cards of user $userId with id '$cardId'")
         val card = cardService.getCardById(cardId)
         CardUtils.checkCardOwner(userId, card)
-        return card.asTo()
+        return cardMapper.asTo(card)
     }
 
     @PutMapping("/{userId}/{cardId}")
     fun updateCard(@PathVariable userId: Int, @PathVariable cardId: String,
                    @Valid @RequestBody adminUpdateCardTo: AdminUpdateCardTo): CardTo {
         log.info("Admin ${authUserId()} updated card '$cardId' of user $userId: $adminUpdateCardTo")
-        return cardService.updateCard(userId, cardId, adminUpdateCardTo).asTo()
+        val card = cardService.updateCard(userId, cardId, adminUpdateCardTo)
+        return cardMapper.asTo(card)
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -57,8 +60,9 @@ class AdminCardsController(private val cardService: CardService) {
     }
 
     @PostMapping
-    fun createCard(@Valid @RequestBody adminCreateCardTo: AdminCreateCardTo): CardTo {
+    fun createCard(@Valid @RequestBody adminCreateCardTo: AdminCreateCardTo): CardToWithOwner {
         log.info("Admin ${authUserId()} create card: $adminCreateCardTo")
-        return cardService.createCard(adminCreateCardTo).asTo()
+        val card = cardService.createCard(adminCreateCardTo)
+        return cardMapper.asToWithUser(card)
     }
 }

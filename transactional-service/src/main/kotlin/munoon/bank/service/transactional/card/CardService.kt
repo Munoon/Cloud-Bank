@@ -2,11 +2,9 @@ package munoon.bank.service.transactional.card
 
 import munoon.bank.common.util.exception.FieldValidationException
 import munoon.bank.common.util.exception.NotFoundException
-import munoon.bank.service.transactional.config.MongoConfig
 import munoon.bank.service.transactional.transaction.UserTransactionService
 import munoon.bank.service.transactional.util.CardUtils
 import munoon.bank.service.transactional.util.NotEnoughBalanceException
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Service
 class CardService(private val cardRepository: CardRepository,
                   private val cardsProperties: CardsProperties,
                   private val passwordEncoder: PasswordEncoder,
+                  private val cardMapper: CardMapper,
                   private val userTransactionService: UserTransactionService) {
     fun buyCard(userId: Int, buyCardTo: BuyCardTo): Card {
         val cardType = getCardType(buyCardTo.type)
@@ -37,7 +36,8 @@ class CardService(private val cardRepository: CardRepository,
         }
 
         val pinCode = passwordEncoder.encode(buyCardTo.pinCode)
-        val buyCard = cardRepository.save(buyCardTo.asCard(userId, pinCode))
+        val card = cardMapper.asCard(buyCardTo, userId, pinCode)
+        val buyCard = cardRepository.save(card)
         if (userTransaction != null) {
             userTransactionService.addCardToCardTransaction(userTransaction, buyCard, cardType.price)
         }
@@ -48,7 +48,7 @@ class CardService(private val cardRepository: CardRepository,
     fun updateCard(userId: Int, cardId: String, adminUpdateCardTo: AdminUpdateCardTo): Card {
         val card = getCardById(cardId)
         CardUtils.checkCardOwner(userId, card)
-        CardMapper.INSTANCE.updateCard(adminUpdateCardTo, card)
+        cardMapper.updateCard(adminUpdateCardTo, card)
         return cardRepository.save(card)
     }
 
@@ -70,7 +70,7 @@ class CardService(private val cardRepository: CardRepository,
     }
 
     fun createCard(adminCreateCardTo: AdminCreateCardTo): Card {
-        val card = CardMapper.INSTANCE.asCard(adminCreateCardTo, passwordEncoder)
+        val card = cardMapper.asCard(adminCreateCardTo, passwordEncoder)
         return cardRepository.save(card)
     }
 

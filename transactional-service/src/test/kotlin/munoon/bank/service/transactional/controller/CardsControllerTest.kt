@@ -1,7 +1,7 @@
 package munoon.bank.service.transactional.controller
 
 import munoon.bank.common.error.ErrorType
-import munoon.bank.service.transactional.AbstractTest
+import munoon.bank.service.transactional.AbstractWebTest
 import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
 import munoon.bank.service.transactional.card.CardTestData.contentJsonList
@@ -10,7 +10,6 @@ import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -19,12 +18,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 import javax.ws.rs.core.MediaType
 
-internal class CardsControllerTest : AbstractTest() {
+internal class CardsControllerTest : AbstractWebTest() {
     @Autowired
     private lateinit var cardService: CardService
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
+
+    @Autowired
+    private lateinit var cardMapper: CardMapper
 
     @Test
     fun buyCard() {
@@ -61,7 +63,7 @@ internal class CardsControllerTest : AbstractTest() {
         mockMvc.perform(get("/cards")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonList(expected.asTo()))
+                .andExpect(contentJsonList(cardMapper.asTo(expected)))
 
         assertMatch(cardService.getCardsByUserId(100), expected)
     }

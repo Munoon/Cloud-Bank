@@ -38,7 +38,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ErrorInfo notFoundExceptionHandler(NotFoundException e, HttpServletRequest req) {
         log.warn("Not found exception on request '{}' for user {}", req.getRequestURL(), authUserIdOrAnonymous(), e);
-        return new ErrorInfo("", ErrorType.NOT_FOUND, e.getMessage());
+        return new ErrorInfo(req.getRequestURL(), ErrorType.NOT_FOUND, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)

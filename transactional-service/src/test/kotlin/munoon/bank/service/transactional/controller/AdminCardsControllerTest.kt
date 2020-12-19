@@ -1,11 +1,14 @@
 package munoon.bank.service.transactional.controller
 
 import munoon.bank.common.error.ErrorType
-import munoon.bank.service.transactional.AbstractTest
+import munoon.bank.service.transactional.AbstractWebTest
 import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
 import munoon.bank.service.transactional.card.CardTestData.contentJson
 import munoon.bank.service.transactional.card.CardTestData.contentJsonList
+import munoon.bank.service.transactional.card.CardTestData.contentJsonWithOwner
+import munoon.bank.service.transactional.user.UserTestData
+import munoon.bank.service.transactional.user.UserTestData.assertMatch
 import munoon.bank.service.transactional.util.JsonUtil
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
@@ -17,12 +20,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import javax.ws.rs.core.MediaType
 
-internal class AdminCardsControllerTest : AbstractTest() {
+internal class AdminCardsControllerTest : AbstractWebTest() {
     @Autowired
     private lateinit var cardService: CardService
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
+
+    @Autowired
+    private lateinit var cardMapper: CardMapper
 
     @Test
     fun getCardsByUser() {
@@ -32,7 +38,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
         mockMvc.perform(get("/admin/cards/100")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonList(expected.asTo()))
+                .andExpect(contentJsonList(cardMapper.asTo(expected)))
     }
 
     @Test
@@ -44,7 +50,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
         mockMvc.perform(get("/admin/cards/number/$cardNumber")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(expected.asTo()))
+                .andExpect(contentJsonWithOwner(cardMapper.asToWithUser(expected)))
     }
 
     @Test
@@ -71,7 +77,7 @@ internal class AdminCardsControllerTest : AbstractTest() {
         mockMvc.perform(get("/admin/cards/100/${card.id}")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(expected.asTo()))
+                .andExpect(contentJson(cardMapper.asTo(expected)))
     }
 
     @Test
@@ -188,10 +194,11 @@ internal class AdminCardsControllerTest : AbstractTest() {
                 .andExpect(status().isOk())
                 .andReturn()
 
-        val card = JsonUtil.readFromJson(result, CardTo::class.java)
+        val card = JsonUtil.readFromJson(result, CardToWithOwner::class.java)
         val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
         assertMatch(cardService.getCardsByUserId(100), expected)
         assertThat(passwordEncoder.matches("1111", cardService.getCardById(card.id).pinCode)).isTrue()
+        assertMatch(card.owner!!, UserTestData.DEFAULT_USER_TO)
     }
 
     @Test

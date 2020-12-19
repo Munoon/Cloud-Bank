@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import javax.validation.ValidationException
 
 @Service
 class UserService(private val userRepository: UserRepository, private val passwordEncoder: PasswordEncoder) {
@@ -57,6 +56,9 @@ class UserService(private val userRepository: UserRepository, private val passwo
             throw NotFoundException("User with id $id is not found")
         }
     }
+
+    fun getUsersByIds(ids: List<Int>) = userRepository.findAllById(ids)
+            .map { it.asUser() }
 
     private fun getEntityById(id: Int) = userRepository.findById(id)
             .orElseThrow { NotFoundException("User with id $id is not found!") }

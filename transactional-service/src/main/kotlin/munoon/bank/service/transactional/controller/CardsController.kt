@@ -11,19 +11,21 @@ import javax.validation.Valid
 @Validated
 @RestController
 @RequestMapping("/cards")
-class CardsController(private val cardService: CardService) {
+class CardsController(private val cardService: CardService,
+                      private val cardMapper: CardMapper) {
     private val log = LoggerFactory.getLogger(CardsController::class.java)
 
     @PostMapping("/buy")
     fun buyCard(@RequestBody @Valid buyCardTo: BuyCardTo): CardTo {
         log.info("User ${authUserId()} buy card: $buyCardTo")
-        return cardService.buyCard(authUserId(), buyCardTo).asTo()
+        val card = cardService.buyCard(authUserId(), buyCardTo)
+        return cardMapper.asTo(card)
     }
 
     @GetMapping
     fun getCards(): List<CardTo> {
         log.info("User ${authUserId()} get his cards list")
-        return cardService.getCardsByUserId(authUserId()).asTo()
+        return cardService.getCardsByUserId(authUserId()).map { cardMapper.asTo(it) }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

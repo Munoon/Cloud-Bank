@@ -163,4 +163,10 @@ internal class UserServiceTest : AbstractTest() {
     fun removeUserNotFound() {
         assertThrows(NotFoundException::class.java) { userService.removeUser(999) }
     }
+
+    @Test
+    fun getUsersByIds() {
+        val actual = userService.getUsersByIds(listOf(100, 101))
+        assertMatch(actual, DEFAULT_USER)
+    }
 }

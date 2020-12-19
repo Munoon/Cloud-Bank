@@ -1,6 +1,7 @@
 package munoon.bank.common;
 
 import munoon.bank.common.user.UserTo;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,6 +10,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import static org.springframework.util.Assert.notNull;
 
 public class SecurityUtils {
+    private static final String ANONYMOUS_MESSAGE = "[anonymous]";
+
     private static AuthorizedUser safeGet() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         notNull(authentication, "User not authenticated");
@@ -33,10 +36,11 @@ public class SecurityUtils {
     }
 
     public static String authUserIdOrAnonymous() {
-        try {
-            return authUser().getId().toString();
-        } catch (IllegalArgumentException e) {
-            return "[anonymous]";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return ANONYMOUS_MESSAGE;
         }
+
+        return authUser().getId().toString();
     }
 }

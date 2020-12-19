@@ -1,35 +1,48 @@
 package munoon.bank.service.transactional.controller
 
 import munoon.bank.common.error.ErrorType
-import munoon.bank.service.transactional.AbstractTest
+import munoon.bank.common.user.UserRoles
+import munoon.bank.common.user.UserTo
+import munoon.bank.service.transactional.AbstractWebTest
 import munoon.bank.service.transactional.card.AdminCreateCardTo
 import munoon.bank.service.transactional.card.CardService
 import munoon.bank.service.transactional.card.CardTestData
 import munoon.bank.service.transactional.transaction.*
+import munoon.bank.service.transactional.user.UserService
+import munoon.bank.service.transactional.user.UserTestData
 import munoon.bank.service.transactional.util.JsonUtil
-import munoon.bank.service.transactional.util.ResponseExceptionValidator
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 import javax.ws.rs.core.MediaType
+import org.mockito.Mockito.`when` as mockWhen
 
-internal class AdminTransactionControllerTest : AbstractTest() {
+internal class AdminTransactionControllerTest : AbstractWebTest() {
     @Autowired
     private lateinit var userTransactionService: UserTransactionService
 
     @Autowired
     private lateinit var cardService: CardService
 
+    @MockBean
+    private lateinit var userService: UserService
+
     @Test
     fun makeAward() {
         val card = cardService.createCard(AdminCreateCardTo(101, "default", "111111111111", "1111", true))
+
+        val user101 = UserTo(101, "test", "test", "username", "10", LocalDateTime.now(), setOf(UserRoles.ROLE_ADMIN))
+
+        mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(mapOf(
+                100 to UserTestData.DEFAULT_USER_TO,
+                101 to user101
+        ))
 
         val result = mockMvc.perform(post("/admin/transaction/fine-award")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -39,6 +52,9 @@ internal class AdminTransactionControllerTest : AbstractTest() {
                 .andReturn()
 
         val transaction = UserTransactionTestData.readFromJson(JsonUtil.getContent(result))
+
+        UserTestData.assertMatch((transaction.info as AwardUserTransactionInfoTo).user!!, UserTestData.DEFAULT_USER_TO)
+        UserTestData.assertMatch(transaction.card.owner!!, user101)
 
         CardTestData.assertMatch(cardService.getCardsByUserId(101), card.copy(balance = 85.0))
 
@@ -53,6 +69,13 @@ internal class AdminTransactionControllerTest : AbstractTest() {
             cardService.plusMoney(it, 100.0)
         }
 
+        val user101 = UserTo(101, "test", "test", "username", "10", LocalDateTime.now(), setOf(UserRoles.ROLE_ADMIN))
+
+        mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(mapOf(
+                100 to UserTestData.DEFAULT_USER_TO,
+                101 to user101
+        ))
+
         val result = mockMvc.perform(post("/admin/transaction/fine-award")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(FineAwardDataTo(card.number!!, 100.0, FineAwardType.FINE, "message")))
@@ -61,6 +84,9 @@ internal class AdminTransactionControllerTest : AbstractTest() {
                 .andReturn()
 
         val transaction = UserTransactionTestData.readFromJson(JsonUtil.getContent(result))
+
+        UserTestData.assertMatch((transaction.info as FineUserTransactionInfoTo).user!!, UserTestData.DEFAULT_USER_TO)
+        UserTestData.assertMatch(transaction.card.owner!!, user101)
 
         CardTestData.assertMatch(cardService.getCardsByUserId(101), card.copy(balance = -15.0))
 

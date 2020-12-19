@@ -2,6 +2,7 @@ package munoon.bank.service.transactional.card
 
 import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
+import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.util.validation.CardType
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
@@ -14,6 +15,24 @@ data class CardTo(
         val type: String,
 
         val number: String?,
+
+        val balance: Double,
+
+        val active: Boolean,
+
+        val registered: LocalDateTime
+)
+
+@KotlinBuilder
+@NoArgsConstructor
+data class CardToWithOwner(
+        val id: String,
+
+        val type: String,
+
+        val number: String?,
+
+        val owner: UserTo?,
 
         val balance: Double,
 
@@ -36,6 +55,7 @@ data class BuyCardTo(
         override fun toString() = "BuyCardTo(type='$type', cardDataTo=$cardData)"
 }
 
+@NoArgsConstructor
 data class CardDataTo(
         @field:Length(min = 12, max = 12)
         val card: String,

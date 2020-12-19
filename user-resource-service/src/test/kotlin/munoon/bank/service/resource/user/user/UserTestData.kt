@@ -1,5 +1,6 @@
 package munoon.bank.service.resource.user.user
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.readValue
 import munoon.bank.common.user.User
 import munoon.bank.common.user.UserRoles
@@ -25,6 +26,11 @@ object UserTestData {
     fun contentJsonPage(vararg expected: UserTo) = ResultMatcher {
         val node = JsonUtils.OBJECT_MAPPER.readTree(getContent(it)).at("/content")
         val actual = JsonUtils.OBJECT_MAPPER.readValue<List<UserTo>>(node.toString())
+        assertMatch(actual, *expected)
+    }
+
+    fun contentJsonList(vararg expected: UserTo) = ResultMatcher {
+        val actual = JsonUtils.OBJECT_MAPPER.readValue(getContent(it), object : TypeReference<List<UserTo>>() {})
         assertMatch(actual, *expected)
     }
 

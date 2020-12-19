@@ -1,6 +1,5 @@
 package munoon.bank.service.transactional.transaction
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import munoon.bank.service.transactional.util.JsonUtil

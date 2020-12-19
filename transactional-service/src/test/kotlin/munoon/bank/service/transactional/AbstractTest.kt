@@ -33,7 +33,7 @@ import org.mockito.Mockito.`when` as mockWhen
 @ActiveProfiles("test")
 @AutoConfigureStubRunner(
         stubsMode = StubRunnerProperties.StubsMode.LOCAL,
-        ids = ["munoon.bank:user-resource-service:+:stubs:8020"]
+        ids = ["munoon.bank:user-resource-service:+:stubs:0"]
 )
 abstract class AbstractTest {
     @Autowired
@@ -47,7 +47,9 @@ abstract class AbstractTest {
         mongoTemplate.db.drop()
         mongoConfig.createIndexes(mongoTemplate).run()
     }
+}
 
+abstract class AbstractWebTest : AbstractTest() {
     @Autowired
     private lateinit var webApplicationContext: WebApplicationContext
 

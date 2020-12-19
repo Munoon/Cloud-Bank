@@ -2,7 +2,9 @@ package munoon.bank.service.transactional.transaction
 
 import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
+import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.card.CardTo
+import munoon.bank.service.transactional.card.CardToWithOwner
 import java.time.LocalDateTime
 
 @KotlinBuilder
@@ -10,7 +12,7 @@ import java.time.LocalDateTime
 data class UserTransactionTo(
         val id: String?,
 
-        val card: CardTo,
+        val card: CardToWithOwner,
 
         val price: Double,
 
@@ -35,7 +37,7 @@ data class BuyCardUserTransactionInfoTo(
 @KotlinBuilder
 @NoArgsConstructor
 data class AwardUserTransactionInfoTo(
-        var userId: Int,
+        var user: UserTo?,
         var message: String?,
         var actualPrice: Double
 ) : UserTransactionInfoTo
@@ -43,7 +45,7 @@ data class AwardUserTransactionInfoTo(
 @KotlinBuilder
 @NoArgsConstructor
 data class FineUserTransactionInfoTo(
-        var userId: Int,
+        var user: UserTo?,
         var message: String?,
         var actualPrice: Double
 ) : UserTransactionInfoTo

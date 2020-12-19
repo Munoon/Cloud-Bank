@@ -6,6 +6,9 @@ import org.hibernate.validator.constraints.Length
 import org.springframework.data.mongodb.core.mapping.DBRef
 
 interface UserTransactionInfo
+interface UsersCollectorTransactionInfo {
+        fun getUsersId(): Set<Int>
+}
 
 data class BuyCardUserTransactionInfo(
         @DBRef
@@ -23,7 +26,9 @@ data class AwardUserTransactionInfo(
 
         @field:ValidMoneyCount
         var actualPrice: Double
-) : UserTransactionInfo
+) : UserTransactionInfo, UsersCollectorTransactionInfo {
+        override fun getUsersId(): Set<Int> = setOf(userId)
+}
 
 data class FineUserTransactionInfo(
         var userId: Int,
@@ -33,4 +38,6 @@ data class FineUserTransactionInfo(
 
         @field:ValidMoneyCount
         var actualPrice: Double
-) : UserTransactionInfo
+) : UserTransactionInfo, UsersCollectorTransactionInfo {
+        override fun getUsersId(): Set<Int> = setOf(userId)
+}

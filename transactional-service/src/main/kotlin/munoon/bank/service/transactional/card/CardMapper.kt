@@ -1,16 +1,39 @@
 package munoon.bank.service.transactional.card
 
+import munoon.bank.common.user.UserTo
+import munoon.bank.common.util.exception.NotFoundException
+import munoon.bank.service.transactional.user.UserService
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.Mappings
-import org.mapstruct.factory.Mappers
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 
-@Mapper
-interface CardMapper {
-    fun asTo(card: Card): CardTo
-    fun updateCard(adminUpdateCardTo: AdminUpdateCardTo, @MappingTarget card: Card): Card
+@Mapper(componentModel = "spring")
+abstract class CardMapper {
+    @Autowired
+    private lateinit var userService: UserService
+
+    abstract fun asTo(card: Card): CardTo
+
+    fun asToWithUser(card: Card): CardToWithOwner {
+        val user = try {
+            userService.getUserById(card.userId)
+        } catch (e: NotFoundException) {
+            null
+        }
+        return asTo(card, user)
+    }
+
+    @Mappings(
+            Mapping(target = "owner", source = "userTo"),
+            Mapping(target = "id", source = "card.id"),
+            Mapping(target = "registered", source = "card.registered")
+    )
+    abstract fun asTo(card: Card, userTo: UserTo?): CardToWithOwner
+
+    abstract fun updateCard(adminUpdateCardTo: AdminUpdateCardTo, @MappingTarget card: Card): Card
 
     @Mappings(
             Mapping(target = "id", expression = "java(null)"),
@@ -20,7 +43,7 @@ interface CardMapper {
             Mapping(target = "active", constant = "true"),
             Mapping(target = "registered", expression = "java(java.time.LocalDateTime.now())")
     )
-    fun asCard(buyCardTo: BuyCardTo, userId: Int, pinCode: String): Card
+    abstract fun asCard(buyCardTo: BuyCardTo, userId: Int, pinCode: String): Card
 
     @Mappings(
             Mapping(target = "id", expression = "java(null)"),
@@ -28,13 +51,5 @@ interface CardMapper {
             Mapping(target = "registered", expression = "java(java.time.LocalDateTime.now())"),
             Mapping(target = "pinCode", expression = "java(passwordEncoder.encode(source.getPinCode()))"),
     )
-    fun asCard(source: AdminCreateCardTo, passwordEncoder: PasswordEncoder): Card
-
-    companion object {
-        val INSTANCE: CardMapper = Mappers.getMapper(CardMapper::class.java)
-    }
+    abstract fun asCard(source: AdminCreateCardTo, passwordEncoder: PasswordEncoder): Card
 }
-
-fun Card.asTo() = CardMapper.INSTANCE.asTo(this)
-fun List<Card>.asTo() = this.map { CardMapper.INSTANCE.asTo(it) }
-fun BuyCardTo.asCard(userId: Int, pinCode: String) = CardMapper.INSTANCE.asCard(this, userId, pinCode)
