@@ -16,6 +16,8 @@ data class UserTransactionTo(
 
         val price: Double,
 
+        val actualPrice: Double,
+
         val leftBalance: Double,
 
         val registered: LocalDateTime,
@@ -30,22 +32,19 @@ interface UserTransactionInfoTo
 @KotlinBuilder
 @NoArgsConstructor
 data class BuyCardUserTransactionInfoTo(
-        var buyCard: CardTo,
-        var actualPrice: Double
+        var buyCard: CardTo
 ) : UserTransactionInfoTo
 
 @KotlinBuilder
 @NoArgsConstructor
 data class AwardUserTransactionInfoTo(
         var user: UserTo?,
-        var message: String?,
-        var actualPrice: Double
+        var message: String?
 ) : UserTransactionInfoTo
 
 @KotlinBuilder
 @NoArgsConstructor
 data class FineUserTransactionInfoTo(
         var user: UserTo?,
-        var message: String?,
-        var actualPrice: Double
+        var message: String?
 ) : UserTransactionInfoTo

@@ -25,13 +25,21 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
             price = MoneyUtils.countWithTax(cardPrice, type.tax.other, TaxType.PLUS)
             cardService.minusMoney(it, price)
         }
-        val transaction = UserTransaction(null, card, price, card.balance, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
+        val transaction = UserTransaction(
+                card = card,
+                price = price,
+                actualPrice = cardPrice,
+                leftBalance = card.balance,
+                type = UserTransactionType.CARD_BUY,
+                registered = LocalDateTime.now(),
+                id = null,
+                info = null
+        )
         return userTransactionRepository.save(transaction)
     }
 
-    fun addCardToCardTransaction(userTransaction: UserTransaction, card: Card, cardPrice: Double): UserTransaction {
-        val info = BuyCardUserTransactionInfo(card, cardPrice)
-        val newTransaction = userTransaction.copy(info = info)
+    fun addCardToCardTransaction(userTransaction: UserTransaction, card: Card): UserTransaction {
+        val newTransaction = userTransaction.copy(info = BuyCardUserTransactionInfo(card))
         return userTransactionRepository.save(newTransaction)
     }
 
@@ -45,19 +53,28 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
             when (fineAwardData.type) {
                 FineAwardType.AWARD -> {
                     transactionType = UserTransactionType.AWARD
-                    transactionInfo = AwardUserTransactionInfo(userId, fineAwardData.message, fineAwardData.count)
+                    transactionInfo = AwardUserTransactionInfo(userId, fineAwardData.message)
                     count = MoneyUtils.countWithTax(fineAwardData.count, type.tax.fine, TaxType.MINUS)
                     cardService.plusMoney(it, count)
                 }
                 FineAwardType.FINE -> {
                     transactionType = UserTransactionType.FINE
-                    transactionInfo = FineUserTransactionInfo(userId, fineAwardData.message, fineAwardData.count)
+                    transactionInfo = FineUserTransactionInfo(userId, fineAwardData.message)
                     count = MoneyUtils.countWithTax(fineAwardData.count, type.tax.award, TaxType.PLUS)
                     cardService.minusMoney(it, count, checkBalance = false)
                 }
             }
         }
-        val transaction = UserTransaction(null, card, count, card.balance, LocalDateTime.now(), transactionType, transactionInfo)
+        val transaction = UserTransaction(
+                card = card,
+                price = count,
+                actualPrice = fineAwardData.count,
+                leftBalance = card.balance,
+                type = transactionType,
+                registered = LocalDateTime.now(),
+                info = transactionInfo,
+                id = null
+        )
         return userTransactionRepository.save(transaction)
     }
 

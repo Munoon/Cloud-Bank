@@ -29,7 +29,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
         }
 
         val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
+        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
         assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
     }
 
@@ -64,9 +64,9 @@ internal class UserTransactionServiceTest : AbstractTest() {
         val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
 
         val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, true, LocalDateTime.now()))
-        userTransactionService.addCardToCardTransaction(transaction, createdCard, 100.0)
+        userTransactionService.addCardToCardTransaction(transaction, createdCard)
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard, 100.0))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard))
         assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
     }
 
@@ -77,7 +77,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
         }
 
         val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
+        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null)
         assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
     }
 
@@ -90,7 +90,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
 
         CardTestData.assertMatch(cardService.getCardsByUserId(100), card.copy(balance = 885.0))
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 885.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "message", 100.0))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "message"))
         val actual = userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10))
         assertMatch(actual.content, expected)
     }
@@ -102,7 +102,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
 
         CardTestData.assertMatch(cardService.getCardsByUserId(100), card.copy(balance = 85.0))
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null, 100.0))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null))
         val actual = userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10))
         assertMatch(actual.content, expected)
     }
@@ -121,7 +121,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
 
         CardTestData.assertMatch(cardService.getCardsByUserId(100), card.copy(balance = -115.0))
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = -115.0), 115.0, -115.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, null, 100.0))
+        val expected = UserTransaction(transaction.id, card.copy(balance = -115.0), 115.0, 100.0, -115.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, null))
         val actual = userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10))
         assertMatch(actual.content, expected)
     }

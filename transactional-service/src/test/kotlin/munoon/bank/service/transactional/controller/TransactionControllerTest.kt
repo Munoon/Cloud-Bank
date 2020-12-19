@@ -50,7 +50,7 @@ internal class TransactionControllerTest : AbstractWebTest() {
         mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(usersMap)
 
         val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc", 100.0))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 100.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"))
 
         mockMvc.perform(get("/transaction/" + card.id)
                 .with(authUser()))

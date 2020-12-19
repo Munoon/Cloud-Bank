@@ -58,7 +58,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
         CardTestData.assertMatch(cardService.getCardsByUserId(101), card.copy(balance = 85.0))
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(100, null, 100.0))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(100, null))
         val actual = userTransactionService.getTransactions(card.id!!, 101, PageRequest.of(0, 10))
         UserTransactionTestData.assertMatch(actual.content, expected)
     }
@@ -90,7 +90,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
         CardTestData.assertMatch(cardService.getCardsByUserId(101), card.copy(balance = -15.0))
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = -15.0), 115.0, -15.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(100, "message", 100.0))
+        val expected = UserTransaction(transaction.id, card.copy(balance = -15.0), 115.0, 100.0, -15.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(100, "message"))
         val actual = userTransactionService.getTransactions(card.id!!, 101, PageRequest.of(0, 10))
         UserTransactionTestData.assertMatch(actual.content, expected)
     }

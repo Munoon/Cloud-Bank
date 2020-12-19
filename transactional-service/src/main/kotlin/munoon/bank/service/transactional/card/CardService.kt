@@ -39,7 +39,7 @@ class CardService(private val cardRepository: CardRepository,
         val card = cardMapper.asCard(buyCardTo, userId, pinCode)
         val buyCard = cardRepository.save(card)
         if (userTransaction != null) {
-            userTransactionService.addCardToCardTransaction(userTransaction, buyCard, cardType.price)
+            userTransactionService.addCardToCardTransaction(userTransaction, buyCard)
         }
 
         return buyCard

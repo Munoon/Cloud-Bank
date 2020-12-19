@@ -18,6 +18,8 @@ data class UserTransaction(
         @field:ValidMoneyCount
         val price: Double,
 
+        val actualPrice: Double,
+
         val leftBalance: Double,
 
         val registered: LocalDateTime,
