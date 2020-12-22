@@ -21,7 +21,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 import org.mockito.Mockito.`when` as mockWhen
 
-internal class TransactionControllerTest : AbstractWebTest() {
+internal class
+
+UserTransactionControllerTest : AbstractWebTest() {
     @Autowired
     private lateinit var cardService: CardService
 

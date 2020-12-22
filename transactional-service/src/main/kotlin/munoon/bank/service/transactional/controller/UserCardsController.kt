@@ -11,9 +11,9 @@ import javax.validation.Valid
 @Validated
 @RestController
 @RequestMapping("/cards")
-class CardsController(private val cardService: CardService,
-                      private val cardMapper: CardMapper) {
-    private val log = LoggerFactory.getLogger(CardsController::class.java)
+class UserCardsController(private val cardService: CardService,
+                          private val cardMapper: CardMapper) {
+    private val log = LoggerFactory.getLogger(UserCardsController::class.java)
 
     @PostMapping("/buy")
     fun buyCard(@RequestBody @Valid buyCardTo: BuyCardTo): CardTo {

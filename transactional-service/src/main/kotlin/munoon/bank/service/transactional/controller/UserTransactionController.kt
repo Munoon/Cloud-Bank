@@ -19,9 +19,9 @@ import javax.validation.Valid
 @Validated
 @RestController
 @RequestMapping("/transaction/{cardId}")
-class TransactionController(private val transactionService: UserTransactionService,
-                            private val transactionMapper: UserTransactionMapper) {
-    private val log = LoggerFactory.getLogger(TransactionController::class.java)
+class UserTransactionController(private val transactionService: UserTransactionService,
+                                private val transactionMapper: UserTransactionMapper) {
+    private val log = LoggerFactory.getLogger(UserTransactionController::class.java)
 
     @GetMapping
     fun getTransactionsList(@Valid @PageSize(min = 0, max = 20) @PageableDefault(page = 0, size = 20) pageable: Pageable,

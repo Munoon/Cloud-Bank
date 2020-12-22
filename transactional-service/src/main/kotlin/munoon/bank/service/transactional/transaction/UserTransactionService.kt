@@ -78,10 +78,12 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
         return userTransactionRepository.save(transaction)
     }
 
-    fun getTransactions(cardId: String, userId: Int, pageable: Pageable): Page<UserTransaction> {
-        val card = cardService.getCardById(cardId)
-        if (card.userId != userId) {
-            throw AccessDeniedException("That card belong to another user")
+    fun getTransactions(cardId: String, userId: Int?, pageable: Pageable): Page<UserTransaction> {
+        if (userId != null) {
+            val card = cardService.getCardById(cardId)
+            if (card.userId != userId) {
+                throw AccessDeniedException("That card belong to another user")
+            }
         }
         return userTransactionRepository.getAllByCardId(cardId, pageable)
     }

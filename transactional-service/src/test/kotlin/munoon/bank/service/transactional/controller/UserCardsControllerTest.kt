@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 import javax.ws.rs.core.MediaType
 
-internal class CardsControllerTest : AbstractWebTest() {
+internal class UserCardsControllerTest : AbstractWebTest() {
     @Autowired
     private lateinit var cardService: CardService
 

@@ -4,10 +4,9 @@ import munoon.bank.common.error.ErrorType
 import munoon.bank.common.user.UserRoles
 import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.AbstractWebTest
-import munoon.bank.service.transactional.card.AdminCreateCardTo
-import munoon.bank.service.transactional.card.CardService
-import munoon.bank.service.transactional.card.CardTestData
+import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.transaction.*
+import munoon.bank.service.transactional.transaction.UserTransactionTestData.contentJsonList
 import munoon.bank.service.transactional.user.UserService
 import munoon.bank.service.transactional.user.UserTestData
 import munoon.bank.service.transactional.util.JsonUtil
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.domain.PageRequest
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
@@ -32,6 +32,12 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
     @MockBean
     private lateinit var userService: UserService
+
+    @Autowired
+    private lateinit var cardRepository: CardRepository
+
+    @Autowired
+    private lateinit var userTransactionMapper: UserTransactionMapper
 
     @Test
     fun makeAward() {
@@ -124,5 +130,35 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(fieldError("card", "count"))
+    }
+
+    @Test
+    fun getTransactionsList() {
+        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
+            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
+        }
+
+        val usersMap = mapOf(
+                100 to UserTestData.DEFAULT_USER_TO,
+                101 to UserTo(101, "test", "test", "username", "10", LocalDateTime.now(), setOf(UserRoles.ROLE_ADMIN))
+        )
+        mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(usersMap)
+
+        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 100.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"))
+
+        mockMvc.perform(get("/admin/transaction/${card.id}")
+                .with(authUser()))
+                .andExpect(status().isOk())
+                .andExpect(contentJsonList(userTransactionMapper.asTo(expected)))
+    }
+
+    @Test
+    fun getTransactionsListNotValid() {
+        mockMvc.perform(get("/admin/transaction/abc")
+                .param("size", "100")
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("getCardTransactions.pageable"))
     }
 }
