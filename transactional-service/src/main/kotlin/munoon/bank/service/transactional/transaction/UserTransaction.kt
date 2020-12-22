@@ -26,7 +26,9 @@ data class UserTransaction(
 
         val type: UserTransactionType,
 
-        val info: UserTransactionInfo?
+        val info: UserTransactionInfo?,
+
+        val canceled: Boolean
 )
 
 enum class UserTransactionType {

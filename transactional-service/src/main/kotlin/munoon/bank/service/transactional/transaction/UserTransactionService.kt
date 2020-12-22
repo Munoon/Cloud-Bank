@@ -1,5 +1,7 @@
 package munoon.bank.service.transactional.transaction
 
+import munoon.bank.common.util.exception.ApplicationException
+import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.transactional.card.Card
 import munoon.bank.service.transactional.card.CardDataTo
 import munoon.bank.service.transactional.card.CardService
@@ -15,6 +17,7 @@ import java.time.LocalDateTime
 
 @Service
 class UserTransactionService(private val userTransactionRepository: UserTransactionRepository,
+                             @Lazy private val cancelOperators: List<CancelTransactionOperator>,
                              @Lazy private val cardService: CardService) {
     fun buyCardTransaction(userId: Int, cardPrice: Double, cardDataTo: CardDataTo): UserTransaction {
         var price: Double
@@ -32,6 +35,7 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
                 leftBalance = card.balance,
                 type = UserTransactionType.CARD_BUY,
                 registered = LocalDateTime.now(),
+                canceled = false,
                 id = null,
                 info = null
         )
@@ -73,9 +77,25 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
                 type = transactionType,
                 registered = LocalDateTime.now(),
                 info = transactionInfo,
+                canceled = false,
                 id = null
         )
         return userTransactionRepository.save(transaction)
+    }
+
+    fun cancelTransaction(transactionId: String): UserTransaction {
+        val transaction = getTransaction(transactionId)
+        if (transaction.canceled) {
+            throw ApplicationException("Operation already canceled!")
+        }
+        val cancelOperator = (cancelOperators.find { it.check(transaction) }
+                ?: throw NotFoundException("Cancel operator for transaction '${transactionId}' is not found!"))
+        val result = cancelOperator.cancel(transaction)
+        val card = cardService.getCardById(transaction.card.id!!)
+        if (result) {
+            return userTransactionRepository.save(transaction.copy(canceled = true, card = card))
+        }
+        return transaction.copy(card = card)
     }
 
     fun getTransactions(cardId: String, userId: Int?, pageable: Pageable): Page<UserTransaction> {
@@ -87,4 +107,7 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
         }
         return userTransactionRepository.getAllByCardId(cardId, pageable)
     }
+
+    fun getTransaction(transactionId: String) = userTransactionRepository.findById(transactionId)
+            .orElseThrow { NotFoundException("Transaction with id '$transactionId' is not found!") }
 }

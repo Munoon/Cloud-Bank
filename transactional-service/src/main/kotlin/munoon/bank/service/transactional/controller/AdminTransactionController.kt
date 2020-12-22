@@ -34,8 +34,15 @@ class AdminTransactionController(private val transactionService: UserTransaction
     @GetMapping("/{cardId}")
     fun getCardTransactions(@Valid @PageSize(min = 0, max = 20) @PageableDefault(page = 0, size = 20) pageable: Pageable,
                             @PathVariable cardId: String): Page<UserTransactionTo> {
-        log.info("Admin {} request transactions of card '$cardId', page $pageable")
+        log.info("Admin ${authUserId()} request transactions of card '$cardId', page $pageable")
         val transactions = transactionService.getTransactions(cardId, userId = null, pageable)
         return transactionMapper.asTo(transactions)
+    }
+
+    @PostMapping("/{transactionId}/cancel")
+    fun cancelTransaction(@PathVariable transactionId: String): UserTransactionTo {
+        log.info("Admin ${authUserId()} canceled transaction '$transactionId'")
+        val transaction = transactionService.cancelTransaction(transactionId)
+        return transactionMapper.asTo(transaction)
     }
 }

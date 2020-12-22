@@ -55,7 +55,7 @@ internal class CardServiceTest : AbstractTest() {
         val goldCard = cardService.buyCard(100, BuyCardTo("gold", "1111", CardDataTo(defaultCardNumber, defaultCardPinCode)))
         val page = transactionService.getTransactions(defaultCard.id!!, 100, PageRequest.of(0, 10))
         assertThat(page.content.size).isEqualTo(1)
-        val expectedTransaction = UserTransaction(page.content[0].id, defaultCard.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(goldCard))
+        val expectedTransaction = UserTransaction(page.content[0].id, defaultCard.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(goldCard), false)
         assertMatch(page.content, expectedTransaction)
     }
 

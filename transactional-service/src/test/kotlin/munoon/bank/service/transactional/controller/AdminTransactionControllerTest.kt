@@ -6,12 +6,15 @@ import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.AbstractWebTest
 import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.transaction.*
+import munoon.bank.service.transactional.transaction.UserTransactionTestData.assertMatch
+import munoon.bank.service.transactional.transaction.UserTransactionTestData.contentJson
 import munoon.bank.service.transactional.transaction.UserTransactionTestData.contentJsonList
 import munoon.bank.service.transactional.user.UserService
 import munoon.bank.service.transactional.user.UserTestData
 import munoon.bank.service.transactional.util.JsonUtil
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -64,7 +67,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
         CardTestData.assertMatch(cardService.getCardsByUserId(101), card.copy(balance = 85.0))
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(100, null))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(100, null), false)
         val actual = userTransactionService.getTransactions(card.id!!, 101, PageRequest.of(0, 10))
         UserTransactionTestData.assertMatch(actual.content, expected)
     }
@@ -96,7 +99,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
         CardTestData.assertMatch(cardService.getCardsByUserId(101), card.copy(balance = -15.0))
 
-        val expected = UserTransaction(transaction.id, card.copy(balance = -15.0), 115.0, 100.0, -15.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(100, "message"))
+        val expected = UserTransaction(transaction.id, card.copy(balance = -15.0), 115.0, 100.0, -15.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(100, "message"), false)
         val actual = userTransactionService.getTransactions(card.id!!, 101, PageRequest.of(0, 10))
         UserTransactionTestData.assertMatch(actual.content, expected)
     }
@@ -145,7 +148,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
         mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(usersMap)
 
         val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 100.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"))
+        val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 100.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"), false)
 
         mockMvc.perform(get("/admin/transaction/${card.id}")
                 .with(authUser()))
@@ -160,5 +163,42 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(fieldError("getCardTransactions.pageable"))
+    }
+
+    @Test
+    fun cancelTransaction() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(85.0)
+
+        val expected = UserTransaction(transaction.id, card.copy(balance = 0.0), 85.0, 100.0, 85.0, transaction.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), true)
+
+        mockMvc.perform(post("/admin/transaction/${transaction.id}/cancel")
+                .with(authUser()))
+                .andExpect(status().isOk())
+                .andExpect(contentJson(userTransactionMapper.asTo(expected)))
+
+        assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(0.0)
+        assertMatch(userTransactionService.getTransactions(card.id!!, null, PageRequest.of(0, 100)).content, expected)
+    }
+
+    @Test
+    fun cancelTransactionNotFound() {
+        mockMvc.perform(post("/admin/transaction/abc/cancel")
+                .with(authUser()))
+                .andExpect(status().isNotFound())
+                .andExpect(error(ErrorType.NOT_FOUND))
+    }
+
+    @Test
+    fun cancelTransactionCanceled() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        userTransactionService.cancelTransaction(transaction.id!!)
+
+        mockMvc.perform(post("/admin/transaction/${transaction.id}/cancel")
+                .with(authUser()))
+                .andExpect(status().isInternalServerError())
+                .andExpect(error(ErrorType.APPLICATION_EXCEPTION))
     }
 }

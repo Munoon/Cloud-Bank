@@ -35,6 +35,11 @@ object UserTransactionTestData {
         assertMatch(actual, expected.toList())
     }
 
+    fun contentJson(expected: UserTransactionTo) = ResultMatcher {
+        val actual = readFromJson(getContent(it))
+        assertMatch(actual, expected)
+    }
+
     fun contentJsonList(vararg expected: UserTransactionTo) = ResultMatcher {
         val actual = readFromJsonList(getContent(it))
         assertMatchTo(actual, expected.toList())

@@ -24,7 +24,9 @@ data class UserTransactionTo(
 
         val type: UserTransactionType,
 
-        val info: UserTransactionInfoTo?
+        val info: UserTransactionInfoTo?,
+
+        val canceled: Boolean
 )
 
 interface UserTransactionInfoTo
