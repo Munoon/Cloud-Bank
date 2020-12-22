@@ -13,12 +13,6 @@ internal class UserServiceTest : AbstractTest() {
     private lateinit var userService: UserService
 
     @Test
-    fun getProfileByToken() {
-        val profile = userService.getProfileByToken("DEFAULT_USER")
-        assertMatch(profile, UserTestData.DEFAULT_USER_TO)
-    }
-
-    @Test
     fun getUsersById() {
         val users = userService.getUsersById(setOf(100))
         assertThat(users).containsOnlyKeys(100)
