@@ -4,6 +4,7 @@ import munoon.bank.common.user.User
 import munoon.bank.common.util.exception.FieldValidationException
 import munoon.bank.common.util.exception.NotFoundException
 import munoon.bank.service.resource.user.AbstractTest
+import munoon.bank.service.resource.user.client.TransactionClient
 import munoon.bank.service.resource.user.user.UserTestData.DEFAULT_USER
 import munoon.bank.service.resource.user.user.UserTestData.USER_ID
 import munoon.bank.service.resource.user.user.UserTestData.USER_PASSWORD
@@ -11,7 +12,10 @@ import munoon.bank.service.resource.user.user.UserTestData.assertMatch
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDateTime
@@ -22,6 +26,9 @@ internal class UserServiceTest : AbstractTest() {
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
+
+    @MockBean
+    private lateinit var transactionClient: TransactionClient
 
     @Test
     fun getById() {
@@ -157,6 +164,8 @@ internal class UserServiceTest : AbstractTest() {
             assertThat(totalElements).isEqualTo(0)
             assertThat(content.size).isEqualTo(0)
         }
+
+        verify(transactionClient, times(1)).deactivateCardsByUser(USER_ID)
     }
 
     @Test

@@ -38,6 +38,7 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
                     .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                     .and()
                 .authorizeRequests()
+                    .antMatchers("/microservices/**").permitAll()
                     .anyRequest().authenticated()
     }
 

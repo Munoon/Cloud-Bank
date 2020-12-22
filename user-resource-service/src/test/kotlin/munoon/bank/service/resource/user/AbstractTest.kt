@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner
+import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken
@@ -34,6 +36,10 @@ import org.mockito.Mockito.`when` as mockWhen
 @SpringBootTest
 @ActiveProfiles("test")
 @Sql(scripts = ["classpath:db/data.sql"])
+@AutoConfigureStubRunner(
+        stubsMode = StubRunnerProperties.StubsMode.LOCAL,
+        ids = ["munoon.bank:transactional-service:+:stubs:0"]
+)
 abstract class AbstractTest
 
 abstract class AbstractWebTest : AbstractTest() {

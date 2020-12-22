@@ -106,4 +106,6 @@ class CardService(private val cardRepository: CardRepository,
 
     fun getCardType(type: String) = cardsProperties.cards[type]
             ?: throw NotFoundException("Card with code name '$type' is not found!")
+
+    fun deactivateAllByOwner(userId: Int) = cardRepository.deactivateAllByUserId(userId)
 }

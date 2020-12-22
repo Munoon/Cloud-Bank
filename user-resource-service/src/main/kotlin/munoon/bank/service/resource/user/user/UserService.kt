@@ -2,6 +2,7 @@ package munoon.bank.service.resource.user.user
 
 import munoon.bank.common.user.User
 import munoon.bank.common.util.exception.NotFoundException
+import munoon.bank.service.resource.user.client.TransactionClient
 import munoon.bank.service.resource.user.util.UserUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -9,7 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
-class UserService(private val userRepository: UserRepository, private val passwordEncoder: PasswordEncoder) {
+class UserService(private val userRepository: UserRepository,
+                  private val passwordEncoder: PasswordEncoder,
+                  private val transactionClient: TransactionClient) {
     fun getById(id: Int): User = getEntityById(id).asUser()
 
     fun getAll(pageable: Pageable, clazz: String): Page<User> = userRepository.findAllByClazz(pageable, clazz)
@@ -55,6 +58,7 @@ class UserService(private val userRepository: UserRepository, private val passwo
         if (modified == 0) {
             throw NotFoundException("User with id $id is not found")
         }
+        transactionClient.deactivateCardsByUser(id)
     }
 
     fun getUsersByIds(ids: List<Int>) = userRepository.findAllById(ids)

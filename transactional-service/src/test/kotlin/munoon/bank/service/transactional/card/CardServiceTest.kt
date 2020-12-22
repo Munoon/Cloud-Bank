@@ -305,4 +305,17 @@ internal class CardServiceTest : AbstractTest() {
             cardService.updateCardPinCode(101, card.id!!, UserUpdateCardPinCode("1111", "2222"))
         }
     }
+
+    @Test
+    fun deactivateAllByOwner() {
+        val (cardId) = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        val (cardId2) = cardService.createCard(AdminCreateCardTo(101, "default", null, "1111", true))
+
+        cardService.deactivateAllByOwner(100)
+
+        val expected = Card(cardId, 100, "default", null, "", 0.0, false, LocalDateTime.now())
+        assertMatch(cardService.getCardsByUserId(100), expected)
+
+        assertThat(cardService.getCardById(cardId2!!).active).isTrue()
+    }
 }
