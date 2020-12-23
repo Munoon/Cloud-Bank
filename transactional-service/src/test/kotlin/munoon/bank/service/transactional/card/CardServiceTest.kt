@@ -318,4 +318,19 @@ internal class CardServiceTest : AbstractTest() {
 
         assertThat(cardService.getCardById(cardId2!!).active).isTrue()
     }
+
+    @Test
+    fun deactivateCard() {
+        val (cardId) = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        assertThat(cardService.getCardById(cardId!!).active).isTrue()
+        cardService.deactivateCard(cardId)
+        assertThat(cardService.getCardById(cardId).active).isFalse()
+    }
+
+    @Test
+    fun deactivateCardNotFound() {
+        assertThrows<NotFoundException> {
+            cardService.deactivateCard("abc")
+        }
+    }
 }

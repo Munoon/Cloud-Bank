@@ -194,11 +194,28 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
     fun cancelTransactionCanceled() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        userTransactionService.cancelTransaction(transaction.id!!)
+        userTransactionService.cancelTransaction(transaction.id!!, emptySet())
 
         mockMvc.perform(post("/admin/transaction/${transaction.id}/cancel")
                 .with(authUser()))
                 .andExpect(status().isInternalServerError())
                 .andExpect(error(ErrorType.APPLICATION_EXCEPTION))
+    }
+
+    @Test
+    fun cancelTransactionWithFlag() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        cardService.plusMoney(card, 200.0)
+        val boughtCard = cardService.buyCard(100, BuyCardTo("gold", "1111", CardDataTo(card.number!!, "1111")))
+        val transaction = userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content[0]
+        assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(85.0)
+
+        val expected = UserTransaction(transaction.id, card.copy(balance = 200.0), 115.0, 100.0, 85.0, transaction.registered, UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(boughtCard), true)
+
+        mockMvc.perform(post("/admin/transaction/${transaction.id}/cancel")
+                .param("flags", CancelTransactionFlag.DEACTIVATE_CARD.toString())
+                .with(authUser()))
+                .andExpect(status().isOk())
+                .andExpect(contentJson(userTransactionMapper.asTo(expected)))
     }
 }

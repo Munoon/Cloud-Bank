@@ -144,7 +144,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
 
         assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(85.0)
 
-        userTransactionService.cancelTransaction(transaction.id!!)
+        userTransactionService.cancelTransaction(transaction.id!!, emptySet())
 
         val expectedCard = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
         assertMatch(cardService.getCardById(card.id!!), expectedCard)
@@ -156,7 +156,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
     @Test
     fun cancelTransactionNotFound() {
         assertThrows<NotFoundException> {
-            userTransactionService.cancelTransaction("abc")
+            userTransactionService.cancelTransaction("abc", emptySet())
         }
     }
 
@@ -164,7 +164,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
     fun cancelTransactionAlreadyCanceled() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        userTransactionService.cancelTransaction(transaction.id!!)
-        assertThrows<ApplicationException> { userTransactionService.cancelTransaction(transaction.id!!) }
+        userTransactionService.cancelTransaction(transaction.id!!, emptySet())
+        assertThrows<ApplicationException> { userTransactionService.cancelTransaction(transaction.id!!, emptySet()) }
     }
 }

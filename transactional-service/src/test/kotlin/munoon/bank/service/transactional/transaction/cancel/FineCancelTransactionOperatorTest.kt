@@ -23,7 +23,7 @@ internal class FineCancelTransactionOperatorTest : AbstractTest() {
     fun cancel() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         val transaction = UserTransaction("abc", card, 100.0, 100.0, 100.0, LocalDateTime.now(), UserTransactionType.FINE, AwardUserTransactionInfo(100, "test"), false)
-        val result = fineCancelTransactionOperator.cancel(transaction)
+        val result = fineCancelTransactionOperator.cancel(transaction, emptySet())
         assertThat(result).isTrue()
         assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(100.0)
     }

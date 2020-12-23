@@ -2,10 +2,7 @@ package munoon.bank.service.transactional.controller
 
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.validation.pageable.size.PageSize
-import munoon.bank.service.transactional.transaction.FineAwardDataTo
-import munoon.bank.service.transactional.transaction.UserTransactionMapper
-import munoon.bank.service.transactional.transaction.UserTransactionService
-import munoon.bank.service.transactional.transaction.UserTransactionTo
+import munoon.bank.service.transactional.transaction.*
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -40,9 +37,10 @@ class AdminTransactionController(private val transactionService: UserTransaction
     }
 
     @PostMapping("/{transactionId}/cancel")
-    fun cancelTransaction(@PathVariable transactionId: String): UserTransactionTo {
+    fun cancelTransaction(@PathVariable transactionId: String,
+                          @RequestParam(defaultValue = "") flags: Set<CancelTransactionFlag>): UserTransactionTo {
         log.info("Admin ${authUserId()} canceled transaction '$transactionId'")
-        val transaction = transactionService.cancelTransaction(transactionId)
+        val transaction = transactionService.cancelTransaction(transactionId, flags)
         return transactionMapper.asTo(transaction)
     }
 }

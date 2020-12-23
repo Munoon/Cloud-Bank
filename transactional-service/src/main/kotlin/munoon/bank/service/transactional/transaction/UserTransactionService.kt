@@ -83,14 +83,14 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
         return userTransactionRepository.save(transaction)
     }
 
-    fun cancelTransaction(transactionId: String): UserTransaction {
+    fun cancelTransaction(transactionId: String, flags: Set<CancelTransactionFlag>): UserTransaction {
         val transaction = getTransaction(transactionId)
         if (transaction.canceled) {
             throw ApplicationException("Operation already canceled!")
         }
         val cancelOperator = (cancelOperators.find { it.check(transaction) }
                 ?: throw NotFoundException("Cancel operator for transaction '${transactionId}' is not found!"))
-        val result = cancelOperator.cancel(transaction)
+        val result = cancelOperator.cancel(transaction, flags)
         val card = cardService.getCardById(transaction.card.id!!)
         if (result) {
             return userTransactionRepository.save(transaction.copy(canceled = true, card = card))
