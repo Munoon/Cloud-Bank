@@ -69,7 +69,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
         val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(100, null), false)
         val actual = userTransactionService.getTransactions(card.id!!, 101, PageRequest.of(0, 10))
-        UserTransactionTestData.assertMatch(actual.content, expected)
+        assertMatch(actual.content, expected)
     }
 
     @Test
@@ -101,7 +101,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
         val expected = UserTransaction(transaction.id, card.copy(balance = -15.0), 115.0, 100.0, -15.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(100, "message"), false)
         val actual = userTransactionService.getTransactions(card.id!!, 101, PageRequest.of(0, 10))
-        UserTransactionTestData.assertMatch(actual.content, expected)
+        assertMatch(actual.content, expected)
     }
 
     @Test
@@ -150,7 +150,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
         val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
         val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 100.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"), false)
 
-        mockMvc.perform(get("/admin/transaction/${card.id}")
+        mockMvc.perform(get("/admin/transaction/card/${card.id}")
                 .with(authUser()))
                 .andExpect(status().isOk())
                 .andExpect(contentJsonList(userTransactionMapper.asTo(expected)))
@@ -158,7 +158,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
 
     @Test
     fun getTransactionsListNotValid() {
-        mockMvc.perform(get("/admin/transaction/abc")
+        mockMvc.perform(get("/admin/transaction/card/abc")
                 .param("size", "100")
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())

@@ -54,8 +54,9 @@ class AdminController(private val userService: UserService,
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun getUser(@PathVariable id: Int): UserToWithCards {
         log.info("User ${authUserId()} get user with id $id")
+        val user = userService.getById(id)
         val cards = transactionClient.getCardsByUserId(id)
-        return userService.getById(id).asTo(cards)
+        return user.asTo(cards)
     }
 
     @PostMapping

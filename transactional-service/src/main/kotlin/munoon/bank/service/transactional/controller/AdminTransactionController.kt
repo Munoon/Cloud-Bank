@@ -28,7 +28,7 @@ class AdminTransactionController(private val transactionService: UserTransaction
         return transactionMapper.asTo(transaction)
     }
 
-    @GetMapping("/{cardId}")
+    @GetMapping("/card/{cardId}")
     fun getCardTransactions(@Valid @PageSize(min = 0, max = 20) @PageableDefault(page = 0, size = 20) pageable: Pageable,
                             @PathVariable cardId: String): Page<UserTransactionTo> {
         log.info("Admin ${authUserId()} request transactions of card '$cardId', page $pageable")

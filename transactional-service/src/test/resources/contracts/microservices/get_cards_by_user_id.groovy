@@ -19,12 +19,16 @@ Contract.make {
             contentType applicationJson()
         }
         body([[
-                id: $(consumer("CARD_ID"), producer(anyUuid())),
+                id: $(consumer("CARD_ID"), producer(anyRegex())),
                 type: "default",
                 number: "123456789012",
                 balance: 0.0,
                 active: true,
-                registered: $(consumer("2020-12-06T00:10"), producer(new ServerDslProperty(Pattern.compile(".*"))))
+                registered: $(consumer("2020-12-06T00:10"), producer(anyRegex()))
         ]])
     }
+}
+
+static ServerDslProperty anyRegex() {
+    return new ServerDslProperty(Pattern.compile(".*"))
 }
