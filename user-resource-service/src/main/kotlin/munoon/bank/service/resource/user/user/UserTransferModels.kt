@@ -3,9 +3,11 @@ package munoon.bank.service.resource.user.user
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
+import munoon.bank.common.card.CardTo
 import munoon.bank.common.user.UserRoles
 import munoon.bank.service.resource.user.util.validator.ValidClass
 import org.hibernate.validator.constraints.Length
+import java.time.LocalDateTime
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
@@ -40,7 +42,7 @@ data class AdminRegisterUserTo(
         val clazz: String,
 
         @field:NotNull
-        val roles: Set<UserRoles>
+        val roles: Set<UserRoles>,
 ) {
         override fun toString() =
                 "AdminRegisterUserTo(name='$name', surname='$surname', username='$username', class='$clazz', roles=$roles)"
@@ -92,7 +94,7 @@ data class UpdatePasswordTo(
         @field:Length(min = 8)
         val newPassword: String,
 
-        val oldPassword: String
+        val oldPassword: String,
 ) {
         override fun toString() = "UpdatePasswordTo()"
 }
@@ -104,7 +106,23 @@ data class UpdateUsernameTo(
         @field:NotNull
         @field:NotEmpty
         @field:Length(min = 3, max = 20)
-        val newUsername: String
+        val newUsername: String,
 ) {
         override fun toString() = "UpdateUsernameTo(newUsername='$newUsername')"
 }
+
+@KotlinBuilder
+@NoArgsConstructor
+data class UserToWithCards(
+        val id: Int,
+        val name: String,
+        val surname: String,
+        val username: String,
+
+        @field:JsonProperty("class")
+        val clazz: String,
+
+        val registered: LocalDateTime,
+        val roles: Set<UserRoles>,
+        val cards: List<CardTo>
+)

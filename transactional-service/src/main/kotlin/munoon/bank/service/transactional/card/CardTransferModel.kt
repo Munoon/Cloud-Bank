@@ -9,22 +9,6 @@ import java.time.LocalDateTime
 
 @KotlinBuilder
 @NoArgsConstructor
-data class CardTo(
-        val id: String,
-
-        val type: String,
-
-        val number: String?,
-
-        val balance: Double,
-
-        val active: Boolean,
-
-        val registered: LocalDateTime
-)
-
-@KotlinBuilder
-@NoArgsConstructor
 data class CardToWithOwner(
         val id: String,
 

@@ -3,10 +3,8 @@ package munoon.bank.service.resource.user.controller
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.user.UserTo
-import munoon.bank.service.resource.user.user.UpdatePasswordTo
-import munoon.bank.service.resource.user.user.UpdateUsernameTo
-import munoon.bank.service.resource.user.user.UserService
-import munoon.bank.service.resource.user.user.asTo
+import munoon.bank.service.resource.user.client.TransactionClient
+import munoon.bank.service.resource.user.user.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -15,13 +13,15 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/profile")
-class ProfileController(private val userService: UserService) {
+class ProfileController(private val userService: UserService,
+                        private val transactionClient: TransactionClient) {
     private val log = LoggerFactory.getLogger(ProfileController::class.java)
 
     @GetMapping
-    fun getProfile(@AuthenticationPrincipal authorizedUser: AuthorizedUser): UserTo {
+    fun getProfile(@AuthenticationPrincipal authorizedUser: AuthorizedUser): UserToWithCards {
         log.info("User ${authorizedUser.id} get his profile")
-        return userService.getById(authorizedUser.id).asTo()
+        val cards = transactionClient.getCardsByUserId(authorizedUser.id)
+        return userService.getById(authorizedUser.id).asTo(cards)
     }
 
     @PutMapping("/password")

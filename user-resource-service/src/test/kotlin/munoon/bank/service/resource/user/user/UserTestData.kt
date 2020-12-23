@@ -23,6 +23,11 @@ object UserTestData {
         assertMatch(actual, expected)
     }
 
+    fun contentJson(expected: UserToWithCards) = ResultMatcher {
+        val actual = JsonUtils.readFromJson(it, UserToWithCards::class.java)
+        assertMatch(actual, expected)
+    }
+
     fun contentJsonPage(vararg expected: UserTo) = ResultMatcher {
         val node = JsonUtils.OBJECT_MAPPER.readTree(getContent(it)).at("/content")
         val actual = JsonUtils.OBJECT_MAPPER.readValue<List<UserTo>>(node.toString())
@@ -43,6 +48,10 @@ object UserTestData {
     }
 
     fun assertMatch(actual: UserTo, expected: UserTo) {
+        assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
+    }
+
+    fun assertMatch(actual: UserToWithCards, expected: UserToWithCards) {
         assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
     }
 

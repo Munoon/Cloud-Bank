@@ -1,5 +1,6 @@
 package munoon.bank.service.resource.user.controller
 
+import munoon.bank.common.card.CardTo
 import munoon.bank.common.user.User
 import munoon.bank.service.resource.user.AbstractWebTest
 import munoon.bank.service.resource.user.user.*
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDateTime
 import javax.ws.rs.core.MediaType
 
 internal class ProfileControllerTest : AbstractWebTest() {
@@ -27,10 +29,13 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
     @Test
     fun getProfile() {
+        val expectedCard = CardTo("CARD_ID", "default", "123456789012", 0.0, true, LocalDateTime.of(2020, 12, 6, 0, 10))
+        val expectedCards = listOf(expectedCard)
+
         mockMvc.perform(get("/profile")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(UserTestData.DEFAULT_USER.asTo()))
+                .andExpect(contentJson(UserTestData.DEFAULT_USER.asTo(expectedCards)))
     }
 
     @Test

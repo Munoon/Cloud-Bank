@@ -1,5 +1,6 @@
 package munoon.bank.service.resource.user.controller
 
+import munoon.bank.common.card.CardTo
 import munoon.bank.common.error.ErrorType
 import munoon.bank.common.user.User
 import munoon.bank.common.user.UserTo
@@ -75,10 +76,13 @@ internal class AdminControllerTest : AbstractWebTest() {
 
     @Test
     fun getUser() {
+        val expectedCard = CardTo("CARD_ID", "default", "123456789012", 0.0, true, LocalDateTime.of(2020, 12, 6, 0, 10))
+        val expectedCards = listOf(expectedCard)
+
         mockMvc.perform(get("/admin/$USER_ID")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(DEFAULT_USER.asTo()))
+                .andExpect(contentJson(DEFAULT_USER.asTo(expectedCards)))
     }
 
     @Test

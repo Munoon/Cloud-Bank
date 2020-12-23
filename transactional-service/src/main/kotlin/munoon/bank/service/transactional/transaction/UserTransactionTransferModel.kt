@@ -2,8 +2,8 @@ package munoon.bank.service.transactional.transaction
 
 import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
+import munoon.bank.common.card.CardTo
 import munoon.bank.common.user.UserTo
-import munoon.bank.service.transactional.card.CardTo
 import munoon.bank.service.transactional.card.CardToWithOwner
 import java.time.LocalDateTime
 

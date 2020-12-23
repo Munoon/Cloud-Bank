@@ -5,6 +5,8 @@ import io.restassured.module.mockmvc.RestAssuredMockMvc
 import io.restassured.module.mockmvc.config.RestAssuredMockMvcConfig
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.user.User
+import munoon.bank.service.transactional.card.AdminCreateCardTo
+import munoon.bank.service.transactional.card.CardService
 import munoon.bank.service.transactional.config.MongoConfig
 import munoon.bank.service.transactional.user.UserTestData
 import munoon.bank.service.transactional.util.OAuth2TestData
@@ -96,11 +98,16 @@ abstract class AbstractWebTest : AbstractTest() {
 }
 
 abstract class AbstractContractTest : AbstractWebTest() {
+    @Autowired
+    private lateinit var cardService: CardService
+
     @BeforeEach
     fun setUpContract() {
         authUser(token = "DEFAULT_USER")
         RestAssuredMockMvc.mockMvc(mockMvc)
         RestAssuredMockMvc.config = RestAssuredMockMvcConfig()
                 .encoderConfig(EncoderConfig(StandardCharsets.UTF_8.name(), StandardCharsets.UTF_8.name()))
+
+        cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
     }
 }

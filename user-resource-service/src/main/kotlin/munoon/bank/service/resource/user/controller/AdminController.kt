@@ -3,6 +3,7 @@ package munoon.bank.service.resource.user.controller
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.user.UserTo
 import munoon.bank.common.validation.pageable.size.PageSize
+import munoon.bank.service.resource.user.client.TransactionClient
 import munoon.bank.service.resource.user.config.ClassesProperties
 import munoon.bank.service.resource.user.user.*
 import munoon.bank.service.resource.user.util.validator.ValidClass
@@ -21,7 +22,9 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
-class AdminController(private val userService: UserService, private val classesProperties: ClassesProperties) {
+class AdminController(private val userService: UserService,
+                      private val transactionClient: TransactionClient,
+                      private val classesProperties: ClassesProperties) {
     private val log = LoggerFactory.getLogger(AdminController::class.java)
 
     @GetMapping
@@ -49,9 +52,10 @@ class AdminController(private val userService: UserService, private val classesP
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
-    fun getUser(@PathVariable id: Int): UserTo {
+    fun getUser(@PathVariable id: Int): UserToWithCards {
         log.info("User ${authUserId()} get user with id $id")
-        return userService.getById(id).asTo()
+        val cards = transactionClient.getCardsByUserId(id)
+        return userService.getById(id).asTo(cards)
     }
 
     @PostMapping

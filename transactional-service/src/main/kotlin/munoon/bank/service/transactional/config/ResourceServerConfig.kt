@@ -23,8 +23,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter
-import org.springframework.security.oauth2.provider.token.AccessTokenConverter
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
@@ -49,10 +49,9 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
     fun passwordEncoder(): PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 
     @Bean
-    fun accessTokenConverter(): AccessTokenConverter {
-        val accessTokenConverter = DefaultAccessTokenConverter()
-        accessTokenConverter.setUserTokenConverter(userIdAuthenticationConverter())
-        return accessTokenConverter
+    fun accessTokenConverter(jwtAccessTokenConverter: JwtAccessTokenConverter) = DefaultAccessTokenConverter().also {
+        it.setUserTokenConverter(userIdAuthenticationConverter())
+        jwtAccessTokenConverter.accessTokenConverter = it
     }
 
     @Bean

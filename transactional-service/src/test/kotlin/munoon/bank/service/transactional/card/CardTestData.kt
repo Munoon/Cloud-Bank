@@ -1,6 +1,7 @@
 package munoon.bank.service.transactional.card
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import munoon.bank.common.card.CardTo
 import munoon.bank.service.transactional.user.UserTestData.assertMatch
 import munoon.bank.service.transactional.util.JsonUtil
 import org.assertj.core.api.Assertions.assertThat

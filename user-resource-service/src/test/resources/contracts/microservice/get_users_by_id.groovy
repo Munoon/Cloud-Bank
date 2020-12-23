@@ -28,7 +28,7 @@ Contract.make {
               username: "munoon",
               class: 10,
               roles: ["ROLE_COURIER", "ROLE_TEACHER", "ROLE_BARMEN", "ROLE_ADMIN"],
-              registered: $(consumer([2020, 12, 6, 0, 10]), producer(new ServerDslProperty(Pattern.compile(".*"))))
+              registered: $(consumer("2020-12-06T00:10"), producer(new ServerDslProperty(Pattern.compile(".*"))))
         ]])
     }
 }

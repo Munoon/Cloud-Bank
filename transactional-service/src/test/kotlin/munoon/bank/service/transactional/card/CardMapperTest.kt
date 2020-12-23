@@ -1,5 +1,6 @@
 package munoon.bank.service.transactional.card
 
+import munoon.bank.common.card.CardTo
 import munoon.bank.service.transactional.AbstractTest
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
 import munoon.bank.service.transactional.user.UserTestData
@@ -15,7 +16,7 @@ internal class CardMapperTest : AbstractTest() {
     @Test
     fun asTo() {
         val card = Card("CARD_ID", 100, "default", "123456789012", "1111", 100.0, true, LocalDateTime.now())
-        val expected = CardTo("CARD_ID", "default","123456789012", 100.0, true, LocalDateTime.now())
+        val expected = CardTo("CARD_ID", "default", "123456789012", 100.0, true, LocalDateTime.now())
         val actual = cardMapper.asTo(card)
         assertMatch(actual, expected)
     }
