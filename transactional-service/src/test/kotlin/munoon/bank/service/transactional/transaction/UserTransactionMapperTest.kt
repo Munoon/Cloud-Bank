@@ -29,6 +29,9 @@ internal class UserTransactionMapperTest : AbstractTest() {
     @MockBean
     private lateinit var userService: UserService
 
+    @MockBean
+    private lateinit var userTransactionService: UserTransactionService
+
     @BeforeEach
     fun usersSetup() {
         mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(mapOf(
@@ -59,7 +62,7 @@ internal class UserTransactionMapperTest : AbstractTest() {
         val card = Card("111", 100, "default", "111111111111", "1111", 100.0, true, LocalDateTime.now())
         val transaction = UserTransaction("123", card, 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "test"), true)
         val expected = UserTransactionTo("123", cardMapper.asTo(card, UserTestData.DEFAULT_USER_TO), 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfoTo(user101, "test"), true)
-        assertMatch(userTransactionMapper.asTo(transaction, users), expected)
+        assertMatch(userTransactionMapper.asTo(transaction, users, emptyMap()), expected)
 
         verify(userService, times(0)).getUsersById(anySet())
     }
@@ -78,6 +81,21 @@ internal class UserTransactionMapperTest : AbstractTest() {
         assertMatchTo(actualPage.content, expectedPage.content)
 
         verify(userService, times(1)).getUsersById(anySet())
+    }
+
+    @Test
+    fun asToIgnoreInfo() {
+        val users = mapOf(
+                100 to UserTestData.DEFAULT_USER_TO,
+                101 to user101
+        )
+
+        val card = Card("111", 100, "default", "111111111111", "1111", 100.0, true, LocalDateTime.now())
+        val transaction = UserTransaction("123", card, 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "test"), true)
+        val expected = UserTransactionTo("123", cardMapper.asTo(card, UserTestData.DEFAULT_USER_TO), 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, null, true)
+        assertMatch(userTransactionMapper.asToIgnoreInfo(transaction, users), expected)
+
+        verify(userService, times(0)).getUsersById(anySet())
     }
 
     @Test
@@ -103,6 +121,30 @@ internal class UserTransactionMapperTest : AbstractTest() {
         val card = Card("111", 100, "default", "111111111111", "1111", 100.0, true, LocalDateTime.now())
         val transaction = UserTransaction("123", card, 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "test"), true)
         val expected = UserTransactionTo("123", cardMapper.asTo(card, UserTestData.DEFAULT_USER_TO), 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfoTo(user101, "test"), true)
+        assertMatch(userTransactionMapper.asTo(transaction), expected)
+        verify(userService, times(1)).getUsersById(anySet())
+    }
+
+    @Test
+    fun translateAsTo() {
+        val card = Card("111", 100, "default", "111111111111", "1111", 100.0, true, LocalDateTime.now())
+        val receiveTransaction = UserTransaction("456", card, 100.0, 100.0, 100.0, LocalDateTime.now(), UserTransactionType.RECEIVE_MONEY, ReceiveUserTransactionInfo("RECEIVE_ID", 100, "test"), false)
+        mockWhen(userTransactionService.getTransaction("TRANSLATE_ID")).thenReturn(receiveTransaction)
+
+        val transaction = UserTransaction("123", card, 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.TRANSLATE_MONEY, TranslateUserTransactionInfo("TRANSLATE_ID", 100, "test"), true)
+        val expected = UserTransactionTo("123", cardMapper.asTo(card, UserTestData.DEFAULT_USER_TO), 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.TRANSLATE_MONEY, TranslateUserTransactionInfoTo(userTransactionMapper.asToIgnoreInfo(receiveTransaction, mapOf(100 to UserTestData.DEFAULT_USER_TO)), "test"), true)
+        assertMatch(userTransactionMapper.asTo(transaction), expected)
+        verify(userService, times(1)).getUsersById(anySet())
+    }
+
+    @Test
+    fun receiveAsTo() {
+        val card = Card("111", 100, "default", "111111111111", "1111", 100.0, true, LocalDateTime.now())
+        val translateTransaction = UserTransaction("123", card, 10.0, 100.0, 110.0, LocalDateTime.now(), UserTransactionType.TRANSLATE_MONEY, TranslateUserTransactionInfo("TRANSLATE_ID", 100, "test"), true)
+        mockWhen(userTransactionService.getTransaction("RECEIVE_ID")).thenReturn(translateTransaction)
+
+        val transaction = UserTransaction("456", card, 100.0, 100.0, 100.0, LocalDateTime.now(), UserTransactionType.RECEIVE_MONEY, ReceiveUserTransactionInfo("RECEIVE_ID", 100, "test"), false)
+        val expected = UserTransactionTo("456", cardMapper.asTo(card, UserTestData.DEFAULT_USER_TO), 100.0, 100.0, 100.0, LocalDateTime.now(), UserTransactionType.RECEIVE_MONEY, ReceiveUserTransactionInfoTo(userTransactionMapper.asToIgnoreInfo(translateTransaction, mapOf(100 to UserTestData.DEFAULT_USER_TO)), "test"), false)
         assertMatch(userTransactionMapper.asTo(transaction), expected)
         verify(userService, times(1)).getUsersById(anySet())
     }

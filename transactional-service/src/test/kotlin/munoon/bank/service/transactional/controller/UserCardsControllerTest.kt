@@ -50,10 +50,10 @@ internal class UserCardsControllerTest : AbstractWebTest() {
     fun buyCardValidationError() {
         mockMvc.perform(post("/cards/buy")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(BuyCardTo("abc", "11111", null)))
+                .content(JsonUtil.writeValue(BuyCardTo("abc", "11111", CardDataTo("1111", "1"))))
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(fieldError("type", "pinCode"))
+                .andExpect(fieldError("type", "pinCode", "cardData.card", "cardData.pinCode"))
     }
 
     @Test

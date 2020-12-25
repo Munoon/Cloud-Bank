@@ -83,6 +83,47 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
         return userTransactionRepository.save(transaction)
     }
 
+    fun translateMoney(userId: Int, translateMoneyDataTo: TranslateMoneyDataTo): UserTransaction {
+        var senderCard = cardService.getCardByNumberAndValidatePinCode(translateMoneyDataTo.cardData.card, translateMoneyDataTo.cardData.pinCode).also {
+            CardUtils.checkCardActive(it)
+            CardUtils.checkCardOwner(userId, it)
+        }
+        var receiverCard = cardService.getCardByNumber(translateMoneyDataTo.receiver).also {
+            CardUtils.checkCardActive(it)
+        }
+        val card = cardService.getCardType(senderCard.type)
+
+        val price = MoneyUtils.countWithTax(translateMoneyDataTo.count, card.tax.translate, TaxType.PLUS)
+
+        senderCard = cardService.minusMoney(senderCard, price)
+        receiverCard = cardService.plusMoney(receiverCard, translateMoneyDataTo.count)
+
+        val senderTransaction = userTransactionRepository.save(UserTransaction(
+                card = senderCard,
+                price = price,
+                actualPrice = translateMoneyDataTo.count,
+                leftBalance = senderCard.balance,
+                type = UserTransactionType.TRANSLATE_MONEY,
+                registered = LocalDateTime.now(),
+                info = null,
+                canceled = false,
+                id = null
+        ))
+        val receiverTransaction = userTransactionRepository.save(UserTransaction(
+                card = receiverCard,
+                price = translateMoneyDataTo.count,
+                actualPrice = translateMoneyDataTo.count,
+                leftBalance = receiverCard.balance,
+                type = UserTransactionType.RECEIVE_MONEY,
+                registered = LocalDateTime.now(),
+                info = ReceiveUserTransactionInfo(senderTransaction.id!!, userId, translateMoneyDataTo.message),
+                canceled = false,
+                id = null
+        ))
+        val sendInfo = TranslateUserTransactionInfo(receiverTransaction.id!!, receiverCard.userId, translateMoneyDataTo.message)
+        return userTransactionRepository.save(senderTransaction.copy(info = sendInfo))
+    }
+
     fun cancelTransaction(transactionId: String, flags: Set<CancelTransactionFlag>): UserTransaction {
         val transaction = getTransaction(transactionId)
         if (transaction.canceled) {
@@ -110,4 +151,8 @@ class UserTransactionService(private val userTransactionRepository: UserTransact
 
     fun getTransaction(transactionId: String) = userTransactionRepository.findById(transactionId)
             .orElseThrow { NotFoundException("Transaction with id '$transactionId' is not found!") }
+
+    fun getAll(transactionsId: Set<String>) = userTransactionRepository.findAllById(transactionsId)
+            .map { it.id!! to it }
+            .toMap()
 }

@@ -6,6 +6,7 @@ import munoon.bank.service.transactional.AbstractTest
 import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
 import munoon.bank.service.transactional.transaction.UserTransactionTestData.assertMatch
+import munoon.bank.service.transactional.util.NotEnoughBalanceException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -134,6 +135,90 @@ internal class UserTransactionServiceTest : AbstractTest() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", false))
         assertThrows<AccessDeniedException> {
             userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 10.0, FineAwardType.AWARD, null))
+        }
+    }
+
+    @Test
+    fun translateMoney() {
+        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
+        val receiverCard = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        cardService.plusMoney(senderCard, 200.0)
+
+        val transaction = userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
+
+        assertThat(cardService.getCardById(senderCard.id!!).balance).isEqualTo(85.0)
+        assertThat(cardService.getCardById(receiverCard.id!!).balance).isEqualTo(100.0)
+
+        val receiverTransactionId = (transaction.info as TranslateUserTransactionInfo).receiveTransactionId
+        val expectedSenderTransaction = UserTransaction(
+                id = transaction.id,
+                card = senderCard.copy(balance = 85.0),
+                price = 115.0,
+                actualPrice = 100.0,
+                leftBalance = 85.0,
+                registered = transaction.registered,
+                type = UserTransactionType.TRANSLATE_MONEY,
+                info = TranslateUserTransactionInfo(receiverTransactionId, 100, "test"),
+                canceled = false
+        )
+
+        val expectedReceiverTransaction = UserTransaction(
+                id = receiverTransactionId,
+                card = receiverCard.copy(balance = 100.0),
+                price = 100.0,
+                actualPrice = 100.0,
+                leftBalance = 100.0,
+                registered = transaction.registered,
+                type = UserTransactionType.RECEIVE_MONEY,
+                info = ReceiveUserTransactionInfo(transaction.id!!, 100, "test"),
+                canceled = false
+        )
+
+        val request = PageRequest.of(0, 10)
+        assertMatch(userTransactionService.getTransactions(senderCard.id!!, 100, request).content, expectedSenderTransaction)
+        assertMatch(userTransactionService.getTransactions(receiverCard.id!!, 100, request).content, expectedReceiverTransaction)
+    }
+
+    @Test
+    fun translateCardNotOwn() {
+        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
+        cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        cardService.plusMoney(senderCard, 200.0)
+
+        assertThrows<AccessDeniedException> {
+            userTransactionService.translateMoney(101, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
+        }
+    }
+
+    @Test
+    fun translateCardNotActive() {
+        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", false))
+        cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        cardService.plusMoney(senderCard, 200.0)
+
+        assertThrows<AccessDeniedException> {
+            userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
+        }
+    }
+
+    @Test
+    fun translateCardReceiverNotActive() {
+        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
+        val receiverCard = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", false))
+        cardService.plusMoney(senderCard, 200.0)
+
+        assertThrows<AccessDeniedException> {
+            userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
+        }
+    }
+
+    @Test
+    fun translateCardNotEnoughMoney() {
+        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
+        val receiverCard = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+
+        assertThrows<NotEnoughBalanceException> {
+            userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
         }
     }
 

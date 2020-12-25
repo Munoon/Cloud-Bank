@@ -16,6 +16,7 @@ application:
       tax:
         award: 5.0
         fine: 5.0
+        translate: 5.0
         other: 5.0
     gold:
       name: "Gold"
@@ -24,6 +25,7 @@ application:
       tax:
         award: 0.0
         fine: 0.0
+        translate: 0.0
         other: 0.0
 
 databases:

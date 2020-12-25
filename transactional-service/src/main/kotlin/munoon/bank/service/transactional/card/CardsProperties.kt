@@ -20,6 +20,7 @@ class CardsProperties {
         class Tax {
             var award: Double = 0.0
             var fine: Double = 0.0
+            var translate: Double = 0.0
             var other: Double = 0.0
         }
     }

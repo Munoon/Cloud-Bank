@@ -60,5 +60,7 @@ object UserTransactionTestData {
         UserTransactionType.CARD_BUY -> JsonUtil.OBJECT_MAPPER.readValue<BuyCardUserTransactionInfoTo>(info)
         UserTransactionType.AWARD -> JsonUtil.OBJECT_MAPPER.readValue<AwardUserTransactionInfoTo>(info)
         UserTransactionType.FINE -> JsonUtil.OBJECT_MAPPER.readValue<FineUserTransactionInfoTo>(info)
+        UserTransactionType.RECEIVE_MONEY -> JsonUtil.OBJECT_MAPPER.readValue<ReceiveUserTransactionInfoTo>(info)
+        UserTransactionType.TRANSLATE_MONEY -> JsonUtil.OBJECT_MAPPER.readValue<TranslateUserTransactionInfoTo>(info)
     }
 }

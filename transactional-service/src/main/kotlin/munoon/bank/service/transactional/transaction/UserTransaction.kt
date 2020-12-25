@@ -29,8 +29,17 @@ data class UserTransaction(
         val info: UserTransactionInfo?,
 
         val canceled: Boolean
-)
+) : UsersCollector {
+        override fun getUsersId(): Set<Int> {
+                val users = mutableSetOf(card.userId)
+                if (info is UsersCollector) {
+                        users.addAll(info.getUsersId())
+                }
+                return users
+        }
+
+}
 
 enum class UserTransactionType {
-        CARD_BUY, AWARD, FINE
+        CARD_BUY, AWARD, FINE, TRANSLATE_MONEY, RECEIVE_MONEY
 }

@@ -50,3 +50,17 @@ data class FineUserTransactionInfoTo(
         var user: UserTo?,
         var message: String?
 ) : UserTransactionInfoTo
+
+@KotlinBuilder
+@NoArgsConstructor
+data class TranslateUserTransactionInfoTo(
+        var receiveTransaction: UserTransactionTo,
+        var message: String?
+) : UserTransactionInfoTo
+
+@KotlinBuilder
+@NoArgsConstructor
+data class ReceiveUserTransactionInfoTo(
+        var translateTransaction: UserTransactionTo,
+        var message: String?
+) : UserTransactionInfoTo

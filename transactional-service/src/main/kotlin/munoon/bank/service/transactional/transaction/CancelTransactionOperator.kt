@@ -53,3 +53,34 @@ class CancelBuyCardTransactionOperator(private val cardService: CardService) : C
 
     override fun check(userTransaction: UserTransaction) = userTransaction.type == UserTransactionType.CARD_BUY
 }
+
+@Component
+class CancelTranslateTransactionOperation(private val cardService: CardService,
+                                          private var transactionService: UserTransactionService) : CancelTransactionOperator {
+    override fun cancel(userTransaction: UserTransaction, flags: Set<CancelTransactionFlag>): Boolean {
+        val translateTransaction: UserTransaction
+        val receiveTransaction: UserTransaction
+        when (userTransaction.type) {
+            UserTransactionType.TRANSLATE_MONEY -> {
+                translateTransaction = userTransaction
+                val receiveTransactionId = (userTransaction.info as TranslateUserTransactionInfo).receiveTransactionId
+                receiveTransaction = transactionService.getTransaction(receiveTransactionId)
+            }
+            UserTransactionType.RECEIVE_MONEY -> {
+                receiveTransaction = userTransaction
+                val translateTransactionId = (userTransaction.info as ReceiveUserTransactionInfo).translateTransactionId
+                translateTransaction = transactionService.getTransaction(translateTransactionId)
+            }
+            else -> {
+                translateTransaction = userTransaction
+                receiveTransaction = userTransaction
+            }
+        }
+        cardService.plusMoney(translateTransaction.card, translateTransaction.price)
+        cardService.minusMoney(receiveTransaction.card, receiveTransaction.price)
+        return true
+    }
+
+    override fun check(userTransaction: UserTransaction) = userTransaction.type == UserTransactionType.TRANSLATE_MONEY
+            || userTransaction.type == UserTransactionType.RECEIVE_MONEY
+}

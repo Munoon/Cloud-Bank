@@ -6,6 +6,7 @@ import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.util.validation.CardType
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
+import javax.validation.Valid
 
 @KotlinBuilder
 @NoArgsConstructor
@@ -34,6 +35,7 @@ data class BuyCardTo(
         @field:Length(min = 4, max = 4)
         val pinCode: String,
 
+        @field:Valid
         val cardData: CardDataTo?
 ) {
         override fun toString() = "BuyCardTo(type='$type', cardDataTo=$cardData)"

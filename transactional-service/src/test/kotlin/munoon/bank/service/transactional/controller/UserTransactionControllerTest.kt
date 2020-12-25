@@ -4,21 +4,24 @@ import munoon.bank.common.error.ErrorType
 import munoon.bank.common.user.UserRoles
 import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.AbstractWebTest
-import munoon.bank.service.transactional.card.BuyCardTo
-import munoon.bank.service.transactional.card.CardRepository
-import munoon.bank.service.transactional.card.CardService
+import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.transaction.*
 import munoon.bank.service.transactional.transaction.UserTransactionTestData.contentJsonList
 import munoon.bank.service.transactional.user.UserService
 import munoon.bank.service.transactional.user.UserTestData
+import munoon.bank.service.transactional.util.JsonUtil
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.error
 import munoon.bank.service.transactional.util.ResponseExceptionValidator.fieldError
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.data.domain.PageRequest
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
+import javax.ws.rs.core.MediaType
 import org.mockito.Mockito.`when` as mockWhen
 
 internal class
@@ -57,7 +60,7 @@ UserTransactionControllerTest : AbstractWebTest() {
         mockMvc.perform(get("/transaction/" + card.id)
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonList(userTransactionMapper.asTo(expected, usersMap)))
+                .andExpect(contentJsonList(userTransactionMapper.asTo(expected, usersMap, emptyMap())))
     }
 
     @Test
@@ -84,5 +87,65 @@ UserTransactionControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isNotFound())
                 .andExpect(error(ErrorType.NOT_FOUND))
+    }
+
+    @Test
+    fun translateMoney() {
+        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
+        val receiverCard = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        cardService.plusMoney(senderCard, 200.0)
+
+        val translateMoneyData = TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111"))
+        val result = mockMvc.perform(post("/transaction/translate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(translateMoneyData))
+                .with(authUser()))
+                .andExpect(status().isOk())
+                .andReturn()
+
+        val transaction = UserTransactionTestData.readFromJson(JsonUtil.getContent(result))
+
+        Assertions.assertThat(cardService.getCardById(senderCard.id!!).balance).isEqualTo(85.0)
+        Assertions.assertThat(cardService.getCardById(receiverCard.id!!).balance).isEqualTo(100.0)
+
+        val receiverTransactionId = (transaction.info as TranslateUserTransactionInfoTo).receiveTransaction.id!!
+        val expectedSenderTransaction = UserTransaction(
+                id = transaction.id,
+                card = senderCard.copy(balance = 85.0),
+                price = 115.0,
+                actualPrice = 100.0,
+                leftBalance = 85.0,
+                registered = transaction.registered,
+                type = UserTransactionType.TRANSLATE_MONEY,
+                info = TranslateUserTransactionInfo(receiverTransactionId, 100, "test"),
+                canceled = false
+        )
+
+        val expectedReceiverTransaction = UserTransaction(
+                id = receiverTransactionId,
+                card = receiverCard.copy(balance = 100.0),
+                price = 100.0,
+                actualPrice = 100.0,
+                leftBalance = 100.0,
+                registered = transaction.registered,
+                type = UserTransactionType.RECEIVE_MONEY,
+                info = ReceiveUserTransactionInfo(transaction.id!!, 100, "test"),
+                canceled = false
+        )
+
+        val request = PageRequest.of(0, 10)
+        UserTransactionTestData.assertMatch(userTransactionService.getTransactions(senderCard.id!!, 100, request).content, expectedSenderTransaction)
+        UserTransactionTestData.assertMatch(userTransactionService.getTransactions(receiverCard.id!!, 100, request).content, expectedReceiverTransaction)
+    }
+
+    @Test
+    fun translateMoneyValidationError() {
+        val translateMoneyData = TranslateMoneyDataTo("1111", 100.00009, null, CardDataTo("1111", "1"))
+        mockMvc.perform(post("/transaction/translate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(translateMoneyData))
+                .with(authUser()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(fieldError("receiver", "count", "cardData.card", "cardData.pinCode"))
     }
 }

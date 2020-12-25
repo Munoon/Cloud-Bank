@@ -32,6 +32,7 @@ application:
       tax:
         award: 15.0
         fine: 15.0
+        translate: 15.0
         other: 15.0
     gold:
       name: "Gold"
@@ -40,6 +41,7 @@ application:
       tax:
         award: 0.0
         fine: 0.0
+        translate: 0.0
         other: 0.0
     parliament:
       name: "Parliament"
@@ -48,4 +50,5 @@ application:
       tax:
         award: 5.0
         fine: 5.0
+        translate: 5.0
         other: 5.0
