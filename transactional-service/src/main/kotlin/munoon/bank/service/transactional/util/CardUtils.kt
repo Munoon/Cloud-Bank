@@ -16,3 +16,9 @@ object CardUtils {
         }
     }
 }
+
+fun Card.checkOwner(userId: Int, message: String = "This card belong to other user"): Card =
+        also { CardUtils.checkCardOwner(userId, it, message) }
+
+fun Card.checkActive(message: String = "This card is not active"): Card =
+        also { CardUtils.checkCardActive(it, message) }

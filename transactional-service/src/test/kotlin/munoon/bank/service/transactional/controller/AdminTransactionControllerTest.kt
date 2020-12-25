@@ -9,6 +9,7 @@ import munoon.bank.service.transactional.transaction.*
 import munoon.bank.service.transactional.transaction.UserTransactionTestData.assertMatch
 import munoon.bank.service.transactional.transaction.UserTransactionTestData.contentJson
 import munoon.bank.service.transactional.transaction.UserTransactionTestData.contentJsonList
+import munoon.bank.service.transactional.transaction.operator.CancelTransactionFlag
 import munoon.bank.service.transactional.user.UserService
 import munoon.bank.service.transactional.user.UserTestData
 import munoon.bank.service.transactional.util.JsonUtil
@@ -147,7 +148,8 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
         )
         mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(usersMap)
 
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
+        val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
+        val transaction = userTransactionService.makeTransaction(data)
         val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 100.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"), false)
 
         mockMvc.perform(get("/admin/transaction/card/${card.id}")
@@ -168,7 +170,8 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
     @Test
     fun cancelTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val transaction = userTransactionService.makeTransaction(data)
         assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(85.0)
 
         val expected = UserTransaction(transaction.id, card.copy(balance = 0.0), 85.0, 100.0, 85.0, transaction.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), true)
@@ -193,7 +196,8 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
     @Test
     fun cancelTransactionCanceled() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val transaction = userTransactionService.makeTransaction(data)
         userTransactionService.cancelTransaction(transaction.id!!, emptySet())
 
         mockMvc.perform(post("/admin/transaction/${transaction.id}/cancel")

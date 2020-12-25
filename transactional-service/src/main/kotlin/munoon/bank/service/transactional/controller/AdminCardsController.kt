@@ -3,7 +3,7 @@ package munoon.bank.service.transactional.controller
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.card.CardTo
 import munoon.bank.service.transactional.card.*
-import munoon.bank.service.transactional.util.CardUtils
+import munoon.bank.service.transactional.util.checkOwner
 import org.hibernate.validator.constraints.Length
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -39,8 +39,7 @@ class AdminCardsController(private val cardService: CardService,
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun getCardById(@PathVariable userId: Int, @PathVariable cardId: String): CardTo {
         log.info("User ${authUserId()} request cards of user $userId with id '$cardId'")
-        val card = cardService.getCardById(cardId)
-        CardUtils.checkCardOwner(userId, card)
+        val card = cardService.getCardById(cardId).checkOwner(userId)
         return cardMapper.asTo(card)
     }
 

@@ -2,9 +2,11 @@ package munoon.bank.service.transactional.card
 
 import munoon.bank.common.util.exception.FieldValidationException
 import munoon.bank.common.util.exception.NotFoundException
+import munoon.bank.service.transactional.transaction.AddCardTransactionInfoData
+import munoon.bank.service.transactional.transaction.BuyCardTransactionInfoData
 import munoon.bank.service.transactional.transaction.UserTransactionService
-import munoon.bank.service.transactional.util.CardUtils
 import munoon.bank.service.transactional.util.NotEnoughBalanceException
+import munoon.bank.service.transactional.util.checkOwner
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -31,37 +33,34 @@ class CardService(private val cardRepository: CardRepository,
 
         val userTransaction = when {
             cardType.price == 0.0 && buyCardTo.cardData == null -> null
-            else -> userTransactionService.buyCardTransaction(userId, cardType.price, buyCardTo.cardData
-                    ?: throw AccessDeniedException("You should specify card for doing this operation."))
+            else -> userTransactionService.makeTransaction(BuyCardTransactionInfoData(userId, cardType.price, buyCardTo.cardData
+                    ?: throw AccessDeniedException("You should specify card for doing this operation.")))
         }
 
         val pinCode = passwordEncoder.encode(buyCardTo.pinCode)
         val card = cardMapper.asCard(buyCardTo, userId, pinCode)
         val buyCard = cardRepository.save(card)
         if (userTransaction != null) {
-            userTransactionService.addCardToCardTransaction(userTransaction, buyCard)
+            userTransactionService.makeTransactionNextStep(userTransaction, AddCardTransactionInfoData(buyCard), 1)
         }
 
         return buyCard
     }
 
     fun updateCard(userId: Int, cardId: String, adminUpdateCardTo: AdminUpdateCardTo): Card {
-        val card = getCardById(cardId)
-        CardUtils.checkCardOwner(userId, card)
+        val card = getCardById(cardId).checkOwner(userId)
         cardMapper.updateCard(adminUpdateCardTo, card)
         return cardRepository.save(card)
     }
 
     fun updateCardPinCode(userId: Int, cardId: String, pinCode: String) {
-        val card = getCardById(cardId)
-        CardUtils.checkCardOwner(userId, card)
+        val card = getCardById(cardId).checkOwner(userId)
         val newPinCode = passwordEncoder.encode(pinCode)
         cardRepository.save(card.copy(pinCode = newPinCode))
     }
 
     fun updateCardPinCode(userId: Int, cardId: String, userUpdateCardPinCode: UserUpdateCardPinCode) {
-        val card = getCardById(cardId)
-        CardUtils.checkCardOwner(userId, card)
+        val card = getCardById(cardId).checkOwner(userId)
         if (!passwordEncoder.matches(userUpdateCardPinCode.oldPinCode, card.pinCode)) {
             throw FieldValidationException("oldPinCode", "Старый пин-код введен не верно!")
         }

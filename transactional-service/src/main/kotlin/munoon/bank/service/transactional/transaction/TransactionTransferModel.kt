@@ -20,8 +20,8 @@ data class FineAwardDataTo(
         val message: String?
 )
 
-enum class FineAwardType {
-    FINE, AWARD
+enum class FineAwardType(val originalType: UserTransactionType) {
+    FINE(UserTransactionType.FINE), AWARD(UserTransactionType.AWARD)
 }
 
 @NoArgsConstructor

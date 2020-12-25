@@ -6,14 +6,11 @@ import munoon.bank.service.transactional.AbstractTest
 import munoon.bank.service.transactional.card.*
 import munoon.bank.service.transactional.card.CardTestData.assertMatch
 import munoon.bank.service.transactional.transaction.UserTransactionTestData.assertMatch
-import munoon.bank.service.transactional.util.NotEnoughBalanceException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
-import org.springframework.security.access.AccessDeniedException
 import java.time.LocalDateTime
 
 internal class UserTransactionServiceTest : AbstractTest() {
@@ -27,82 +24,10 @@ internal class UserTransactionServiceTest : AbstractTest() {
     private lateinit var cardRepository: CardRepository
 
     @Test
-    fun buyCardTransaction() {
-        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
-            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
-        }
-
-        val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null, false)
-        assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
-    }
-
-    @Test
-    fun buyCardTransactionNotOwnCard() {
-        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
-            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
-        }
-
-        assertThrows<AccessDeniedException> {
-            userTransactionService.buyCardTransaction(101, 100.0, CardDataTo(card.number!!, "1111"))
-        }
-    }
-
-    @Test
-    fun buyCardTransactionNotActive() {
-        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
-            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012", active = false))
-        }
-
-        assertThrows<AccessDeniedException> {
-            userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-        }
-    }
-
-    @Test
-    fun addCardToCardTransaction() {
-        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
-            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
-        }
-
-        val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-
-        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, true, LocalDateTime.now()))
-        userTransactionService.addCardToCardTransaction(transaction, createdCard)
-
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard), false)
-        assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
-    }
-
-    @Test
-    fun getTransactions() {
-        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
-            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
-        }
-
-        val transaction = userTransactionService.buyCardTransaction(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null, false)
-        assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
-    }
-
-    @Test
-    fun fineTransaction() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true)).let {
-            cardService.plusMoney(it, 1000.0)
-        }
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.FINE, "message"))
-
-        assertMatch(cardService.getCardsByUserId(100), card.copy(balance = 885.0))
-
-        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, "message"), false)
-        val actual = userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10))
-        assertMatch(actual.content, expected)
-    }
-
-    @Test
-    fun awardTransaction() {
+    fun makeTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val transaction = userTransactionService.makeTransaction(data)
 
         assertMatch(cardService.getCardsByUserId(100), card.copy(balance = 85.0))
 
@@ -112,120 +37,106 @@ internal class UserTransactionServiceTest : AbstractTest() {
     }
 
     @Test
-    fun fineAwardTransactionCardNotFound() {
-        assertThrows<NotFoundException> {
-            userTransactionService.fineAwardTransaction(101, FineAwardDataTo("abc", 10.0, FineAwardType.AWARD, null))
+    fun makeTransactionNextStep() {
+        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
+            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
         }
+
+        val data = BuyCardTransactionInfoData(100, 100.0, CardDataTo(card.number!!, "1111"))
+        val transaction = userTransactionService.makeTransaction(data)
+
+        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, true, LocalDateTime.now()))
+        userTransactionService.makeTransactionNextStep(transaction, AddCardTransactionInfoData(createdCard), 1)
+
+        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard), false)
+        assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
     }
 
     @Test
-    fun fineAwardTransactionIgnoreBalance() {
+    fun getTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.FINE, null))
-
-        assertMatch(cardService.getCardsByUserId(100), card.copy(balance = -115.0))
-
-        val expected = UserTransaction(transaction.id, card.copy(balance = -115.0), 115.0, 100.0, -115.0, LocalDateTime.now(), UserTransactionType.FINE, FineUserTransactionInfo(101, null), false)
-        val actual = userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10))
-        assertMatch(actual.content, expected)
+        val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val transaction = userTransactionService.makeTransaction(data)
+        val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 100.0, 85.0, transaction.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+        assertMatch(userTransactionService.getTransaction(transaction.id!!), expected)
     }
 
     @Test
-    fun fineAwardTransactionCardNotActive() {
-        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", false))
-        assertThrows<AccessDeniedException> {
-            userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 10.0, FineAwardType.AWARD, null))
+    fun getTransactionNotFound() {
+        assertThrows<NotFoundException> {
+            userTransactionService.getTransaction("abc")
         }
     }
 
     @Test
-    fun translateMoney() {
-        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
-        val receiverCard = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        cardService.plusMoney(senderCard, 200.0)
-
-        val transaction = userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
-
-        assertThat(cardService.getCardById(senderCard.id!!).balance).isEqualTo(85.0)
-        assertThat(cardService.getCardById(receiverCard.id!!).balance).isEqualTo(100.0)
-
-        val receiverTransactionId = (transaction.info as TranslateUserTransactionInfo).receiveTransactionId
-        val expectedSenderTransaction = UserTransaction(
-                id = transaction.id,
-                card = senderCard.copy(balance = 85.0),
-                price = 115.0,
-                actualPrice = 100.0,
-                leftBalance = 85.0,
-                registered = transaction.registered,
-                type = UserTransactionType.TRANSLATE_MONEY,
-                info = TranslateUserTransactionInfo(receiverTransactionId, 100, "test"),
-                canceled = false
-        )
-
-        val expectedReceiverTransaction = UserTransaction(
-                id = receiverTransactionId,
-                card = receiverCard.copy(balance = 100.0),
-                price = 100.0,
-                actualPrice = 100.0,
-                leftBalance = 100.0,
-                registered = transaction.registered,
-                type = UserTransactionType.RECEIVE_MONEY,
-                info = ReceiveUserTransactionInfo(transaction.id!!, 100, "test"),
-                canceled = false
-        )
-
-        val request = PageRequest.of(0, 10)
-        assertMatch(userTransactionService.getTransactions(senderCard.id!!, 100, request).content, expectedSenderTransaction)
-        assertMatch(userTransactionService.getTransactions(receiverCard.id!!, 100, request).content, expectedReceiverTransaction)
+    fun getAll() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val data1 = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val data2 = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 50.0, FineAwardType.FINE, null))
+        val transaction1 = userTransactionService.makeTransaction(data1)
+        val transaction2 = userTransactionService.makeTransaction(data2)
+        val expected1 = UserTransaction(transaction1.id, card.copy(balance = 27.5), 85.0, 100.0, 85.0, transaction1.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+        val expected2 = UserTransaction(transaction2.id, card.copy(balance = 27.5), 57.5, 50.0, 27.5, transaction1.registered, UserTransactionType.FINE, FineUserTransactionInfo(101, null), false)
+        val actual = userTransactionService.getAll(setOf(transaction1.id!!, transaction2.id!!))
+        assertThat(actual).containsOnlyKeys(transaction1.id!!, transaction2.id!!)
+        assertMatch(actual[transaction1.id]!!, expected1)
+        assertMatch(actual[transaction2.id]!!, expected2)
     }
 
     @Test
-    fun translateCardNotOwn() {
-        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
-        cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        cardService.plusMoney(senderCard, 200.0)
+    fun create() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val create = UserTransaction(null, card, 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+        val actual = userTransactionService.create(create)
+        val expected = UserTransaction(actual.id, card, 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+        assertMatch(userTransactionService.getTransactions(card.id!!, null, PageRequest.of(0, 10)).content, expected)
+    }
 
-        assertThrows<AccessDeniedException> {
-            userTransactionService.translateMoney(101, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
+    @Test
+    fun createNotNew() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val create = UserTransaction("abc", card, 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+        assertThrows<IllegalArgumentException> {
+            userTransactionService.create(create)
         }
     }
 
     @Test
-    fun translateCardNotActive() {
-        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", false))
-        cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        cardService.plusMoney(senderCard, 200.0)
+    fun update() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val create = UserTransaction(null, card, 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+                .let { userTransactionService.create(it) }
+        userTransactionService.update(create.copy(price = 100.0, leftBalance = 100.0))
+        val expected = UserTransaction(create.id, card, 100.0, 100.0, 100.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+        assertMatch(userTransactionService.getTransactions(card.id!!, null, PageRequest.of(0, 10)).content, expected)
+    }
 
-        assertThrows<AccessDeniedException> {
-            userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
+    @Test
+    fun updateNotCreated() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
+        val create = UserTransaction(null, card, 85.0, 100.0, 85.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
+        assertThrows<IllegalArgumentException> {
+            userTransactionService.update(create)
         }
     }
 
     @Test
-    fun translateCardReceiverNotActive() {
-        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
-        val receiverCard = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", false))
-        cardService.plusMoney(senderCard, 200.0)
-
-        assertThrows<AccessDeniedException> {
-            userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
+    fun getTransactions() {
+        val card = cardService.buyCard(100, BuyCardTo("default", "1111", null)).let {
+            cardRepository.save(it.copy(balance = 1000.0, number = "123456789012"))
         }
-    }
 
-    @Test
-    fun translateCardNotEnoughMoney() {
-        val senderCard = cardService.createCard(AdminCreateCardTo(100, "default", "123456789012", "1111", true))
-        val receiverCard = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-
-        assertThrows<NotEnoughBalanceException> {
-            userTransactionService.translateMoney(100, TranslateMoneyDataTo("111111111111", 100.0, "test", CardDataTo("123456789012", "1111")))
-        }
+        val data = BuyCardTransactionInfoData(100, 100.0, CardDataTo(card.number!!, "1111"))
+        val transaction = userTransactionService.makeTransaction(data)
+        val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null, false)
+        assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
     }
 
     @Test
     fun cancelTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val transaction = userTransactionService.makeTransaction(data)
 
         assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(85.0)
 
@@ -248,7 +159,8 @@ internal class UserTransactionServiceTest : AbstractTest() {
     @Test
     fun cancelTransactionAlreadyCanceled() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val transaction = userTransactionService.fineAwardTransaction(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
+        val transaction = userTransactionService.makeTransaction(data)
         userTransactionService.cancelTransaction(transaction.id!!, emptySet())
         assertThrows<ApplicationException> { userTransactionService.cancelTransaction(transaction.id!!, emptySet()) }
     }

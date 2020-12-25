@@ -3,6 +3,7 @@ package munoon.bank.service.transactional.controller
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.validation.pageable.size.PageSize
 import munoon.bank.service.transactional.transaction.*
+import munoon.bank.service.transactional.transaction.operator.CancelTransactionFlag
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -24,7 +25,8 @@ class AdminTransactionController(private val transactionService: UserTransaction
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun makeFineOrAward(@Valid @RequestBody fineAwardData: FineAwardDataTo): UserTransactionTo {
         log.info("Admin ${authUserId()} make fine or award: $fineAwardData")
-        val transaction = transactionService.fineAwardTransaction(authUserId(), fineAwardData)
+        val data = FineAwardTransactionInfoData(authUserId(), fineAwardData)
+        val transaction = transactionService.makeTransaction(data)
         return transactionMapper.asTo(transaction)
     }
 
