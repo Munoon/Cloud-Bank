@@ -30,4 +30,14 @@ internal class UserServiceTest : AbstractTest() {
             userService.getUserById(999)
         }
     }
+
+    @Test
+    fun getUserByIdOrNull() {
+        assertMatch(userService.getUserOrNull(100)!!, UserTestData.DEFAULT_USER_TO)
+    }
+
+    @Test
+    fun getUserByIdNull() {
+        assertThat(userService.getUserOrNull(999)).isNull()
+    }
 }

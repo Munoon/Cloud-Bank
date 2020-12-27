@@ -15,6 +15,8 @@ class UserService(private val restTemplate: RestTemplate) {
                 .toMap()
     }
 
-    fun getUserById(userId: Int): UserTo = getUsersById(setOf(userId))[userId]
+    fun getUserById(userId: Int): UserTo = getUserOrNull(userId)
             ?: throw NotFoundException("User with id $userId not found!")
+
+    fun getUserOrNull(userId: Int): UserTo? = getUsersById(setOf(userId))[userId]
 }

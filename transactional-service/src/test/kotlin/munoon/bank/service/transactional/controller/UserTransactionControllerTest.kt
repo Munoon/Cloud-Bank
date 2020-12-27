@@ -61,7 +61,7 @@ UserTransactionControllerTest : AbstractWebTest() {
         mockMvc.perform(get("/transaction/" + card.id)
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonList(userTransactionMapper.asTo(expected, usersMap, emptyMap())))
+                .andExpect(contentJsonList(userTransactionMapper.asToWithUnSafeInfo(expected, usersMap, emptyMap())))
     }
 
     @Test

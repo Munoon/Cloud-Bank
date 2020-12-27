@@ -26,6 +26,16 @@ data class CardToWithOwner(
         val registered: LocalDateTime
 )
 
+@KotlinBuilder
+@NoArgsConstructor
+data class SafeCardToWithOwner(
+        val id: String,
+
+        val number: String?,
+
+        val owner: UserTo?
+)
+
 @NoArgsConstructor
 data class BuyCardTo(
         @field:CardType

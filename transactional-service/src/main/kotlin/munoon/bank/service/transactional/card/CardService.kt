@@ -37,14 +37,12 @@ class CardService(private val cardRepository: CardRepository,
                     ?: throw AccessDeniedException("You should specify card for doing this operation.")))
         }
 
-        val pinCode = passwordEncoder.encode(buyCardTo.pinCode)
-        val card = cardMapper.asCard(buyCardTo, userId, pinCode)
-        val buyCard = cardRepository.save(card)
+        val card = cardMapper.asCard(buyCardTo, userId).let { cardRepository.save(it) }
         if (userTransaction != null) {
-            userTransactionService.makeTransactionNextStep(userTransaction, AddCardTransactionInfoData(buyCard), 1)
+            userTransactionService.makeTransactionNextStep(userTransaction, AddCardTransactionInfoData(card), 1)
         }
 
-        return buyCard
+        return card
     }
 
     fun updateCard(userId: Int, cardId: String, adminUpdateCardTo: AdminUpdateCardTo): Card {
@@ -69,7 +67,7 @@ class CardService(private val cardRepository: CardRepository,
     }
 
     fun createCard(adminCreateCardTo: AdminCreateCardTo): Card {
-        val card = cardMapper.asCard(adminCreateCardTo, passwordEncoder)
+        val card = cardMapper.asCard(adminCreateCardTo)
         return cardRepository.save(card)
     }
 

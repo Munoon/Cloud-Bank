@@ -27,7 +27,7 @@ class AdminTransactionController(private val transactionService: UserTransaction
         log.info("Admin ${authUserId()} make fine or award: $fineAwardData")
         val data = FineAwardTransactionInfoData(authUserId(), fineAwardData)
         val transaction = transactionService.makeTransaction(data)
-        return transactionMapper.asTo(transaction)
+        return transactionMapper.asToWithUnSafeInfo(transaction)
     }
 
     @GetMapping("/card/{cardId}")
@@ -35,7 +35,7 @@ class AdminTransactionController(private val transactionService: UserTransaction
                             @PathVariable cardId: String): Page<UserTransactionTo> {
         log.info("Admin ${authUserId()} request transactions of card '$cardId', page $pageable")
         val transactions = transactionService.getTransactions(cardId, userId = null, pageable)
-        return transactionMapper.asTo(transactions)
+        return transactionMapper.asToWithUnSafeInfo(transactions)
     }
 
     @PostMapping("/{transactionId}/cancel")
@@ -43,6 +43,6 @@ class AdminTransactionController(private val transactionService: UserTransaction
                           @RequestParam(defaultValue = "") flags: Set<CancelTransactionFlag>): UserTransactionTo {
         log.info("Admin ${authUserId()} canceled transaction '$transactionId'")
         val transaction = transactionService.cancelTransaction(transactionId, flags)
-        return transactionMapper.asTo(transaction)
+        return transactionMapper.asToWithUnSafeInfo(transaction)
     }
 }

@@ -23,7 +23,7 @@ class UserTransactionController(private val transactionService: UserTransactionS
                             @PathVariable cardId: String): Page<UserTransactionTo> {
         log.info("User ${authUserId()} get transactions list of card $cardId")
         val transactions = transactionService.getTransactions(cardId, authUserId(), pageable)
-        return transactionMapper.asTo(transactions)
+        return transactionMapper.asToWithSafeInfo(transactions)
     }
 
     @PostMapping("/translate")
@@ -31,6 +31,6 @@ class UserTransactionController(private val transactionService: UserTransactionS
         log.info("User ${authUserId()} translate money: $translateMoneyDataTo")
         val data = TranslateMoneyTransactionInfoData(authUserId(), translateMoneyDataTo)
         val transaction = transactionService.makeTransaction(data)
-        return transactionMapper.asTo(transaction)
+        return transactionMapper.asToWithSafeInfo(transaction)
     }
 }

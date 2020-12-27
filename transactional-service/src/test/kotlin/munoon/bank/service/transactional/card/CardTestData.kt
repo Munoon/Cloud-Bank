@@ -36,6 +36,13 @@ object CardTestData {
         assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
     }
 
+    fun assertMatch(actual: SafeCardToWithOwner, expected: SafeCardToWithOwner) {
+        assertThat(actual).usingRecursiveComparison().ignoringFields("owner").isEqualTo(expected)
+        if (actual.owner != null) {
+            assertMatch(actual.owner!!, expected.owner!!)
+        }
+    }
+
     fun contentJson(expected: CardTo) = ResultMatcher {
         val actual = JsonUtil.OBJECT_MAPPER.readValue<CardTo>(JsonUtil.getContent(it))
         assertMatch(actual, expected)

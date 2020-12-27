@@ -21,9 +21,17 @@ object UserTransactionTestData {
                 .isEqualTo(expected);
     }
 
+    fun assertMatch(actual: SafeUserTransactionTo, expected: SafeUserTransactionTo) {
+        assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected);
+    }
+
     fun assertMatchTo(actual: List<UserTransactionTo>, expected: List<UserTransactionTo>) {
         assertThat(actual).hasSize(expected.size)
         actual.forEachIndexed { index, it -> assertMatch(it, expected[index]) }
+    }
+
+    fun assertMatch(actual: List<UserTransactionTo>, vararg expected: UserTransactionTo) {
+        assertMatchTo(actual, expected.toList())
     }
 
     fun assertMatch(actual: List<UserTransaction>, expected: List<UserTransaction>) {

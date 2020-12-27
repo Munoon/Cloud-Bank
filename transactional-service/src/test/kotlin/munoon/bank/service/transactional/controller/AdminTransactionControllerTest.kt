@@ -155,7 +155,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
         mockMvc.perform(get("/admin/transaction/card/${card.id}")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonList(userTransactionMapper.asTo(expected)))
+                .andExpect(contentJsonList(userTransactionMapper.asToWithUnSafeInfo(expected)))
     }
 
     @Test
@@ -179,7 +179,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
         mockMvc.perform(post("/admin/transaction/${transaction.id}/cancel")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(userTransactionMapper.asTo(expected)))
+                .andExpect(contentJson(userTransactionMapper.asToWithUnSafeInfo(expected)))
 
         assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(0.0)
         assertMatch(userTransactionService.getTransactions(card.id!!, null, PageRequest.of(0, 100)).content, expected)
@@ -220,6 +220,6 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
                 .param("flags", CancelTransactionFlag.DEACTIVATE_CARD.toString())
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(userTransactionMapper.asTo(expected)))
+                .andExpect(contentJson(userTransactionMapper.asToWithUnSafeInfo(expected)))
     }
 }
