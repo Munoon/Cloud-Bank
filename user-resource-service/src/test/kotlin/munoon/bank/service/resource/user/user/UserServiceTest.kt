@@ -64,10 +64,10 @@ internal class UserServiceTest : AbstractTest() {
 
     @Test
     fun createUser() {
-        val userTo = AdminRegisterUserTo("New", "User", "username", "password", "10", emptySet())
+        val userTo = AdminRegisterUserTo("New", "User", "username", "password", "10", 100.0, emptySet())
         val createUser = userService.createUser(userTo)
 
-        val expected = User(createUser.id, "New", "User", "username", createUser.password, "10", createUser.registered, emptySet())
+        val expected = User(createUser.id, "New", "User", "username", createUser.password, "10", 100.0, createUser.registered, emptySet())
 
         assertMatch(userService.getAll(PageRequest.of(0, 10), UserTestData.USER_CLASS).content, DEFAULT_USER, expected)
         assertThat(passwordEncoder.matches("password", createUser.password)).isTrue()
@@ -75,17 +75,17 @@ internal class UserServiceTest : AbstractTest() {
 
     @Test
     fun updateUser() {
-        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", emptySet())
+        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", 100.0, emptySet())
         userService.updateUser(USER_ID, userTo)
 
-        val expected = User(100, "NewName", "NewSurname", "test", "password", "10", LocalDateTime.now(), emptySet())
+        val expected = User(100, "NewName", "NewSurname", "test", "password", "10", 100.0, LocalDateTime.now(), emptySet())
         val actual = userService.getById(USER_ID)
         assertMatch(actual, expected)
     }
 
     @Test
     fun updateUserNotFound() {
-        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", emptySet())
+        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", 100.0, emptySet())
         assertThrows(NotFoundException::class.java) { userService.updateUser(999, userTo) }
     }
 

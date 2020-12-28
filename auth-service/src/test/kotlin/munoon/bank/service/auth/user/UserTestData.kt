@@ -10,7 +10,7 @@ object UserTestData {
     const val USER_ID = 100
     const val USER_USERNAME = "munoon"
     const val USER_PASSWORD = "password"
-    val USER = User(USER_ID, "Nikita", "Ivchenko", USER_USERNAME, "{noop}" + USER_PASSWORD, "10", LocalDateTime.now(), hashSetOf(UserRoles.ROLE_ADMIN, UserRoles.ROLE_BARMEN, UserRoles.ROLE_COURIER, UserRoles.ROLE_TEACHER))
+    val USER = User(USER_ID, "Nikita", "Ivchenko", USER_USERNAME, "{noop}$USER_PASSWORD", "10", 100.0, LocalDateTime.now(), hashSetOf(UserRoles.ROLE_ADMIN, UserRoles.ROLE_BARMEN, UserRoles.ROLE_COURIER, UserRoles.ROLE_TEACHER))
 
     fun assertMatch(actual: User, expected: User) {
         Assertions.assertThat(actual).usingRecursiveComparison().ignoringFields("registered", "password").isEqualTo(expected)

@@ -33,4 +33,9 @@ object JsonUtils {
         val data = OBJECT_MAPPER.readValue(getContent(it), object : TypeReference<List<T>>() {})
         assertThat(data).usingDefaultComparator().isEqualTo(obj.toList())
     }
+
+    fun emptyJsonPage() = ResultMatcher {
+        val node = OBJECT_MAPPER.readTree(getContent(it)).at("/content")
+        assertThat(node.size()).isEqualTo(0)
+    }
 }

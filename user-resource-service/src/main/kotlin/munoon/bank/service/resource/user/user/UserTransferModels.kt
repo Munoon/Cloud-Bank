@@ -5,6 +5,7 @@ import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
 import munoon.bank.common.card.CardTo
 import munoon.bank.common.user.UserRoles
+import munoon.bank.common.validation.money.ValidMoneyCount
 import munoon.bank.service.resource.user.util.validator.ValidClass
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
@@ -41,6 +42,9 @@ data class AdminRegisterUserTo(
         @field:JsonProperty("class")
         val clazz: String,
 
+        @field:ValidMoneyCount
+        val salary: Double,
+
         @field:NotNull
         val roles: Set<UserRoles>,
 ) {
@@ -72,6 +76,9 @@ data class AdminUpdateUserTo(
         @field:Length(min = 1, max = 20)
         @field:JsonProperty("class")
         var clazz: String,
+
+        @field:ValidMoneyCount
+        val salary: Double,
 
         @field:NotNull
         val roles: Set<UserRoles>,
@@ -122,6 +129,23 @@ data class UserToWithCards(
         @field:JsonProperty("class")
         val clazz: String,
 
+        val registered: LocalDateTime,
+        val roles: Set<UserRoles>,
+        val cards: List<CardTo>
+)
+
+@KotlinBuilder
+@NoArgsConstructor
+data class FullUserToWithCards(
+        val id: Int,
+        val name: String,
+        val surname: String,
+        val username: String,
+
+        @field:JsonProperty("class")
+        val clazz: String,
+
+        val salary: Double,
         val registered: LocalDateTime,
         val roles: Set<UserRoles>,
         val cards: List<CardTo>

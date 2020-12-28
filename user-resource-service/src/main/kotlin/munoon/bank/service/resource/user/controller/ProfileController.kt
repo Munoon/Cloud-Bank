@@ -2,7 +2,7 @@ package munoon.bank.service.resource.user.controller
 
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.SecurityUtils.authUserId
-import munoon.bank.common.user.UserTo
+import munoon.bank.common.user.FullUserTo
 import munoon.bank.service.resource.user.client.TransactionClient
 import munoon.bank.service.resource.user.user.*
 import org.slf4j.LoggerFactory
@@ -18,10 +18,10 @@ class ProfileController(private val userService: UserService,
     private val log = LoggerFactory.getLogger(ProfileController::class.java)
 
     @GetMapping
-    fun getProfile(@AuthenticationPrincipal authorizedUser: AuthorizedUser): UserToWithCards {
+    fun getProfile(@AuthenticationPrincipal authorizedUser: AuthorizedUser): FullUserToWithCards {
         log.info("User ${authorizedUser.id} get his profile")
         val cards = transactionClient.getCardsByUserId(authorizedUser.id)
-        return userService.getById(authorizedUser.id).asTo(cards)
+        return userService.getById(authorizedUser.id).asFullTo(cards)
     }
 
     @PutMapping("/password")
@@ -32,8 +32,8 @@ class ProfileController(private val userService: UserService,
     }
 
     @PutMapping
-    fun updateUsername(@Valid @RequestBody updateUsernameTo: UpdateUsernameTo): UserTo {
+    fun updateUsername(@Valid @RequestBody updateUsernameTo: UpdateUsernameTo): FullUserTo {
         log.info("User ${authUserId()} updated his username to '${updateUsernameTo.newUsername}'")
-        return userService.updateUser(authUserId(), updateUsernameTo).asTo()
+        return userService.updateUser(authUserId(), updateUsernameTo).asFullTo()
     }
 }

@@ -1,8 +1,8 @@
 package munoon.bank.service.transactional.transaction
 
 import lombok.NoArgsConstructor
+import munoon.bank.common.validation.money.ValidMoneyCount
 import munoon.bank.service.transactional.card.CardDataTo
-import munoon.bank.service.transactional.util.validation.ValidMoneyCount
 import org.hibernate.validator.constraints.Length
 import javax.validation.Valid
 

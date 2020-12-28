@@ -1,7 +1,7 @@
 package munoon.bank.service.resource.user.controller
 
 import munoon.bank.common.SecurityUtils.authUserId
-import munoon.bank.common.user.UserTo
+import munoon.bank.common.user.FullUserTo
 import munoon.bank.common.validation.pageable.size.PageSize
 import munoon.bank.service.resource.user.client.TransactionClient
 import munoon.bank.service.resource.user.config.ClassesProperties
@@ -30,9 +30,9 @@ class AdminController(private val userService: UserService,
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun getUsersList(@Valid @PageSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
-                     @Valid @ValidClass @RequestParam("class") clazz: String): Page<UserTo> {
+                     @Valid @ValidClass @RequestParam("class") clazz: String): Page<FullUserTo> {
         log.info("User ${authUserId()} get users list by class $clazz: $pageable")
-        return userService.getAll(pageable, clazz).map { it.asTo() }
+        return userService.getAll(pageable, clazz).map { it.asFullTo() }
     }
 
     @GetMapping("/classes")
@@ -45,37 +45,37 @@ class AdminController(private val userService: UserService,
     @GetMapping("/find")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     fun findUser(@Valid @PageSize(max = 20) @PageableDefault(size = 10, page = 0) pageable: Pageable,
-                 @Valid @Length(min = 3, max = 30) @RequestParam query: String): Page<UserTo> {
+                 @Valid @Length(min = 3, max = 30) @RequestParam query: String): Page<FullUserTo> {
         log.info("User ${authUserId()} find user by query '$query' (page: $pageable)")
-        return userService.findUser(pageable, query).map { it.asTo() }
+        return userService.findUser(pageable, query).map { it.asFullTo() }
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
-    fun getUser(@PathVariable id: Int): UserToWithCards {
+    fun getUser(@PathVariable id: Int): FullUserToWithCards {
         log.info("User ${authUserId()} get user with id $id")
         val user = userService.getById(id)
         val cards = transactionClient.getCardsByUserId(id)
-        return user.asTo(cards)
+        return user.asFullTo(cards)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createUser(@Valid @RequestBody adminRegisterUserTo: AdminRegisterUserTo): UserTo {
+    fun createUser(@Valid @RequestBody adminRegisterUserTo: AdminRegisterUserTo): FullUserTo {
         log.info("Admin ${authUserId()} create user: $adminRegisterUserTo")
-        return userService.createUser(adminRegisterUserTo).asTo()
+        return userService.createUser(adminRegisterUserTo).asFullTo()
     }
 
     @PutMapping("/{id}")
-    fun updateUser(@PathVariable id: Int, @Valid @RequestBody userTo: AdminUpdateUserTo): UserTo {
+    fun updateUser(@PathVariable id: Int, @Valid @RequestBody userTo: AdminUpdateUserTo): FullUserTo {
         log.info("Admin ${authUserId()} updated user $id: $userTo")
-        return userService.updateUser(id, userTo).asTo()
+        return userService.updateUser(id, userTo).asFullTo()
     }
 
     @PutMapping("/{id}/password")
-    fun updateUserPassword(@PathVariable id: Int, @Valid @RequestBody userTo: AdminUpdateUserPasswordTo): UserTo {
+    fun updateUserPassword(@PathVariable id: Int, @Valid @RequestBody userTo: AdminUpdateUserPasswordTo): FullUserTo {
         log.info("Admin ${authUserId()} updated user $id password")
-        return userService.updateUser(id, userTo).asTo()
+        return userService.updateUser(id, userTo).asFullTo()
     }
 
     @DeleteMapping("/{id}")

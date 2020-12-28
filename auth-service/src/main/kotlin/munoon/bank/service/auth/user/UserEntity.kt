@@ -34,6 +34,9 @@ data class UserEntity(
         @Column(name = "class", nullable = false)
         val clazz: String,
 
+        @Column(name = "salary")
+        val salary: Double,
+
         @JsonInclude
         @Enumerated(EnumType.STRING)
         @Column(name = "role", nullable = false)

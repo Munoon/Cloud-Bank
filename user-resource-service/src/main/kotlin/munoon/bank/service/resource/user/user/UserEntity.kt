@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.pozo.KotlinBuilder
 import lombok.NoArgsConstructor
 import munoon.bank.common.user.UserRoles
-import munoon.bank.service.resource.user.util.validator.ValidClass
+import munoon.bank.common.validation.money.ValidMoneyCount
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -55,6 +55,10 @@ data class UserEntity(
         @field:Length(min = 1, max = 20)
         @Column(name = "class", nullable = false)
         var clazz: String,
+
+        @field:ValidMoneyCount
+        @Column(name = "salary")
+        var salary: Double?,
 
         @JsonInclude
         @field:NotNull

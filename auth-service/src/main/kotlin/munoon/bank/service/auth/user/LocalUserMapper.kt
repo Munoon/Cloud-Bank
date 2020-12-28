@@ -1,4 +1,4 @@
-package munoon.bank.service.auth.user
+ package munoon.bank.service.auth.user
 
 import munoon.bank.common.user.User
 import org.mapstruct.Mapper

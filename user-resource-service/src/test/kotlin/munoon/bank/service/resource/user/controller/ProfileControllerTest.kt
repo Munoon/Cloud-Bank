@@ -35,7 +35,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
         mockMvc.perform(get("/profile")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(UserTestData.DEFAULT_USER.asTo(expectedCards)))
+                .andExpect(contentJson(UserTestData.DEFAULT_USER.asFullTo(expectedCards)))
     }
 
     @Test
@@ -86,7 +86,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
                 .content(JsonUtils.writeValue(userTo))
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(expected.asTo()))
+                .andExpect(contentJson(expected.asFullTo()))
 
         val actual = userService.getById(UserTestData.USER_ID)
         assertMatch(actual, expected)

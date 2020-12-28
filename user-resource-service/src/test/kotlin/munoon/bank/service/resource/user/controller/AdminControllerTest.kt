@@ -2,8 +2,8 @@ package munoon.bank.service.resource.user.controller
 
 import munoon.bank.common.card.CardTo
 import munoon.bank.common.error.ErrorType
+import munoon.bank.common.user.FullUserTo
 import munoon.bank.common.user.User
-import munoon.bank.common.user.UserTo
 import munoon.bank.service.resource.user.AbstractWebTest
 import munoon.bank.service.resource.user.user.*
 import munoon.bank.service.resource.user.user.UserTestData.DEFAULT_USER
@@ -14,6 +14,7 @@ import munoon.bank.service.resource.user.user.UserTestData.contentJson
 import munoon.bank.service.resource.user.user.UserTestData.contentJsonPage
 import munoon.bank.service.resource.user.util.JsonUtils
 import munoon.bank.service.resource.user.util.JsonUtils.contentJsonList
+import munoon.bank.service.resource.user.util.JsonUtils.emptyJsonPage
 import munoon.bank.service.resource.user.util.ResponseExceptionValidator.error
 import munoon.bank.service.resource.user.util.ResponseExceptionValidator.fieldError
 import org.assertj.core.api.Assertions.assertThat
@@ -35,7 +36,7 @@ internal class AdminControllerTest : AbstractWebTest() {
 
     @Test
     fun getUsersList() {
-        val userTo = AdminRegisterUserTo("New", "User", "username", "password", "9", emptySet())
+        val userTo = AdminRegisterUserTo("New", "User", "username", "password", "9", 100.0, emptySet())
         val createdUser = userService.createUser(userTo)
 
         mockMvc.perform(get("/admin")
@@ -44,7 +45,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .param("class", USER_CLASS)
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonPage(DEFAULT_USER.asTo()))
+                .andExpect(contentJsonPage(DEFAULT_USER.asFullTo()))
 
         mockMvc.perform(get("/admin")
                 .param("page", "1")
@@ -52,7 +53,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .param("class", USER_CLASS)
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonPage())
+                .andExpect(emptyJsonPage())
 
         mockMvc.perform(get("/admin")
                 .param("page", "0")
@@ -60,7 +61,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .param("class", "9")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJsonPage(createdUser.asTo()))
+                .andExpect(contentJsonPage(createdUser.asFullTo()))
     }
 
     @Test
@@ -82,7 +83,7 @@ internal class AdminControllerTest : AbstractWebTest() {
         mockMvc.perform(get("/admin/$USER_ID")
                 .with(authUser()))
                 .andExpect(status().isOk())
-                .andExpect(contentJson(DEFAULT_USER.asTo(expectedCards)))
+                .andExpect(contentJson(DEFAULT_USER.asFullTo(expectedCards)))
     }
 
     @Test
@@ -102,10 +103,10 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isOk())
 
-        find("kit").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
-        find("che").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
-        find("${DEFAULT_USER.name} ${DEFAULT_USER.surname}").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
-        find("${DEFAULT_USER.surname} ${DEFAULT_USER.name}").andExpect(contentJsonPage(DEFAULT_USER.asTo()))
+        find("kit").andExpect(contentJsonPage(DEFAULT_USER.asFullTo()))
+        find("che").andExpect(contentJsonPage(DEFAULT_USER.asFullTo()))
+        find("${DEFAULT_USER.name} ${DEFAULT_USER.surname}").andExpect(contentJsonPage(DEFAULT_USER.asFullTo()))
+        find("${DEFAULT_USER.surname} ${DEFAULT_USER.name}").andExpect(contentJsonPage(DEFAULT_USER.asFullTo()))
     }
 
     @Test
@@ -129,7 +130,7 @@ internal class AdminControllerTest : AbstractWebTest() {
 
     @Test
     fun createUser() {
-        val userTo = AdminRegisterUserTo("New", "User", "username", "password", "10", emptySet())
+        val userTo = AdminRegisterUserTo("New", "User", "username", "password", "10", 100.0, emptySet())
 
         val result = mockMvc.perform(post("/admin")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -138,16 +139,16 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .andExpect(status().isCreated())
                 .andReturn()
 
-        val created = JsonUtils.readFromJson(result, UserTo::class.java)
+        val created = JsonUtils.readFromJson(result, FullUserTo::class.java)
 
-        val expected = User(created.id, "New", "User", "username", "password", "10", created.registered, emptySet())
+        val expected = User(created.id, "New", "User", "username", "password", "10", 100.0, created.registered, emptySet())
         assertMatch(userService.getAll(PageRequest.of(0, 10), USER_CLASS).content, DEFAULT_USER, expected)
         assertThat(passwordEncoder.matches("password", userService.getById(created.id).password)).isTrue()
     }
 
     @Test
     fun createUserInvalid() {
-        val userTo = AdminRegisterUserTo("", "", "", "", "invalid-class", emptySet())
+        val userTo = AdminRegisterUserTo("", "", "", "", "invalid-class", 100.0, emptySet())
 
         mockMvc.perform(post("/admin")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -159,21 +160,21 @@ internal class AdminControllerTest : AbstractWebTest() {
 
     @Test
     fun updateUser() {
-        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", emptySet())
+        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", 100.0, emptySet())
         mockMvc.perform(put("/admin/$USER_ID")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(userTo))
                 .with(authUser()))
                 .andExpect(status().isOk())
 
-        val expected = User(100, "NewName", "NewSurname", "test", "password", "10", LocalDateTime.now(), emptySet())
+        val expected = User(100, "NewName", "NewSurname", "test", "password", "10", 100.0, LocalDateTime.now(), emptySet())
         val actual = userService.getById(USER_ID)
         assertMatch(actual, expected)
     }
 
     @Test
     fun updateUserInvalid() {
-        val userTo = AdminUpdateUserTo("", "", "", "invalid-class", emptySet())
+        val userTo = AdminUpdateUserTo("", "", "", "invalid-class", 100.0, emptySet())
         mockMvc.perform(put("/admin/$USER_ID")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(userTo))
@@ -184,7 +185,7 @@ internal class AdminControllerTest : AbstractWebTest() {
 
     @Test
     fun updateUserNotFound() {
-        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", emptySet())
+        val userTo = AdminUpdateUserTo("NewName", "NewSurname", "test", "10", 100.0, emptySet())
         mockMvc.perform(put("/admin/999")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtils.writeValue(userTo))

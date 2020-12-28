@@ -13,6 +13,7 @@ CREATE TABLE users (
     username         VARCHAR                        NOT NULL,
     class            VARCHAR                        NOT NULL,
     password         VARCHAR                        NOT NULL,
+    salary           FLOAT,
     registered       TIMESTAMP DEFAULT now()        NOT NULL,
     UNIQUE (username)
 );
