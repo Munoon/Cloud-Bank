@@ -21,4 +21,7 @@ interface UserRepository : JpaRepository<UserEntity, Int> {
             "OR LOWER(CONCAT(u.name, ' ', u.surname)) LIKE %?1% " +
             "OR LOWER(CONCAT(u.surname, ' ', u.name)) LIKE %?1%")
     fun findByQuery(query: String, pageable: Pageable): Page<UserEntity>
+
+    @Query("FROM UserEntity u WHERE u.salary IS NOT NULL")
+    fun findAllWithSalary(pageable: Pageable): Page<UserEntity>
 }

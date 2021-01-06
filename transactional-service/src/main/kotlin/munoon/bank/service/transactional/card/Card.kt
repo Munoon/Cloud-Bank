@@ -30,8 +30,10 @@ data class Card(
 
         var active: Boolean,
 
+        var primary: Boolean,
+
         var registered: LocalDateTime
 ) {
         override fun toString() =
-                "Card(id=$id, userId=$userId, type='$type', number=$number, balance=$balance, active=$active, registered=$registered)"
+                "Card(id=$id, userId=$userId, type='$type', number=$number, balance=$balance, active=$active, primary=$primary, registered=$registered)"
 }

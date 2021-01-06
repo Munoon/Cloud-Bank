@@ -24,6 +24,16 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  batch:
+    initialize-schema: always
+    # disabling job auto-launching, don't touch this
+    job:
+      enabled: false
+
+  # will working only with profile 'salaryPayouter'
+  scheduling:
+    enabled: true
+
 security:
   oauth2:
     resource:

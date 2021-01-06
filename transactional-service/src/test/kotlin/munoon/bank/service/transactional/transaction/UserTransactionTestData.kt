@@ -18,11 +18,11 @@ object UserTransactionTestData {
         assertThat(actual)
                 .usingRecursiveComparison()
                 .ignoringFields("card.registered", "card.pinCode", "info.buyCard.pinCode", "info.buyCard.registered", "registered")
-                .isEqualTo(expected);
+                .isEqualTo(expected)
     }
 
     fun assertMatch(actual: SafeUserTransactionTo, expected: SafeUserTransactionTo) {
-        assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected);
+        assertThat(actual).usingRecursiveComparison().ignoringFields("registered").isEqualTo(expected)
     }
 
     fun assertMatchTo(actual: List<UserTransactionTo>, expected: List<UserTransactionTo>) {
@@ -70,5 +70,6 @@ object UserTransactionTestData {
         UserTransactionType.FINE -> JsonUtil.OBJECT_MAPPER.readValue<FineUserTransactionInfoTo>(info)
         UserTransactionType.RECEIVE_MONEY -> JsonUtil.OBJECT_MAPPER.readValue<ReceiveUserTransactionInfoTo>(info)
         UserTransactionType.TRANSLATE_MONEY -> JsonUtil.OBJECT_MAPPER.readValue<TranslateUserTransactionInfoTo>(info)
+        UserTransactionType.SALARY -> null
     }
 }

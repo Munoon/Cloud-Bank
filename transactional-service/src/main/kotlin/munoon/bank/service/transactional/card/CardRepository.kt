@@ -12,14 +12,19 @@ import java.util.*
 interface CardRepository : MongoRepository<Card, String>, UpdateCardRepository {
     fun countAllByUserIdAndType(userId: Int, type: String): Int
 
+    fun countAllByUserId(userId: Int): Int
+
     fun findAllByUserId(userId: Int): List<Card>
 
     fun findByNumber(number: String): Optional<Card>
+
+    fun findByUserIdAndPrimaryTrue(userId: Int): Optional<Card>
 }
 
 interface UpdateCardRepository {
     fun deactivateAllByUserId(userId: Int): UpdateResult
     fun deactivateCard(cardId: String): UpdateResult
+    fun makeAllUnPrimaryByUserId(userId: Int): UpdateResult
 }
 
 @Repository
@@ -33,6 +38,12 @@ class UpdateCardRepositoryImpl(private val mongoTemplate: MongoTemplate) : Updat
     override fun deactivateCard(cardId: String): UpdateResult {
         val query = Query(Criteria.where("id").`is`(cardId))
         val update = Update().apply { set("active", false) }
+        return mongoTemplate.updateMulti(query, update, Card::class.java)
+    }
+
+    override fun makeAllUnPrimaryByUserId(userId: Int): UpdateResult {
+        val query = Query(Criteria.where("userId").`is`(userId))
+        val update = Update().apply { set("primary", false) }
         return mongoTemplate.updateMulti(query, update, Card::class.java)
     }
 }

@@ -27,7 +27,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
     fun makeTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
 
         assertMatch(cardService.getCardsByUserId(100), card.copy(balance = 85.0))
 
@@ -43,9 +43,9 @@ internal class UserTransactionServiceTest : AbstractTest() {
         }
 
         val data = BuyCardTransactionInfoData(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
 
-        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, true, LocalDateTime.now()))
+        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, active = true, primary = true, LocalDateTime.now()))
         userTransactionService.makeTransactionNextStep(transaction, AddCardTransactionInfoData(createdCard), 1)
 
         val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard), false)
@@ -56,7 +56,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
     fun getTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
         val expected = UserTransaction(transaction.id, card.copy(balance = 85.0), 85.0, 100.0, 85.0, transaction.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
         assertMatch(userTransactionService.getTransaction(transaction.id!!), expected)
     }
@@ -73,8 +73,8 @@ internal class UserTransactionServiceTest : AbstractTest() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val data1 = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
         val data2 = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 50.0, FineAwardType.FINE, null))
-        val transaction1 = userTransactionService.makeTransaction(data1)
-        val transaction2 = userTransactionService.makeTransaction(data2)
+        val transaction1 = userTransactionService.makeTransaction(data1)!!
+        val transaction2 = userTransactionService.makeTransaction(data2)!!
         val expected1 = UserTransaction(transaction1.id, card.copy(balance = 27.5), 85.0, 100.0, 85.0, transaction1.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), false)
         val expected2 = UserTransaction(transaction2.id, card.copy(balance = 27.5), 57.5, 50.0, 27.5, transaction1.registered, UserTransactionType.FINE, FineUserTransactionInfo(101, null), false)
         val actual = userTransactionService.getAll(setOf(transaction1.id!!, transaction2.id!!))
@@ -127,7 +127,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
         }
 
         val data = BuyCardTransactionInfoData(100, 100.0, CardDataTo(card.number!!, "1111"))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
         val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, null, false)
         assertMatch(userTransactionService.getTransactions(card.id!!, 100, PageRequest.of(0, 10)).content, expected)
     }
@@ -136,13 +136,13 @@ internal class UserTransactionServiceTest : AbstractTest() {
     fun cancelTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
 
         assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(85.0)
 
         userTransactionService.cancelTransaction(transaction.id!!, emptySet())
 
-        val expectedCard = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
+        val expectedCard = Card(card.id, 100, "default", "111111111111", "", 0.0, active = true, primary = true, card.registered)
         assertMatch(cardService.getCardById(card.id!!), expectedCard)
 
         val expected = UserTransaction(transaction.id, cardService.getCardById(card.id!!), 85.0, 100.0, 85.0, transaction.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), true)
@@ -160,7 +160,7 @@ internal class UserTransactionServiceTest : AbstractTest() {
     fun cancelTransactionAlreadyCanceled() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
         userTransactionService.cancelTransaction(transaction.id!!, emptySet())
         assertThrows<ApplicationException> { userTransactionService.cancelTransaction(transaction.id!!, emptySet()) }
     }

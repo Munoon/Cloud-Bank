@@ -23,6 +23,8 @@ data class CardToWithOwner(
 
         val active: Boolean,
 
+        val primary: Boolean,
+
         val registered: LocalDateTime
 )
 

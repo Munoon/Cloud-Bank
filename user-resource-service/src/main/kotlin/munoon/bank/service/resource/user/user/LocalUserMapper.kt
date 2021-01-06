@@ -39,7 +39,6 @@ interface LocalUserMapper {
 fun UserEntity.asUser(): User = LocalUserMapper.INSTANCE.asUser(this)
 fun User.asTo(): UserTo = UserMapper.INSTANCE.asTo(this)
 fun User.asFullTo(): FullUserTo = UserMapper.INSTANCE.asFullTo(this)
-fun User.asTo(cards: List<CardTo>): UserToWithCards = LocalUserMapper.INSTANCE.asTo(this, cards)
 fun User.asFullTo(cards: List<CardTo>): FullUserToWithCards = LocalUserMapper.INSTANCE.asFullTo(this, cards)
 fun AdminRegisterUserTo.asEntity(passwordEncoder: PasswordEncoder) = LocalUserMapper.INSTANCE.asUserEntity(this, passwordEncoder)
 fun AdminUpdateUserTo.asEntity(entity: UserEntity) = LocalUserMapper.INSTANCE.asUserEntity(this, entity)

@@ -20,10 +20,12 @@ Contract.make {
         }
         body([[
                 id: $(consumer("CARD_ID"), producer(anyRegex())),
+                userId: 100,
                 type: "default",
                 number: "123456789012",
                 balance: 0.0,
                 active: true,
+                primary: true,
                 registered: $(consumer("2020-12-06T00:10"), producer(anyRegex()))
         ]])
     }

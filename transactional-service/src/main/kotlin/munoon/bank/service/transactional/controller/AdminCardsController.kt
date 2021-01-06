@@ -59,6 +59,13 @@ class AdminCardsController(private val cardService: CardService,
         cardService.updateCardPinCode(userId, cardId, adminUpdateCardPinCode.pinCode)
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/{userId}/{cardId}/primary")
+    fun changePrimaryCard(@PathVariable userId: Int, @PathVariable cardId: String) {
+        log.info("Admin ${authUserId()} make card '$cardId' primary for user $userId")
+        cardService.changePrimaryCard(userId, cardId)
+    }
+
     @PostMapping
     fun createCard(@Valid @RequestBody adminCreateCardTo: AdminCreateCardTo): CardToWithOwner {
         log.info("Admin ${authUserId()} create card: $adminCreateCardTo")

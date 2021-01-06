@@ -19,7 +19,7 @@ internal class LocalUserMapperTest {
 
     @Test
     fun asToWithCards() {
-        val card = CardTo("CARD", "default", "123456789012", 10.0, true, LocalDateTime.now())
+        val card = CardTo("CARD", 100, "default", "123456789012", 10.0, true, true, LocalDateTime.now())
         val expected = UserToWithCards(100, "Nikita", "Ivchenko", "munoon", "10", LocalDateTime.now(), UserTestData.DEFAULT_USER.roles, listOf(card))
         val actual = LocalUserMapper.INSTANCE.asTo(UserTestData.DEFAULT_USER, listOf(card))
         assertMatch(actual, expected)
@@ -27,7 +27,7 @@ internal class LocalUserMapperTest {
 
     @Test
     fun asFullToWithCards() {
-        val card = CardTo("CARD", "default", "123456789012", 10.0, true, LocalDateTime.now())
+        val card = CardTo("CARD", 100, "default", "123456789012", 10.0, true, true, LocalDateTime.now())
         val expected = FullUserToWithCards(100, "Nikita", "Ivchenko", "munoon", "10", 100.0, LocalDateTime.now(), UserTestData.DEFAULT_USER.roles, listOf(card))
         val actual = LocalUserMapper.INSTANCE.asFullTo(UserTestData.DEFAULT_USER, listOf(card))
         assertMatch(actual, expected)

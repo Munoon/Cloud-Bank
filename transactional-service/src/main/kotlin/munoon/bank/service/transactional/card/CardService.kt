@@ -6,6 +6,7 @@ import munoon.bank.service.transactional.transaction.AddCardTransactionInfoData
 import munoon.bank.service.transactional.transaction.BuyCardTransactionInfoData
 import munoon.bank.service.transactional.transaction.UserTransactionService
 import munoon.bank.service.transactional.util.NotEnoughBalanceException
+import munoon.bank.service.transactional.util.checkActive
 import munoon.bank.service.transactional.util.checkOwner
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -37,7 +38,8 @@ class CardService(private val cardRepository: CardRepository,
                     ?: throw AccessDeniedException("You should specify card for doing this operation.")))
         }
 
-        val card = cardMapper.asCard(buyCardTo, userId).let { cardRepository.save(it) }
+        val cardPrimary = cardRepository.countAllByUserId(userId) == 0
+        val card = cardMapper.asCard(buyCardTo, userId, cardPrimary).let { cardRepository.save(it) }
         if (userTransaction != null) {
             userTransactionService.makeTransactionNextStep(userTransaction, AddCardTransactionInfoData(card), 1)
         }
@@ -66,8 +68,17 @@ class CardService(private val cardRepository: CardRepository,
         cardRepository.save(card.copy(pinCode = newPinCode))
     }
 
+    fun changePrimaryCard(userId: Int, cardId: String) {
+        val card = getCardById(cardId)
+                .checkOwner(userId)
+                .checkActive()
+        cardRepository.makeAllUnPrimaryByUserId(userId)
+        cardRepository.save(card.copy(primary = true))
+    }
+
     fun createCard(adminCreateCardTo: AdminCreateCardTo): Card {
-        val card = cardMapper.asCard(adminCreateCardTo)
+        val primary = cardRepository.countAllByUserId(adminCreateCardTo.userId) == 0
+        val card = cardMapper.asCard(adminCreateCardTo, primary)
         return cardRepository.save(card)
     }
 
@@ -114,4 +125,7 @@ class CardService(private val cardRepository: CardRepository,
             throw NotFoundException("Card with id '$cardId' is not found!")
         }
     }
+
+    fun getPrimaryCardByUserId(userId: Int): Card = cardRepository.findByUserIdAndPrimaryTrue(userId)
+            .orElseThrow { NotFoundException("User $userId haven't primary card") }
 }

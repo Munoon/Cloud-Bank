@@ -29,14 +29,14 @@ internal class MicroserviceCardControllerTest : AbstractWebTest() {
                 .param("userId", "100"))
                 .andExpect(status().isNoContent())
 
-        val expected = Card(cardId, 100, "default", null, "", 0.0, false, LocalDateTime.now())
+        val expected = Card(cardId, 100, "default", null, "", 0.0, active = false, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
     }
 
     @Test
     fun getCardsByUserId() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now())
 
         mockMvc.perform(get("/microservices/card/100"))
                 .andExpect(status().isOk())

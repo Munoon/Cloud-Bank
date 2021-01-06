@@ -51,15 +51,17 @@ abstract class CardMapper {
             Mapping(target = "pinCode", expression = "java(passwordEncoder.encode(buyCardTo.getPinCode()))"),
             Mapping(target = "balance", constant = "0.0"),
             Mapping(target = "active", constant = "true"),
-            Mapping(target = "registered", expression = "java(java.time.LocalDateTime.now())")
+            Mapping(target = "registered", expression = "java(java.time.LocalDateTime.now())"),
+            Mapping(target = "primary", source = "primary")
     )
-    abstract fun asCard(buyCardTo: BuyCardTo, userId: Int): Card
+    abstract fun asCard(buyCardTo: BuyCardTo, userId: Int, primary: Boolean): Card
 
     @Mappings(
             Mapping(target = "id", expression = "java(null)"),
             Mapping(target = "balance", constant = "0.0"),
+            Mapping(target = "primary", source = "primary"),
             Mapping(target = "registered", expression = "java(java.time.LocalDateTime.now())"),
             Mapping(target = "pinCode", expression = "java(passwordEncoder.encode(source.getPinCode()))"),
     )
-    abstract fun asCard(source: AdminCreateCardTo): Card
+    abstract fun asCard(source: AdminCreateCardTo, primary: Boolean): Card
 }

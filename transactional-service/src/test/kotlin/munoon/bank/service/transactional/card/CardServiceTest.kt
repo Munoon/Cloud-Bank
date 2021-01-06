@@ -37,7 +37,7 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun buyFreeCard() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
 
         val actualCard = cardService.getCardById(card.id!!)
@@ -53,6 +53,7 @@ internal class CardServiceTest : AbstractTest() {
         }
 
         val goldCard = cardService.buyCard(100, BuyCardTo("gold", "1111", CardDataTo(defaultCardNumber, defaultCardPinCode)))
+        assertThat(goldCard.primary).isFalse()
         val page = transactionService.getTransactions(defaultCard.id!!, 100, PageRequest.of(0, 10))
         assertThat(page.content.size).isEqualTo(1)
         val expectedTransaction = UserTransaction(page.content[0].id, defaultCard.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(goldCard), false)
@@ -116,7 +117,7 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun getCardsByUserId() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
     }
 
@@ -127,7 +128,7 @@ internal class CardServiceTest : AbstractTest() {
             cardRepository.save(it.copy(number = cardNumber))
         }
 
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardByNumberAndValidatePinCode(cardNumber, "1111"), expected)
     }
 
@@ -148,7 +149,7 @@ internal class CardServiceTest : AbstractTest() {
             cardRepository.save(it.copy(number = cardNumber))
         }
 
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardByNumber(cardNumber), expected)
     }
 
@@ -159,7 +160,7 @@ internal class CardServiceTest : AbstractTest() {
         }
         cardService.minusMoney(card, 100.0)
 
-        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardById(card.id!!), expected)
     }
 
@@ -189,7 +190,7 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun getCardById() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardById(card.id!!), expected)
     }
 
@@ -197,7 +198,7 @@ internal class CardServiceTest : AbstractTest() {
     fun createCard() {
         val createCard = AdminCreateCardTo(100, "default", "111111111111", "1111", true)
         val card = cardService.createCard(createCard)
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
         assertThat(passwordEncoder.matches("1111", cardService.getCardById(card.id!!).pinCode)).isTrue()
     }
@@ -215,7 +216,7 @@ internal class CardServiceTest : AbstractTest() {
     fun updateCard() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
         cardService.updateCard(100, card.id!!, AdminUpdateCardTo(101, "gold", "111111111111", true))
-        val expected = Card(card.id, 101, "gold", "111111111111", "", 0.0, true, card.registered)
+        val expected = Card(card.id, 101, "gold", "111111111111", "", 0.0, active = true, primary = true, registered = card.registered)
         assertMatch(cardService.getCardsByUserId(101), expected)
     }
 
@@ -269,8 +270,8 @@ internal class CardServiceTest : AbstractTest() {
     @Test
     fun cardWithOutNumberNotUnique() {
         assertDoesNotThrow {
-            cardRepository.save(Card(null, 100, "default", null, "", 0.0, true, LocalDateTime.now()))
-            cardRepository.save(Card(null, 100, "default", null, "", 0.0, true, LocalDateTime.now()))
+            cardRepository.save(Card(null, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now()))
+            cardRepository.save(Card(null, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now()))
         }
     }
 
@@ -313,7 +314,7 @@ internal class CardServiceTest : AbstractTest() {
 
         cardService.deactivateAllByOwner(100)
 
-        val expected = Card(cardId, 100, "default", null, "", 0.0, false, LocalDateTime.now())
+        val expected = Card(cardId, 100, "default", null, "", 0.0, active = false, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
 
         assertThat(cardService.getCardById(cardId2!!).active).isTrue()
@@ -332,5 +333,44 @@ internal class CardServiceTest : AbstractTest() {
         assertThrows<NotFoundException> {
             cardService.deactivateCard("abc")
         }
+    }
+
+    @Test
+    fun changePrimaryCard() {
+        val card1 = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        val card2 = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+
+        assertThat(card1.primary).isTrue()
+        assertThat(card2.primary).isFalse()
+
+        cardService.changePrimaryCard(100, card2.id!!)
+
+        assertMatch(cardService.getCardById(card1.id!!), card1.copy(primary = false))
+        assertMatch(cardService.getCardById(card2.id!!), card2.copy(primary = true))
+    }
+
+    @Test
+    fun changePrimaryCardNotOwn() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        assertThrows<AccessDeniedException> { cardService.changePrimaryCard(999, card.id!!) }
+    }
+
+    @Test
+    fun changePrimaryCardNotActive() {
+        val card = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", false))
+        assertThrows<AccessDeniedException> { cardService.changePrimaryCard(100, card.id!!) }
+    }
+
+    @Test
+    fun getPrimaryCardByUserId() {
+        val card1 = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+
+        assertMatch(cardService.getPrimaryCardByUserId(100), card1)
+    }
+
+    @Test
+    fun getPrimaryCardByUserIdNotFound() {
+        assertThrows<NotFoundException> { cardService.getPrimaryCardByUserId(100) }
     }
 }

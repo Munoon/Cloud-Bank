@@ -16,7 +16,7 @@ import org.springframework.util.Assert
 class UserTransactionService(private val userTransactionRepository: UserTransactionRepository,
                              @Lazy private val transactionOperators: List<TransactionOperator>,
                              @Lazy private val cardService: CardService) {
-    fun makeTransaction(transactionInfoData: TransactionInfoData): UserTransaction {
+    fun makeTransaction(transactionInfoData: TransactionInfoData): UserTransaction? {
         val type = transactionInfoData.transactionType
         val operator = transactionOperators.find { it.check(type) }
                 ?: throw NotFoundException("Operator for transaction type $type is not found!")

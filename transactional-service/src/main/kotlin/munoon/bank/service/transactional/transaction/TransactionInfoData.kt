@@ -32,3 +32,10 @@ data class TranslateMoneyTransactionInfoData(
 ) : TransactionInfoData {
     override val transactionType = UserTransactionType.TRANSLATE_MONEY
 }
+
+data class SalaryTransactionInfoData(
+        val userId: Int,
+        val count: Double
+) : TransactionInfoData {
+    override val transactionType = UserTransactionType.SALARY
+}

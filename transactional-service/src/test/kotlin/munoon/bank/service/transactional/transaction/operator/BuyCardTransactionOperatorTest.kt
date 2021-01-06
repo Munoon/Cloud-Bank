@@ -68,7 +68,7 @@ internal class BuyCardTransactionOperatorTest : AbstractTest() {
         val data = BuyCardTransactionInfoData(100, 100.0, CardDataTo(card.number!!, "1111"))
         val transaction = buyCardTransactionOperator.createTransaction(data)
 
-        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, true, LocalDateTime.now()))
+        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, active = true, primary = true, LocalDateTime.now()))
         buyCardTransactionOperator.createTransactionNextStep(transaction, AddCardTransactionInfoData(createdCard), 1)
 
         val expected = UserTransaction(transaction.id, card.copy(balance = 885.0), 115.0, 100.0, 885.0, LocalDateTime.now(), UserTransactionType.CARD_BUY, BuyCardUserTransactionInfo(createdCard), false)
@@ -84,7 +84,7 @@ internal class BuyCardTransactionOperatorTest : AbstractTest() {
         val data = BuyCardTransactionInfoData(100, 100.0, CardDataTo(card.number!!, "1111"))
         val transaction = buyCardTransactionOperator.createTransaction(data)
 
-        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, true, LocalDateTime.now()))
+        val createdCard = cardRepository.save(Card(null, 100, "default", "121212121212", "{noop}1111", 0.0, active = true, primary = true, LocalDateTime.now()))
 
         assertThrows<IllegalArgumentException> {
             buyCardTransactionOperator.createTransactionNextStep(transaction, AddCardTransactionInfoData(createdCard), 2)

@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 public class CardTo {
     private String id;
 
+    private int userId;
+
     private String type;
 
     private String number;
@@ -20,9 +22,11 @@ public class CardTo {
 
     private boolean active;
 
+    private boolean primary;
+
     private LocalDateTime registered;
 
     public CardTo(CardTo c) {
-        this(c.getId(), c.getType(), c.getNumber(), c.getBalance(), c.isActive(), c.getRegistered());
+        this(c.getId(), c.getUserId(), c.getType(), c.getNumber(), c.getBalance(), c.isActive(), c.isPrimary(), c.getRegistered());
     }
 }

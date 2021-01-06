@@ -33,7 +33,7 @@ internal class AdminCardsControllerTest : AbstractWebTest() {
     @Test
     fun getCardsByUser() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, active = true, primary = true, card.registered)
 
         mockMvc.perform(get("/admin/cards/100")
                 .with(authUser()))
@@ -45,7 +45,7 @@ internal class AdminCardsControllerTest : AbstractWebTest() {
     fun getCardByNumber() {
         val cardNumber = "123456789012"
         val card = cardService.createCard(AdminCreateCardTo(100, "default", cardNumber, "1111", true))
-        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, true, card.registered)
+        val expected = Card(card.id, 100, "default", cardNumber, "", 0.0, active = true, primary = true, card.registered)
 
         mockMvc.perform(get("/admin/cards/number/$cardNumber")
                 .with(authUser()))
@@ -72,7 +72,7 @@ internal class AdminCardsControllerTest : AbstractWebTest() {
     @Test
     fun getCardById() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, active = true, primary = true, card.registered)
 
         mockMvc.perform(get("/admin/cards/100/${card.id}")
                 .with(authUser()))
@@ -108,7 +108,7 @@ internal class AdminCardsControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isOk())
 
-        val expected = Card(card.id, 101, "gold", "222222222222", "", 0.0, false, card.registered)
+        val expected = Card(card.id, 101, "gold", "222222222222", "", 0.0, active = false, primary = true, card.registered)
         assertMatch(cardService.getCardsByUserId(101), expected)
     }
 
@@ -195,7 +195,7 @@ internal class AdminCardsControllerTest : AbstractWebTest() {
                 .andReturn()
 
         val card = JsonUtil.readFromJson(result, CardToWithOwner::class.java)
-        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, true, card.registered)
+        val expected = Card(card.id, 100, "default", "111111111111", "", 0.0, active = true, primary = true, card.registered)
         assertMatch(cardService.getCardsByUserId(100), expected)
         assertThat(passwordEncoder.matches("1111", cardService.getCardById(card.id).pinCode)).isTrue()
         assertMatch(card.owner!!, UserTestData.DEFAULT_USER_TO)
@@ -209,5 +209,21 @@ internal class AdminCardsControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(fieldError("type", "number", "pinCode"))
+    }
+
+    @Test
+    fun changePrimaryCard() {
+        val card1 = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        val card2 = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+
+        assertThat(card1.primary).isTrue()
+        assertThat(card2.primary).isFalse()
+
+        mockMvc.perform(put("/admin/cards/100/${card2.id!!}/primary")
+                .with(authUser()))
+                .andExpect(status().isNoContent())
+
+        assertMatch(cardService.getCardById(card1.id!!), card1.copy(primary = false))
+        assertMatch(cardService.getCardById(card2.id!!), card2.copy(primary = true))
     }
 }

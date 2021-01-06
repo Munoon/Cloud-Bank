@@ -27,7 +27,7 @@ class AdminTransactionController(private val transactionService: UserTransaction
         log.info("Admin ${authUserId()} make fine or award: $fineAwardData")
         val data = FineAwardTransactionInfoData(authUserId(), fineAwardData)
         val transaction = transactionService.makeTransaction(data)
-        return transactionMapper.asToWithUnSafeInfo(transaction)
+        return transactionMapper.asToWithUnSafeInfo(transaction!!)
     }
 
     @GetMapping("/card/{cardId}")

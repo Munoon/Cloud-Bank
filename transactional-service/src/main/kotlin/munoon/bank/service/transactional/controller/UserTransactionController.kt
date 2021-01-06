@@ -31,6 +31,6 @@ class UserTransactionController(private val transactionService: UserTransactionS
         log.info("User ${authUserId()} translate money: $translateMoneyDataTo")
         val data = TranslateMoneyTransactionInfoData(authUserId(), translateMoneyDataTo)
         val transaction = transactionService.makeTransaction(data)
-        return transactionMapper.asToWithSafeInfo(transaction)
+        return transactionMapper.asToWithSafeInfo(transaction!!)
     }
 }

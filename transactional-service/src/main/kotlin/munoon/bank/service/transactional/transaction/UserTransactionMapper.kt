@@ -1,5 +1,6 @@
 package munoon.bank.service.transactional.transaction
 
+import munoon.bank.common.transaction.to.SalaryUserTransactionInfoTo
 import munoon.bank.common.user.UserTo
 import munoon.bank.service.transactional.card.CardMapper
 import munoon.bank.service.transactional.card.CardToWithOwner
@@ -21,6 +22,9 @@ abstract class UserTransactionMapper {
 
     @Autowired
     protected lateinit var cardMapper: CardMapper
+
+    @Mapping(target = "card", expression = "java(cardMapper.asTo(userTransaction.getCard()))")
+    abstract fun asPaySalaryTo(userTransaction: UserTransaction): SalaryUserTransactionInfoTo
 
     // To UserTransactionTo with unsafe info
 

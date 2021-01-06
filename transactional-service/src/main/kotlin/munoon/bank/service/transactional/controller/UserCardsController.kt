@@ -1,5 +1,6 @@
 package munoon.bank.service.transactional.controller
 
+import munoon.bank.common.SecurityUtils.authUser
 import munoon.bank.common.SecurityUtils.authUserId
 import munoon.bank.common.card.CardTo
 import munoon.bank.service.transactional.card.BuyCardTo
@@ -37,5 +38,12 @@ class UserCardsController(private val cardService: CardService,
     fun updateCardPinCode(@PathVariable cardId: String, @Valid @RequestBody updatePinCode: UserUpdateCardPinCode) {
         log.info("User ${authUserId()} update pinCode of card '$cardId'")
         cardService.updateCardPinCode(authUserId(), cardId, updatePinCode)
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/{cardId}/primary")
+    fun changePrimaryCard(@PathVariable cardId: String) {
+        log.info("User ${authUser()} make card '$cardId' primary")
+        cardService.changePrimaryCard(authUserId(), cardId)
     }
 }

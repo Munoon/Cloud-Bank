@@ -29,7 +29,7 @@ internal class ProfileControllerTest : AbstractWebTest() {
 
     @Test
     fun getProfile() {
-        val expectedCard = CardTo("CARD_ID", "default", "123456789012", 0.0, true, LocalDateTime.of(2020, 12, 6, 0, 10))
+        val expectedCard = CardTo("CARD_ID", 100, "default", "123456789012", 0.0, true, true, LocalDateTime.of(2020, 12, 6, 0, 10))
         val expectedCards = listOf(expectedCard)
 
         mockMvc.perform(get("/profile")

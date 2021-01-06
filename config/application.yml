@@ -17,6 +17,7 @@ application:
         award: 5.0
         fine: 5.0
         translate: 5.0
+        salary: 5.0
         other: 5.0
     gold:
       name: "Gold"
@@ -26,6 +27,7 @@ application:
         award: 0.0
         fine: 0.0
         translate: 0.0
+        salary: 0.0
         other: 0.0
 
 databases:
@@ -41,6 +43,10 @@ databases:
     database: bank-transactions
     username: mongodb
     password: password
+
+cron:
+  # at 10:00 each first day of month
+  salaryPayout: 0 0 10 1 * *
 
 jwt:
   keyValue: |

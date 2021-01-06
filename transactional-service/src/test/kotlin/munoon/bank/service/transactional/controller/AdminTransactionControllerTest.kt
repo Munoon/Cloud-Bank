@@ -149,7 +149,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
         mockWhen(userService.getUsersById(setOf(100, 101))).thenReturn(usersMap)
 
         val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, "abc"))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
         val expected = UserTransaction(transaction.id, card.copy(balance = 1085.0), 85.0, 100.0, 1085.0, LocalDateTime.now(), UserTransactionType.AWARD, AwardUserTransactionInfo(101, "abc"), false)
 
         mockMvc.perform(get("/admin/transaction/card/${card.id}")
@@ -171,7 +171,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
     fun cancelTransaction() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
         assertThat(cardService.getCardById(card.id!!).balance).isEqualTo(85.0)
 
         val expected = UserTransaction(transaction.id, card.copy(balance = 0.0), 85.0, 100.0, 85.0, transaction.registered, UserTransactionType.AWARD, AwardUserTransactionInfo(101, null), true)
@@ -197,7 +197,7 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
     fun cancelTransactionCanceled() {
         val card = cardService.createCard(AdminCreateCardTo(100, "default", "111111111111", "1111", true))
         val data = FineAwardTransactionInfoData(101, FineAwardDataTo(card.number!!, 100.0, FineAwardType.AWARD, null))
-        val transaction = userTransactionService.makeTransaction(data)
+        val transaction = userTransactionService.makeTransaction(data)!!
         userTransactionService.cancelTransaction(transaction.id!!, emptySet())
 
         mockMvc.perform(post("/admin/transaction/${transaction.id}/cancel")

@@ -39,7 +39,7 @@ internal class UserCardsControllerTest : AbstractWebTest() {
                 .andReturn()
 
         val card = JsonUtil.readFromJson(result, CardTo::class.java)
-        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now())
         assertMatch(cardService.getCardsByUserId(100), expected)
 
         val actualCard = cardService.getCardById(card.id)
@@ -59,7 +59,7 @@ internal class UserCardsControllerTest : AbstractWebTest() {
     @Test
     fun getCards() {
         val card = cardService.buyCard(100, BuyCardTo("default", "1111", null))
-        val expected = Card(card.id, 100, "default", null, "", 0.0, true, LocalDateTime.now())
+        val expected = Card(card.id, 100, "default", null, "", 0.0, active = true, primary = true, LocalDateTime.now())
 
         mockMvc.perform(get("/cards")
                 .with(authUser()))
@@ -113,5 +113,21 @@ internal class UserCardsControllerTest : AbstractWebTest() {
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(fieldError("oldPinCode"))
+    }
+
+    @Test
+    fun changePrimaryCard() {
+        val card1 = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+        val card2 = cardService.createCard(AdminCreateCardTo(100, "default", null, "1111", true))
+
+        assertThat(card1.primary).isTrue()
+        assertThat(card2.primary).isFalse()
+
+        mockMvc.perform(post("/cards/${card2.id}/primary")
+                .with(authUser()))
+                .andExpect(status().isNoContent())
+
+        assertThat(cardService.getCardById(card2.id!!).primary).isTrue()
+        assertThat(cardService.getCardById(card1.id!!).primary).isFalse()
     }
 }
