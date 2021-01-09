@@ -72,7 +72,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .param("class", "abc")
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(fieldError("getUsersList.pageable", "getUsersList.clazz"))
+                .andExpect(fieldError("getUsersList.clazz"))
     }
 
     @Test
@@ -117,7 +117,7 @@ internal class AdminControllerTest : AbstractWebTest() {
                 .param("query", "q")
                 .with(authUser()))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(fieldError("findUser.pageable", "findUser.query"))
+                .andExpect(fieldError("findUser.query"))
     }
 
     @Test

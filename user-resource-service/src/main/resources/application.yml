@@ -34,6 +34,11 @@ spring:
   scheduling:
     enabled: true
 
+  data:
+    web:
+      pageable:
+        max-page-size: 20
+
 security:
   oauth2:
     resource:

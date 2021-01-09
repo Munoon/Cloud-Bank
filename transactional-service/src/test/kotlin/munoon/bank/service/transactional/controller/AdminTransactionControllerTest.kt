@@ -22,9 +22,11 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.domain.PageRequest
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime
 import javax.ws.rs.core.MediaType
+import org.hamcrest.core.Is.`is` as equalsTo
 import org.mockito.Mockito.`when` as mockWhen
 
 internal class AdminTransactionControllerTest : AbstractWebTest() {
@@ -159,12 +161,12 @@ internal class AdminTransactionControllerTest : AbstractWebTest() {
     }
 
     @Test
-    fun getTransactionsListNotValid() {
+    fun getTransactionsListIsBig() {
         mockMvc.perform(get("/admin/transaction/card/abc")
                 .param("size", "100")
                 .with(authUser()))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(fieldError("getCardTransactions.pageable"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pageable.size", equalsTo(20)))
     }
 
     @Test

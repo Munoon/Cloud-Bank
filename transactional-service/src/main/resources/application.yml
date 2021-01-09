@@ -11,6 +11,10 @@ spring:
       username: ${databases.transactions.username}
       password: ${databases.transactions.password}
 
+    web:
+      pageable:
+        max-page-size: 20
+
   mvc:
     throw-exception-if-no-handler-found: true
 
