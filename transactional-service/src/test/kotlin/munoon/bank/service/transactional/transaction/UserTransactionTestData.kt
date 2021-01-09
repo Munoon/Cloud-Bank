@@ -71,5 +71,6 @@ object UserTransactionTestData {
         UserTransactionType.RECEIVE_MONEY -> JsonUtil.OBJECT_MAPPER.readValue<ReceiveUserTransactionInfoTo>(info)
         UserTransactionType.TRANSLATE_MONEY -> JsonUtil.OBJECT_MAPPER.readValue<TranslateUserTransactionInfoTo>(info)
         UserTransactionType.SALARY -> null
+        UserTransactionType.CARD_SERVICE -> null
     }
 }

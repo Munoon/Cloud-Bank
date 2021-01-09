@@ -41,5 +41,5 @@ data class UserTransaction(
 }
 
 enum class UserTransactionType {
-        CARD_BUY, AWARD, FINE, TRANSLATE_MONEY, RECEIVE_MONEY, SALARY
+        CARD_BUY, AWARD, FINE, TRANSLATE_MONEY, RECEIVE_MONEY, SALARY, CARD_SERVICE
 }

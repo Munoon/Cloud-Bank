@@ -103,7 +103,7 @@ abstract class UserTransactionMapper {
                 is FineUserTransactionInfo -> asTo(userTransaction.info, users)
                 is TranslateUserTransactionInfo -> asTo(userTransaction.info, users, transactions)
                 is ReceiveUserTransactionInfo -> asTo(userTransaction.info, users, transactions)
-                else -> null
+                null -> null
             }
 
     protected fun mapSafeInfo(userTransaction: UserTransaction,

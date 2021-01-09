@@ -12,6 +12,9 @@ spring:
       username: mongodb
       password: password
 
+  scheduling:
+    enabled: false
+
 security:
   oauth2:
     resource:
@@ -38,6 +41,7 @@ application:
     gold:
       name: "Gold"
       price: 100
+      service: 10.0
       ableToBuy: true
       tax:
         award: 0.0

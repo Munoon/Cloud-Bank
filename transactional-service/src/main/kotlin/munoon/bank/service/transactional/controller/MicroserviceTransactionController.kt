@@ -3,9 +3,7 @@ package munoon.bank.service.transactional.controller
 import munoon.bank.common.transaction.to.PaySalaryTransactionDataTo
 import munoon.bank.common.transaction.to.SalaryUserTransactionInfoTo
 import munoon.bank.common.util.MicroserviceUtils.getMicroserviceName
-import munoon.bank.service.transactional.transaction.SalaryTransactionInfoData
-import munoon.bank.service.transactional.transaction.UserTransactionMapper
-import munoon.bank.service.transactional.transaction.UserTransactionService
+import munoon.bank.service.transactional.transaction.*
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -24,5 +22,13 @@ class MicroserviceTransactionController(private val transactionService: UserTran
         val data = SalaryTransactionInfoData(paySalaryTransactionDataTo.userId, paySalaryTransactionDataTo.count)
         val transaction = transactionService.makeTransaction(data) ?: return null
         return transactionMapper.asPaySalaryTo(transaction)
+    }
+
+    @PostMapping("/payout/card/service")
+    fun payCardService(@RequestBody cardId: String): UserTransactionTo {
+        log.info("Microservice ${getMicroserviceName()} pay card service to card '$cardId'")
+        val data = CardServiceTransactionInfoData(cardId)
+        val transaction = transactionService.makeTransaction(data)
+        return transactionMapper.asToIgnoreInfo(transaction!!, emptyMap())
     }
 }

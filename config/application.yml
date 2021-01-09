@@ -23,6 +23,7 @@ application:
       name: "Gold"
       price: 100
       ableToBuy: true
+      service: 10.0
       tax:
         award: 0.0
         fine: 0.0
@@ -47,6 +48,8 @@ databases:
 cron:
   # at 10:00 each first day of month
   salaryPayout: 0 0 10 1 * *
+  # at 10:30 each first day of month
+  cardPayouterJob: 0 30 10 1 * *
 
 jwt:
   keyValue: |

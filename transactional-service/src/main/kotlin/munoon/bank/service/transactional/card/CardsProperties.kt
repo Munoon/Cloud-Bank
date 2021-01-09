@@ -13,6 +13,7 @@ class CardsProperties {
     class CardProperties {
         lateinit var name: String
         var price: Double = 0.0
+        var service: Double = 0.0
         var ableToBuy: Boolean = false
         var clientLimit: Int? = null
         var tax = Tax()

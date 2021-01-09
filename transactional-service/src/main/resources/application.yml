@@ -18,6 +18,15 @@ spring:
   mvc:
     throw-exception-if-no-handler-found: true
 
+  # disabling job auto-launching, don't touch this
+  batch:
+    job:
+      enabled: false
+
+  # will working only with profile 'cardServicePayouter'
+  scheduling:
+    enabled: true
+
 server:
   port: ${PORT:0}
   error:

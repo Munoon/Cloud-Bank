@@ -27,3 +27,7 @@ data class SalaryTransactionInfoData(
         val userId: Int,
         val count: Double
 ) : TransactionInfoData(UserTransactionType.SALARY)
+
+data class CardServiceTransactionInfoData(
+        val cardId: String
+) : TransactionInfoData(UserTransactionType.CARD_SERVICE)

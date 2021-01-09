@@ -4,7 +4,7 @@ import munoon.bank.service.transactional.card.Card
 import org.hibernate.validator.constraints.Length
 import org.springframework.data.mongodb.core.mapping.DBRef
 
-interface UserTransactionInfo
+sealed class UserTransactionInfo
 interface UsersCollector {
         fun getUsersId(): Set<Int>
 }
@@ -15,14 +15,14 @@ interface UserTransactionsIdCollector {
 data class BuyCardUserTransactionInfo(
         @DBRef
         var buyCard: Card
-) : UserTransactionInfo
+) : UserTransactionInfo()
 
 data class AwardUserTransactionInfo(
         var userId: Int,
 
         @field:Length(max = 200, message = "Сообщение слишком большое")
         var message: String?
-) : UserTransactionInfo, UsersCollector {
+) : UserTransactionInfo(), UsersCollector {
         override fun getUsersId(): Set<Int> = setOf(userId)
 }
 
@@ -31,7 +31,7 @@ data class FineUserTransactionInfo(
 
         @field:Length(max = 200, message = "Сообщение слишком большое")
         var message: String?
-) : UserTransactionInfo, UsersCollector {
+) : UserTransactionInfo(), UsersCollector {
         override fun getUsersId(): Set<Int> = setOf(userId)
 }
 
@@ -41,7 +41,7 @@ data class TranslateUserTransactionInfo(
 
         @field:Length(max = 200, message = "Сообщение слишком большое")
         var message: String?
-) : UserTransactionInfo, UsersCollector, UserTransactionsIdCollector {
+) : UserTransactionInfo(), UsersCollector, UserTransactionsIdCollector {
         override fun getUsersId(): Set<Int> = setOf(receiverUserId)
         override fun getTransactionsId(): Set<String> = setOf(receiveTransactionId)
 }
@@ -52,7 +52,7 @@ data class ReceiveUserTransactionInfo(
 
         @field:Length(max = 200, message = "Сообщение слишком большое")
         var message: String?
-) : UserTransactionInfo, UsersCollector, UserTransactionsIdCollector {
+) : UserTransactionInfo(), UsersCollector, UserTransactionsIdCollector {
         override fun getUsersId(): Set<Int> = setOf(translateUserId)
         override fun getTransactionsId(): Set<String> = setOf(translateTransactionId)
 }
