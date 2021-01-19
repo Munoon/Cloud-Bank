@@ -10,6 +10,7 @@
 
     <modules>
         <module>common</module>
+        <module>client</module>
         <module>config-service</module>
         <module>discovery-service</module>
         <module>auth-service</module>
@@ -23,6 +24,7 @@
         <spring-cloud.version>2020.0.0-M5</spring-cloud.version>
         <mapstruct.version>1.3.1.Final</mapstruct.version>
         <common.version>1.0-SNAPSHOT</common.version>
+        <client.frontend.version>1.0-SNAPSHOT</client.frontend.version>
         <kotlin.version>1.4.10</kotlin.version>
         <mapstruct.kotlin.processor.version>1.4.0.0</mapstruct.kotlin.processor.version>
         <maven.compiler-plugin.version>3.8.1</maven.compiler-plugin.version>
@@ -59,6 +61,11 @@
                 <version>${common.version}</version>
             </dependency>
             <dependency>
+                <groupId>munoon.bank</groupId>
+                <artifactId>frontend</artifactId>
+                <version>${client.frontend.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-feign</artifactId>
                 <version>${spring.feign.version}</version>
@@ -91,6 +98,11 @@
             <id>common</id>
             <name>Common classes</name>
             <url>file:///${project.basedir}/common</url>
+        </repository>
+        <repository>
+            <id>frontend</id>
+            <name>Frontend resources</name>
+            <url>file:///${project.basedir}/client/frontend</url>
         </repository>
         <repository>
             <id>spring-milestones</id>

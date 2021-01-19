@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_parameter" th:content="${_csrf.parameterName}">
+
+    <meta name="forms:login:url" th:value="@{/login}">
+
+    <title>Login</title>
+</head>
+<body></body>
+<script th:src="@{/static/js/login.min.js}" defer></script>
+</html>

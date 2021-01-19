@@ -14,6 +14,7 @@ class WebSecurityConfig(private val userService: UserService) : WebSecurityConfi
         http
                 .authorizeRequests()
                     .antMatchers("/login**").anonymous()
+                    .antMatchers("/static/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                 .csrf().and()
@@ -21,6 +22,7 @@ class WebSecurityConfig(private val userService: UserService) : WebSecurityConfi
                     .permitAll()
                     .and()
                 .formLogin()
+                    .loginPage("/login")
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {

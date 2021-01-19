@@ -26,6 +26,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
         </dependency>
@@ -57,6 +61,10 @@
         <dependency>
             <groupId>munoon.bank</groupId>
             <artifactId>common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>munoon.bank</groupId>
+            <artifactId>frontend</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
