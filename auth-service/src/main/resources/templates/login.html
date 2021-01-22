@@ -6,13 +6,15 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_parameter" th:content="${_csrf.parameterName}">
+    <meta name="tokens:csrf" th:content="${_csrf.token}">
+    <meta name="base_url" th:content="${#httpServletRequest.getContextPath()}">
 
-    <meta name="forms:login:url" th:value="@{/login}">
+    <link rel="stylesheet" th:href="@{/static/styles.css}">
 
     <title>Login</title>
 </head>
-<body></body>
+<body class="login-page">
+    <div id="root"></div>
+</body>
 <script th:src="@{/static/js/login.min.js}" defer></script>
 </html>

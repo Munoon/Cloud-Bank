@@ -1,13 +1,17 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
+
+const destinationPrefix = 'target/classes/frontend-scripts';
 
 module.exports = {
     entry: {
-        'js/login.min.js': path.join(__dirname, 'src/page/login/index.tsx')
+        'js/login.min.js': path.join(__dirname, 'src/page/login/index.tsx'),
+        'styles': path.join(__dirname, 'src/styles.scss')
     },
 
     output: {
-        path: path.join(__dirname, 'target/classes/frontend-scripts'),
+        path: path.join(__dirname, destinationPrefix),
         filename: '[name]'
     },
 
@@ -35,18 +39,30 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    { loader: 'css-loader', options: { url: false } },
+                    'postcss-loader'
+                ]
             },
             {
                 test: /\.s[ac]ss$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    'css-loader',
+                    { loader: 'css-loader', options: { url: false } },
+                    'postcss-loader',
                     'sass-loader',
                 ]
             }
         ]
     },
 
-    plugins: [new MiniCssExtractPlugin()]
+    plugins: [
+        new MiniCssExtractPlugin(),
+        new CopyPlugin({
+            patterns: [
+                { from: "./src/assets", to: path.join(__dirname, destinationPrefix + '/assets') }
+            ],
+        }),
+    ]
 };

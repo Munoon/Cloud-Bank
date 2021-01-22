@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.login-page {
+    background-image: url('./assets/bg/login_bg.png');
+    background-repeat: no-repeat;
+    background-size: auto;
+}
