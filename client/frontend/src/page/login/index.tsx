@@ -12,7 +12,7 @@ export const LoginPage = () => (
 );
 
 export const LoginHeader = () => (
-    <div className='h16 w-16 m-auto'>
+    <div className='h-16 w-16 m-auto'>
         <img src={`${readProperty('base_url')}/static/assets/icons/hello_hand.png`} alt='Hello hand icon'/>
     </div>
 );

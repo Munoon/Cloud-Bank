@@ -16,6 +16,7 @@
         <module>auth-service</module>
         <module>user-resource-service</module>
         <module>transactional-service</module>
+        <module>market-service</module>
     </modules>
 
     <properties>

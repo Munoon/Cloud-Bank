@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      name: market-service
+      uri: "http://localhost:8010"
+      username: test
+      password: test
