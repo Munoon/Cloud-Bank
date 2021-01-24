@@ -3,8 +3,9 @@ import {connect, ConnectedProps, useSelector} from 'react-redux';
 import {useForm} from 'react-hook-form';
 
 import {login} from './middleware';
-import {readProperty} from '../../utils/globalUtils';
-import {loginShowPassword, LoginState, LoginStoreStateType, LoginStoreType} from "./store";
+import {readProperty, testId} from '../../utils/globalUtils';
+import {loginShowPassword, LoginState, LoginStoreStateType} from "./reducer";
+import {LoginStoreType} from "./store";
 
 const connector = connect(null, { login });
 
@@ -32,10 +33,10 @@ const LoginForm = ({ login }: ConnectedProps<typeof connector>) => {
     );
 }
 
-const SubmitButton = ({ disabled }: { disabled: boolean }) => {
+export const SubmitButton = ({ disabled }: { disabled: boolean }) => {
     const loginState = useSelector((store: LoginStoreType) => store.login.state);
-    const shouldDisabled = disabled || loginState === LoginState.LOADING;
     const loginSuccess = loginState === LoginState.LOGGED_IN;
+    const shouldDisabled = disabled || loginState === LoginState.LOADING || loginSuccess;
     return (
         <button type="submit"
                 className={(loginSuccess ? 'bg-success' : 'bg-primary')
@@ -49,20 +50,20 @@ const failMessages: Record<string, string> = {
     'bad_credentials': 'Incorrect login or password!'
 };
 
-const FailMessage = () => {
+export const FailMessage = () => {
     const login: LoginStoreStateType = useSelector((store: LoginStoreType) => store.login);
     const loginFailed = login.state === LoginState.ERROR;
     if (!loginFailed) {
         return null;
     }
     const errorCode = login.errorData.errorCode;
-    if (errorCode && failMessages[errorCode] !== undefined) {
-        return <div>{failMessages[errorCode]}</div>;
-    }
-    return <div>{login.errorData.errorMessage}</div>
+    let message = errorCode && failMessages[errorCode] !== undefined
+        ? failMessages[errorCode]
+        : login.errorData.errorMessage;
+    return <div {...testId('login_form.error_message')} className='bg-red-500 p-3 w-full text-white'>{message}</div>
 }
 
-const SupportButtons = () => (
+export const SupportButtons = () => (
     <div className='flex items-center justify-between mt-1'>
         <ShowPasswordButton />
         <ForgotPasswordButton />
@@ -73,7 +74,7 @@ const showPasswordButtonConnector = connect(
     (state: LoginStoreType) => ({ showPassword: state.login.showPassword }),
     { loginShowPassword }
 );
-const ShowPasswordButton = showPasswordButtonConnector((props: ConnectedProps<typeof showPasswordButtonConnector>) => (
+export const ShowPasswordButton = showPasswordButtonConnector((props: ConnectedProps<typeof showPasswordButtonConnector>) => (
     <div className='flex items-center'>
         <input onChange={e => props.loginShowPassword(e.target.checked)}
                checked={props.showPassword}
@@ -85,7 +86,7 @@ const ShowPasswordButton = showPasswordButtonConnector((props: ConnectedProps<ty
     </div>
 ));
 
-const ForgotPasswordButton = () => (
+export const ForgotPasswordButton = () => (
     <div className="text-sm">
         <a href="#" className='font-medium text-indigo-600 hover:text-indigo-500 select-none'>Forgot password?</a>
     </div>
@@ -97,7 +98,7 @@ interface FormInputProps {
     placeholder?: string;
 }
 
-const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>((props, ref)  => (
+export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>((props, ref)  => (
     <input type={props.type} name={props.name} placeholder={props.placeholder} ref={ref}
            className="mt-10 bg-primary p-1 rounded-full w-full text-center text-white outline-none placeholder-secondary" />
 ));

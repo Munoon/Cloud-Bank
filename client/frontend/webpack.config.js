@@ -1,10 +1,11 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
+const { DefinePlugin } = require('webpack');
 
 const destinationPrefix = 'target/classes/frontend-scripts';
 
-module.exports = {
+module.exports = (env, options) => ({
     entry: {
         'js/login.min.js': path.join(__dirname, 'src/page/login/index.tsx'),
         'styles': path.join(__dirname, 'src/styles.scss')
@@ -64,5 +65,8 @@ module.exports = {
                 { from: "./src/assets", to: path.join(__dirname, destinationPrefix + '/assets') }
             ],
         }),
+        new DefinePlugin({
+            DEVELOPEMENT: JSON.stringify(options.mode === 'development')
+        })
     ]
-};
+});

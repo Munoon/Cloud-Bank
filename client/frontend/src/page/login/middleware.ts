@@ -1,7 +1,7 @@
 import {Dispatch} from 'redux';
 
 import {LoginFormData} from "./LoginForm";
-import {loginErrorAction, loginLoadingAction, loginLoggedInAction} from './store';
+import {loginErrorAction, loginLoadingAction, loginLoggedInAction} from './reducer';
 import {readProperty} from "../../utils/globalUtils";
 import fetcher from "../../utils/fetcher";
 
@@ -14,9 +14,8 @@ export const login = (data: LoginFormData) => async (dispatch: Dispatch) => {
     };
     try {
         const info = await fetcher<SuccessAuthenticationInfo>(url, { method: 'POST', params, redirect: 'manual' });
-        const redirectUrl = info.redirectUrl;
         dispatch(loginLoggedInAction());
-        location.href = redirectUrl;
+        location.href = info.redirectUrl;
     } catch (e) {
         const failAuthenticationInfo = e.response as FailAuthenticationInfo;
         dispatch(loginErrorAction(failAuthenticationInfo));

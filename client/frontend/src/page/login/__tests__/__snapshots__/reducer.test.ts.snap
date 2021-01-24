@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`login store reducer test snapshot tests loading 1`] = `
+Object {
+  "errorData": null,
+  "showPassword": false,
+  "state": "login_state:loading",
+}
+`;
+
+exports[`login store reducer test snapshot tests logged in 1`] = `
+Object {
+  "errorData": null,
+  "showPassword": false,
+  "state": "login_state:logged_in",
+}
+`;
+
+exports[`login store reducer test snapshot tests login error 1`] = `
+Object {
+  "errorData": Object {
+    "errorCode": "incorrect_password",
+    "errorMessage": "Incorrect password",
+  },
+  "showPassword": false,
+  "state": "login_state:error",
+}
+`;
+
+exports[`login store reducer test snapshot tests password toggle 1`] = `
+Object {
+  "errorData": null,
+  "showPassword": true,
+  "state": "login_state:idle",
+}
+`;
+
+exports[`login store reducer test snapshot tests password toggle 2`] = `
+Object {
+  "errorData": null,
+  "showPassword": false,
+  "state": "login_state:idle",
+}
+`;

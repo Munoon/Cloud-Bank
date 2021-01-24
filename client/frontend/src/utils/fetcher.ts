@@ -7,7 +7,7 @@ interface CustomRequestInit extends RequestInit {
     addCsrf?: boolean
 }
 
-export default function fetcher<T = any>(input: RequestInfo, init: CustomRequestInit): Promise<T> {
+export default function fetcher<T = any>(input: RequestInfo, init: CustomRequestInit = {}): Promise<T> {
     if (!init.headers) {
         init.headers = {};
     }
@@ -59,6 +59,6 @@ function parseFromJson(text: string) {
     try {
         return JSON.parse(text);
     } catch (e) {
-        return '';
+        return text;
     }
 }

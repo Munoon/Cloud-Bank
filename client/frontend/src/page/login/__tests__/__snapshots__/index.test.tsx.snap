@@ -1,0 +1,281 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Login header test Snapshot test 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="h16 w-16 m-auto"
+      >
+        <img
+          alt="Hello hand icon"
+          src="http://localhost/static/assets/icons/hello_hand.png"
+        />
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="h16 w-16 m-auto"
+    >
+      <img
+        alt="Hello hand icon"
+        src="http://localhost/static/assets/icons/hello_hand.png"
+      />
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
+
+exports[`Login page test Snapshot test 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="shadow-2xl w-1/4 min-w-min bg-white p-10 m-auto mt-10 login-panel self-center"
+      >
+        <div
+          class="h16 w-16 m-auto"
+        >
+          <img
+            alt="Hello hand icon"
+            src="http://localhost/static/assets/icons/hello_hand.png"
+          />
+        </div>
+        <form
+          action="http://localhost/login"
+          class="object-center font-mono mt-3"
+          method="post"
+        >
+          <input
+            name="_csrf"
+            type="hidden"
+            value="MOCK_CSRF_TOKEN"
+          />
+          <input
+            class="mt-10 bg-primary p-1 rounded-full w-full text-center text-white outline-none placeholder-secondary"
+            name="username"
+            placeholder="Username"
+          />
+          <input
+            class="mt-10 bg-primary p-1 rounded-full w-full text-center text-white outline-none placeholder-secondary"
+            name="password"
+            placeholder="Password"
+            type="password"
+          />
+          <div
+            class="flex items-center justify-between mt-1"
+          >
+            <div
+              class="flex items-center"
+            >
+              <input
+                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                id="showPassword"
+                type="checkbox"
+              />
+              <label
+                class="ml-2 block text-sm text-gray-900 select-none"
+                for="showPassword"
+              >
+                Show password
+              </label>
+            </div>
+            <div
+              class="text-sm"
+            >
+              <a
+                class="font-medium text-indigo-600 hover:text-indigo-500 select-none"
+                href="#"
+              >
+                Forgot password?
+              </a>
+            </div>
+          </div>
+          <button
+            class="bg-primary disabled:bg-disabled mt-10 p-1 transition rounded-full w-full text-center text-white focus:outline-none"
+            type="submit"
+          >
+            Sign in
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="shadow-2xl w-1/4 min-w-min bg-white p-10 m-auto mt-10 login-panel self-center"
+    >
+      <div
+        class="h16 w-16 m-auto"
+      >
+        <img
+          alt="Hello hand icon"
+          src="http://localhost/static/assets/icons/hello_hand.png"
+        />
+      </div>
+      <form
+        action="http://localhost/login"
+        class="object-center font-mono mt-3"
+        method="post"
+      >
+        <input
+          name="_csrf"
+          type="hidden"
+          value="MOCK_CSRF_TOKEN"
+        />
+        <input
+          class="mt-10 bg-primary p-1 rounded-full w-full text-center text-white outline-none placeholder-secondary"
+          name="username"
+          placeholder="Username"
+        />
+        <input
+          class="mt-10 bg-primary p-1 rounded-full w-full text-center text-white outline-none placeholder-secondary"
+          name="password"
+          placeholder="Password"
+          type="password"
+        />
+        <div
+          class="flex items-center justify-between mt-1"
+        >
+          <div
+            class="flex items-center"
+          >
+            <input
+              class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              id="showPassword"
+              type="checkbox"
+            />
+            <label
+              class="ml-2 block text-sm text-gray-900 select-none"
+              for="showPassword"
+            >
+              Show password
+            </label>
+          </div>
+          <div
+            class="text-sm"
+          >
+            <a
+              class="font-medium text-indigo-600 hover:text-indigo-500 select-none"
+              href="#"
+            >
+              Forgot password?
+            </a>
+          </div>
+        </div>
+        <button
+          class="bg-primary disabled:bg-disabled mt-10 p-1 transition rounded-full w-full text-center text-white focus:outline-none"
+          type="submit"
+        >
+          Sign in
+        </button>
+      </form>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;

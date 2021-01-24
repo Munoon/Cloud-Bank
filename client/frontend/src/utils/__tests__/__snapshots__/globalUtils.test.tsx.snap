@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render test Render test with store 1`] = `
+Array [
+  <Provider
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+  >
+    <h1>
+      test
+    </h1>
+  </Provider>,
+  null,
+]
+`;
+
+exports[`render test Render test without store 1`] = `
+Array [
+  <h1>
+    test
+  </h1>,
+  null,
+]
+`;
