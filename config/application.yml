@@ -37,6 +37,11 @@ databases:
     username: postgres
     password: password
     initialization-mode: always
+  market:
+    url: jdbc:postgresql://localhost:5432/bank-market
+    username: postgres
+    password: password
+    initialization-mode: always
   transactions:
     host: localhost
     port: 27017

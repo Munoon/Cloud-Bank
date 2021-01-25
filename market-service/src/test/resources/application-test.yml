@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank-users
+    username: postgres
+    password: password
+    initialization-mode: always
+
+eureka:
+  client:
+    enabled: false
+
+security:
+  oauth2:
+    resource:
+      jwt:
+        keyValue: SimpleKey

@@ -5,6 +5,14 @@ spring:
   mvc:
     throw-exception-if-no-handler-found: true
 
+  datasource:
+    url: ${databases.market.url}
+    username: ${databases.market.username}
+    password: ${databases.market.password}
+    driver-class-name: org.postgresql.Driver
+    schema: classpath:db/schema.sql
+    data: classpath:db/data.sql
+    initialization-mode: ${databases.market.initialization-mode}
 
 server:
   port: ${PORT:0}
