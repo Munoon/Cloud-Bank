@@ -5,6 +5,7 @@ import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.Mappings
 import org.mapstruct.factory.Mappers
+import org.springframework.data.domain.Page
 import java.time.LocalDateTime
 
 @Mapper(imports = [LocalDateTime::class])
@@ -17,10 +18,14 @@ interface ProductMapper {
 
     fun update(saveProductTo: SaveProductTo, @MappingTarget product: Product): Product
 
+    fun asTo(product: Product): ProductTo
+
     companion object {
         val INSTANCE: ProductMapper = Mappers.getMapper(ProductMapper::class.java)
     }
 }
 
+fun Product.asTo() = ProductMapper.INSTANCE.asTo(this)
+fun Page<Product>.asTo() = map { it.asTo() }
 fun Product.update(saveProductTo: SaveProductTo) = ProductMapper.INSTANCE.update(saveProductTo, this)
 fun SaveProductTo.asProduct() = ProductMapper.INSTANCE.create(this)

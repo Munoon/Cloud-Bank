@@ -1,6 +1,10 @@
 package munook.bank.service.market.product
 
+import com.fasterxml.jackson.module.kotlin.readValue
+import munook.bank.service.market.util.JsonUtil
+import munook.bank.service.market.util.JsonUtil.getContent
 import org.assertj.core.api.Assertions.assertThat
+import org.springframework.test.web.servlet.ResultMatcher
 import java.time.LocalDateTime
 
 object ProductTestData {
@@ -15,5 +19,24 @@ object ProductTestData {
 
     fun assertMatch(actual: Iterable<Product>, vararg expected: Product) {
         assertThat(actual).usingElementComparatorIgnoringFields("created").isEqualTo(expected.toList())
+    }
+
+    fun assertMatch(actual: ProductTo, expected: ProductTo) {
+        assertThat(actual).usingRecursiveComparison().ignoringFields("created").isEqualTo(expected)
+    }
+
+    fun assertMatch(actual: Iterable<ProductTo>, vararg expected: ProductTo) {
+        assertThat(actual).usingElementComparatorIgnoringFields("created").isEqualTo(expected.toList())
+    }
+
+    fun contentType(expected: ProductTo) = ResultMatcher {
+        val actual = JsonUtil.readFromJson(it, ProductTo::class)
+        assertMatch(actual, expected)
+    }
+
+    fun contentTypeList(vararg expected: ProductTo) = ResultMatcher {
+        val node = JsonUtil.OBJECT_MAPPER.readTree(getContent(it)).at("/content")
+        val actual = JsonUtil.OBJECT_MAPPER.readValue<List<ProductTo>>(node.toString())
+        assertMatch(actual, *expected)
     }
 }

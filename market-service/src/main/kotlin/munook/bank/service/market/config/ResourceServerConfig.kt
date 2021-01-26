@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import munoon.bank.common.AuthorizedUser
 import munoon.bank.common.auth.user.UserIdAuthenticationConverter
 import munoon.bank.common.config.JsonConfig
+import munoon.bank.common.error.RestExceptionHandler
 import munoon.bank.common.user.UserTo
 import munoon.bank.common.util.MicroserviceUtils
 import org.springframework.beans.factory.annotation.Value
@@ -31,7 +32,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @Configuration
 @EnableWebSecurity
 @EnableResourceServer
-@Import(JsonConfig::class)
+@Import(JsonConfig::class, RestExceptionHandler::class)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class ResourceServerConfig : ResourceServerConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {

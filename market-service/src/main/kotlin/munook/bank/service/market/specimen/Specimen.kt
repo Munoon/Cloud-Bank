@@ -2,6 +2,7 @@ package munook.bank.service.market.specimen
 
 import com.github.pozo.KotlinBuilder
 import munook.bank.service.market.product.Product
+import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -13,6 +14,7 @@ data class Specimen (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?,
 
+    @field:Length(min = 1, max = 200)
     @Column(name = "custom_id", nullable = false)
     var customId: String,
 

@@ -1,8 +1,11 @@
 package munook.bank.service.market.product
 
 import com.github.pozo.KotlinBuilder
+import munoon.bank.common.validation.money.ValidMoneyCount
+import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 import javax.persistence.*
+import javax.validation.constraints.Min
 
 @Entity
 @KotlinBuilder
@@ -12,6 +15,7 @@ data class Product(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?,
 
+    @field:Length(min = 1, max = 30)
     @Column(name = "name", nullable = false)
     var name: String,
 
@@ -19,9 +23,11 @@ data class Product(
     @Column(name = "type", nullable = false)
     var type: ProductType,
 
+    @field:Min(0)
     @Column(name = "count")
     var count: Int?,
 
+    @field:ValidMoneyCount
     @Column(name = "price", nullable = false)
     var price: Double,
 

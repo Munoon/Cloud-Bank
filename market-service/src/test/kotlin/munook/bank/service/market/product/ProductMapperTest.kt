@@ -19,4 +19,11 @@ class ProductMapperTest {
         val expected = Product(null, "test", ProductType.FIXED_SPECIMEN, 10, 15.0, true, actual.created)
         assertMatch(actual, expected)
     }
+
+    @Test
+    fun asTo() {
+        val product = Product(100, "Name", ProductType.UNFIXED_SPECIMEN, null, 10.0, true, LocalDateTime.now())
+        val expected = ProductTo(100, "Name", ProductType.UNFIXED_SPECIMEN, null, 10.0, true, LocalDateTime.now())
+        assertMatch(ProductMapper.INSTANCE.asTo(product), expected)
+    }
 }
