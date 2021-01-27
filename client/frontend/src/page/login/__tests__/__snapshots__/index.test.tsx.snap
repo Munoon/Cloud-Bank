@@ -6,7 +6,7 @@ Object {
   "baseElement": <body>
     <div>
       <div
-        class="h16 w-16 m-auto"
+        class="h-16 w-16 m-auto"
       >
         <img
           alt="Hello hand icon"
@@ -17,7 +17,7 @@ Object {
   </body>,
   "container": <div>
     <div
-      class="h16 w-16 m-auto"
+      class="h-16 w-16 m-auto"
     >
       <img
         alt="Hello hand icon"
@@ -85,10 +85,10 @@ Object {
   "baseElement": <body>
     <div>
       <div
-        class="shadow-2xl w-1/4 min-w-min bg-white p-10 m-auto mt-10 login-panel self-center"
+        class="shadow-2xl min-w-min bg-white p-10 m-auto mt-10 login-panel self-center w-5/6 md:w-1/2 max-w-sm"
       >
         <div
-          class="h16 w-16 m-auto"
+          class="h-16 w-16 m-auto"
         >
           <img
             alt="Hello hand icon"
@@ -157,10 +157,10 @@ Object {
   </body>,
   "container": <div>
     <div
-      class="shadow-2xl w-1/4 min-w-min bg-white p-10 m-auto mt-10 login-panel self-center"
+      class="shadow-2xl min-w-min bg-white p-10 m-auto mt-10 login-panel self-center w-5/6 md:w-1/2 max-w-sm"
     >
       <div
-        class="h16 w-16 m-auto"
+        class="h-16 w-16 m-auto"
       >
         <img
           alt="Hello hand icon"

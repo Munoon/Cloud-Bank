@@ -16,3 +16,5 @@ jobs:
         run: mvn install -DskipTests --file pom.xml
       - name: Test with Maven
         run: mvn surefire:test --file pom.xml
+      - name: Frontend test
+        run: mvn test -pl client/frontend
